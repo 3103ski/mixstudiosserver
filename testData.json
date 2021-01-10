@@ -1,0 +1,82 @@
+{
+    "Users": [
+        {
+            "userInfo": {
+                "username": "bjastski",
+                "email": "bjastski@gmail.com",
+                "languages": ["english"],
+                "firstName": "Bryan",
+                "lastName": "Jastrzembski",
+                "location": "Seattle, Wa"
+            },
+            "styleInfo": {
+                "music": {
+                    "confidentGenres": ["rock", "hip-hop", "acoutic", "pop", "country"],
+                    "lessExperiencedGenres": ["edm", "reggae", "latin"],
+                    "unwillingGenres": ["death-metal", "heavy-metal"]
+                },
+                "tv": {
+                    "doesOffer": false,
+                    "tvType": {
+                        "tvAndFilm": false,
+                        "commercials": false,
+                        "theater": false
+                    },
+                    "tvGenres": {
+                        "confidentGenres": [],
+                        "lessExperiencedGenres": [],
+                        "unwillingGenres": []
+                    },
+                    "tvMusic": {
+                        "offersService": false,
+                        "confidentGenres": [],
+                        "lessExperiencedGenres": [],
+                        "unwillingGenres": [],
+                        "moodes": [],
+                        "scenes": []
+                    }
+                },
+                "soundsLike": []
+            }
+        },
+        {
+            "userInfo": {
+                "username": "Tommy P",
+                "email": "tommypeluso@me.com",
+                "languages": ["english"],
+                "firstName": "Tommy",
+                "lastName": "Peluso",
+                "location": "Miami, Fl"
+            },
+            "styleInfo": {
+                "music": {
+                    "confidentGenres": ["rock", "hip-hop", "acoutic", "pop", "country"],
+                    "lessExperiencedGenres": ["edm", "reggae", "latin"],
+                    "unwillingGenres": ["death-metal", "heavy-metal"]
+                },
+                "tv": {
+                    "doesOffer": true,
+                    "types": {
+                        "tvAndFilm": true,
+                        "commercials": false,
+                        "theater": false
+                    },
+                    "tvGenres": {
+                        "confidentGenres": ["thriller", "action"],
+                        "lessExperiencedGenres": ["romance"],
+                        "unwillingGenres": []
+                    },
+                    "tvMusic": {
+                        "offersService": false,
+                        "confidentGenres": [],
+                        "lessExperiencedGenres": [],
+                        "unwillingGenres": [],
+                        "moodes": [],
+                        "scenes": []
+                    }
+                },
+                "soundsLike": []
+            }
+        }
+    ]
+}

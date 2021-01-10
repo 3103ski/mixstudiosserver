@@ -6,7 +6,6 @@ var logger = require('morgan');
 
 // Router Imports
 var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
 
 const userProfileRouter = require('./routes/userProfilesRouter');
 const serviceProfilesRouter = require('./routes/serviceProfileRouter/serviceProfilesRouter');
