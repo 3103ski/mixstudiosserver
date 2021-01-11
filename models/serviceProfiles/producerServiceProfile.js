@@ -8,6 +8,10 @@ const producerProfileSchema = new Schema(
 			type: String,
 			required: true,
 		},
+		serviceType: {
+			type: String,
+			default: 'producer',
+		},
 		emotionsAndFeelings: {
 			type: Array,
 			default: [],

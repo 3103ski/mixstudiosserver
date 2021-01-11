@@ -1,51 +1,108 @@
 const express = require('express');
-const fd = require('../../../constants/fakeData');
-const singerServiceProfiles = fd.singerServiceProfiles;
+const SingerServiceProfile = require('../../../models/serviceProfiles/singerServiceProfile');
 
 const singerProfileRouter = express.Router();
 
 singerProfileRouter
 	.route('/')
-	.all((req, res, next) => {
-		res.statusCode = 200;
-		res.setHeader('Content-Type', 'text/json');
-		next();
+	.get((req, res, next) => {
+		SingerServiceProfile.find()
+			.then((profiles) => {
+				res.statusCode = 200;
+				res.setHeader('Content-Type', 'application/json');
+				res.json(profiles);
+			})
+			.catch((err) => next(err));
 	})
-	.get((req, res) => {
-		res.send(singerServiceProfiles);
+	.post((req, res, next) => {
+		SingerServiceProfile.find({ userId: req.body.userId }).then((profiles) => {
+			if (profiles[0]) {
+				res.statusCode = 400;
+				res.setHeader('Content-Type', 'application/json');
+				res.end(`User ${req.body.userId} already has a singer service profile`);
+			} else {
+				SingerServiceProfile.create(req.body)
+					.then((profile) => {
+						res.statusCode = 200;
+						res.setHeader('Content-Type', 'application/json');
+						res.json(profile);
+					})
+					.catch((err) => next(err));
+			}
+		});
 	})
-	.post((req, res) => {
-		res.end('We will add the new singer service profile');
+	.delete((req, res, next) => {
+		SingerServiceProfile.deleteMany()
+			.then((response) => {
+				res.statusCode = 200;
+				res.setHeader('Content-Type', 'application/json');
+				res.json(response);
+			})
+			.catch((err) => next(err));
 	})
 	.put((req, res) => {
-		res.end('You cannot PUT at this endpoint');
-	})
-	.delete((req, res) => {
-		res.end('You cannot DELETE this endpoint');
+		res.statusCode = 405;
+		res.end('You cannot PUT at this endpoint.');
 	});
 
 singerProfileRouter
 	.route('/:userId')
-	.all((req, res, next) => {
-		res.statusCode = 200;
-		res.setHeader('Content-Type', 'text/json');
-		next();
-	})
-	.get((req, res) => {
+	.get((req, res, next) => {
 		const id = req.params.userId;
-		const profile = singerServiceProfiles.filter((profile) => profile.userId === id);
-		if (profile.length === 0) {
-			res.end(`User ${req.params.userId} does not have a singing servicer profile`);
-		}
-		res.send(profile[0]);
+		SingerServiceProfile.find({ userId: id })
+			.then((profiles) => {
+				if (profiles[0]) {
+					const profile = profiles[0];
+					res.statusCode = 200;
+					res.setHeader('Content-Type', 'application/json');
+					res.json(profile);
+				} else {
+					res.statusCode = 404;
+					res.end(`There was no singer service profile for the user id ${id}`);
+				}
+			})
+			.catch((err) => next(err));
 	})
-	.delete((req, res) => {
-		res.end(`User with id: ${req.params.userId}\nwill be deleted.`);
+	.delete((req, res, next) => {
+		const id = req.params.userId;
+		SingerServiceProfile.find({ userId: id })
+			.then((profiles) => {
+				if (profiles[0]) {
+					SingerServiceProfile.findByIdAndDelete(profiles[0]._id)
+						.then((response) => {
+							res.statusCode = 200;
+							res.setHeader('Content-Type', 'application/json');
+							res.json(response);
+						})
+						.catch((err) => next(err));
+				} else {
+					res.statusCode = 404;
+					res.end(`There was no singer service profile for the user id ${id}`);
+				}
+			})
+			.catch((err) => next(err));
 	})
-	.put((req, res) => {
-		res.end(`We will update the profile for user ${req.params.userId}`);
+	.put((req, res, next) => {
+		const id = req.params.userId;
+		SingerServiceProfile.find({ userId: id })
+			.then((profiles) => {
+				if (profiles[0]) {
+					SingerServiceProfile.findByIdAndUpdate(profiles[0]._id, { $set: req.body }, { new: true })
+						.then((response) => {
+							res.statusCode = 200;
+							res.setHeader('Content-Type', 'application/json');
+							res.json(response);
+						})
+						.catch((err) => next(err));
+				} else {
+					res.statusCode = 404;
+					res.end(`There was no singer service profile for the user id ${id}`);
+				}
+			})
+			.catch((err) => next(err));
 	})
 	.post((req, res) => {
+		res.statusCode = 405;
 		res.end('You cannot POST at this endpoint');
 	});
 

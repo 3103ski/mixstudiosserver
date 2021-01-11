@@ -4,9 +4,13 @@ const shared = require('./sharedSubSchemas');
 
 const singerProfileSchema = new Schema(
 	{
-		doesOffer: {
-			type: Boolean,
-			default: false,
+		userId: {
+			required: true,
+			type: String,
+		},
+		serviceType: {
+			type: String,
+			default: 'singer',
 		},
 		isRapper: {
 			type: Boolean,

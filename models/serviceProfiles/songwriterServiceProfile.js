@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const shared = required('./sharedSubSchemas.js');
+const shared = require('./sharedSubSchemas');
 
 const songwriterLyrics = new Schema(
 	{
@@ -40,9 +40,13 @@ const songwriterMusic = new Schema(
 
 const songwriterProfileSchema = new Schema(
 	{
-		doesOffer: {
-			type: Boolean,
-			default: false,
+		userId: {
+			type: String,
+			required: true,
+		},
+		serviceType: {
+			type: String,
+			default: 'songwriter',
 		},
 		lyrics: {
 			type: songwriterLyrics,

@@ -1,40 +1,63 @@
 const express = require('express');
 // Service Routers
 const profiles = require('./serviceRouters/index');
-
-// fake data
-const fd = require('../../constants/fakeData');
+// Mongoose Models
+const SingerServiceProfiles = require('../../models/serviceProfiles/singerServiceProfile');
+const MixingServiceProfiles = require('../../models/serviceProfiles/mixingServiceProfile');
+const MasteringServiceProfiles = require('../../models/serviceProfiles/masteringServiceProfile');
+const StudioMusicianServiceProfiles = require('../../models/serviceProfiles/studioMusicianServiceProfile');
+const ProducerServiceProfiles = require('../../models/serviceProfiles/producerServiceProfile');
+const SongwriterServiceProfiles = require('../../models/serviceProfiles/songwriterServiceProfile');
 
 const serviceProfilesRouter = express.Router();
 
 serviceProfilesRouter
 	.route('/')
-	.all((req, res, next) => {
-		res.statusCode = 200;
-		res.setHeader('Content-Type', 'text/json');
-		next();
-	})
-	.get((req, res) => {
-		const allProfiles = [
-			...fd.songwriterServiceProfiles,
-			...fd.mixingServiceProfiles,
-			...fd.masteringServiceProfiles,
-			...fd.studioMusicianServiceProfiles,
-			...fd.producerServiceProfiles,
-			...fd.singerServiceProfiles,
-		];
-		res.send(allProfiles);
+	.get((req, res, next) => {
+		let allProfiles = [];
+		SingerServiceProfiles.find()
+			.then((profiles) => {
+				allProfiles = [...allProfiles, ...profiles];
+				return MixingServiceProfiles.find();
+			})
+			.then((profiles) => {
+				allProfiles = [...allProfiles, ...profiles];
+				return MasteringServiceProfiles.find();
+			})
+			.then((profiles) => {
+				allProfiles = [...allProfiles, ...profiles];
+				return StudioMusicianServiceProfiles.find();
+			})
+			.then((profiles) => {
+				allProfiles = [...allProfiles, ...profiles];
+				return ProducerServiceProfiles.find();
+			})
+			.then((profiles) => {
+				allProfiles = [...allProfiles, ...profiles];
+				return SongwriterServiceProfiles.find();
+			})
+			.then((profiles) => {
+				allProfiles = [...allProfiles, ...profiles];
+				res.statusCode = 200;
+				res.setHeader('Content-Header', 'application/json');
+				res.json(allProfiles);
+			})
+			.catch((err) => next(err));
 	})
 	.post((req, res) => {
-		res.send({
-			error: 'You cannot post directly to this endpoint. You are likely forgetting to include the service name in the endpoint.',
-		});
+		res.statusCode = 405;
+		res.setHeader('Content-Header', 'application/json');
+		res.end('You cannot post to this endpoint');
 	})
 	.delete((req, res) => {
-		res.end('DELETE not supported at this endpoint.');
+		res.statusCode = 405;
+		res.setHeader('Content-Header', 'application/json');
+		res.end('You cannot delete to this endpoint');
 	})
 	.put((req, res) => {
-		res.end('PUT not supported at this endpoint.');
+		res.statusCode = 405;
+		res.setHeader('Content-Header', 'application/json');
+		res.end('You cannot put to this endpoint');
 	});
 
 serviceProfilesRouter.use('/mixing-engineers', profiles.mixingProfiles);

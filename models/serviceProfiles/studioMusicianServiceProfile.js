@@ -1,13 +1,16 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-
-const shared = required('./sharedSubSchemas.js');
+const shared = require('./sharedSubSchemas');
 
 const studioMusicianSchema = new Schema(
 	{
-		doesOffer: {
-			type: Boolean,
-			default: false,
+		userId: {
+			required: true,
+			type: String,
+		},
+		serviceType: {
+			type: String,
+			default: 'studio musician',
 		},
 		instruments: {
 			type: Array,

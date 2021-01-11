@@ -36,6 +36,10 @@ const mixingProfileSchema = new Schema(
 			type: String,
 			required: true,
 		},
+		serviceType: {
+			type: String,
+			default: 'mixing',
+		},
 		extraServices: {
 			type: extraServices,
 			default: () => ({}),

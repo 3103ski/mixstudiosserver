@@ -1,11 +1,12 @@
 const express = require('express');
-const SongwriterServiceProfile = require('../../../models/serviceProfiles/songwriterServiceProfile');
-const songwriterProfileRouter = express.Router();
+const StudioMusicianProfile = require('../../../models/serviceProfiles/studioMusicianServiceProfile');
 
-songwriterProfileRouter
+const studioMusicianProfileRouter = express.Router();
+
+studioMusicianProfileRouter
 	.route('/')
 	.get((req, res, next) => {
-		SongwriterServiceProfile.find()
+		StudioMusicianProfile.find()
 			.then((profiles) => {
 				res.statusCode = 200;
 				res.setHeader('Content-Type', 'application/json');
@@ -14,13 +15,13 @@ songwriterProfileRouter
 			.catch((err) => next(err));
 	})
 	.post((req, res, next) => {
-		SongwriterServiceProfile.find({ userId: req.body.userId }).then((profiles) => {
+		StudioMusicianProfile.find({ userId: req.body.userId }).then((profiles) => {
 			if (profiles[0]) {
 				res.statusCode = 400;
 				res.setHeader('Content-Type', 'application/json');
-				res.end(`User ${req.body.userId} already has a songwriter service profile`);
+				res.end(`User ${req.body.userId} already has a studio musician service profile`);
 			} else {
-				SongwriterServiceProfile.create(req.body)
+				StudioMusicianProfile.create(req.body)
 					.then((profile) => {
 						res.statusCode = 200;
 						res.setHeader('Content-Type', 'application/json');
@@ -31,7 +32,7 @@ songwriterProfileRouter
 		});
 	})
 	.delete((req, res, next) => {
-		SongwriterServiceProfile.deleteMany()
+		StudioMusicianProfile.deleteMany()
 			.then((response) => {
 				res.statusCode = 200;
 				res.setHeader('Content-Type', 'application/json');
@@ -44,11 +45,11 @@ songwriterProfileRouter
 		res.end('You cannot PUT at this endpoint.');
 	});
 
-songwriterProfileRouter
+studioMusicianProfileRouter
 	.route('/:userId')
 	.get((req, res, next) => {
 		const id = req.params.userId;
-		SongwriterServiceProfile.find({ userId: id })
+		StudioMusicianProfile.find({ userId: id })
 			.then((profiles) => {
 				if (profiles[0]) {
 					const profile = profiles[0];
@@ -57,17 +58,17 @@ songwriterProfileRouter
 					res.json(profile);
 				} else {
 					res.statusCode = 404;
-					res.end(`There was no songwriter profile for the user id ${id}`);
+					res.end(`There was no studio musician profile for the user id ${id}`);
 				}
 			})
 			.catch((err) => next(err));
 	})
 	.delete((req, res, next) => {
 		const id = req.params.userId;
-		SongwriterServiceProfile.find({ userId: id })
+		StudioMusicianProfile.find({ userId: id })
 			.then((profiles) => {
 				if (profiles[0]) {
-					SongwriterServiceProfile.findByIdAndDelete(profiles[0]._id)
+					StudioMusicianProfile.findByIdAndDelete(profiles[0]._id)
 						.then((response) => {
 							res.statusCode = 200;
 							res.setHeader('Content-Type', 'application/json');
@@ -76,17 +77,17 @@ songwriterProfileRouter
 						.catch((err) => next(err));
 				} else {
 					res.statusCode = 404;
-					res.end(`There was no songwriter profile for the user id ${id}`);
+					res.end(`There was no studio musician profile for the user id ${id}`);
 				}
 			})
 			.catch((err) => next(err));
 	})
 	.put((req, res, next) => {
 		const id = req.params.userId;
-		SongwriterServiceProfile.find({ userId: id })
+		StudioMusicianProfile.find({ userId: id })
 			.then((profiles) => {
 				if (profiles[0]) {
-					SongwriterServiceProfile.findByIdAndUpdate(profiles[0]._id, { $set: req.body }, { new: true })
+					StudioMusicianProfile.findByIdAndUpdate(profiles[0]._id, { $set: req.body }, { new: true })
 						.then((response) => {
 							res.statusCode = 200;
 							res.setHeader('Content-Type', 'application/json');
@@ -95,7 +96,7 @@ songwriterProfileRouter
 						.catch((err) => next(err));
 				} else {
 					res.statusCode = 404;
-					res.end(`There was no songwriter profile for the user id ${id}`);
+					res.end(`There was no studio musician profile for the user id ${id}`);
 				}
 			})
 			.catch((err) => next(err));
@@ -105,4 +106,4 @@ songwriterProfileRouter
 		res.end('You cannot POST at this endpoint');
 	});
 
-module.exports = songwriterProfileRouter;
+module.exports = studioMusicianProfileRouter;
