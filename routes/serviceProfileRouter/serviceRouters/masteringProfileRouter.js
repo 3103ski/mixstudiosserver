@@ -1,5 +1,4 @@
 const express = require('express');
-
 const MasteringProfile = require('../../../models/serviceProfiles/masteringServiceProfile');
 
 const masteringProfileRouter = express.Router();
@@ -16,20 +15,30 @@ masteringProfileRouter
 			.catch((err) => next(err));
 	})
 	.post((req, res, next) => {
-		MasteringProfile.create(req.body)
-			.then((profile) => {
-				res.statusCode = 200;
-				res.setHeader('Content-Type', 'application/data');
-				res.json(profile);
-			})
-			.catch((err) => next(err));
+		MasteringProfile.find({ userId: req.body.userId }).then((profiles) => {
+			if (profiles[0]) {
+				res.statusCode = 400;
+				res.setHeader('Content-Type', 'application/json');
+				res.end(`User ${req.body.userId} already has a mastering service profile`);
+			} else {
+				MasteringProfile.create(req.body)
+					.then((profile) => {
+						res.statusCode = 200;
+						res.setHeader('Content-Type', 'application/json');
+						res.json(profile);
+					})
+					.catch((err) => next(err));
+			}
+		});
 	})
 	.delete((req, res) => {
-		MasteringProfile.deleteMany().then((response) => {
-			res.statusCode = 200;
-			res.setHeader('Content-Type', 'application/data');
-			res.json(response);
-		});
+		MasteringProfile.deleteMany()
+			.then((response) => {
+				res.statusCode = 200;
+				res.setHeader('Content-Type', 'application/json');
+				res.json(response);
+			})
+			.catch((err) => next(err));
 	})
 	.put((req, res) => {
 		res.end('You cannot PUT at this endpoint.');
@@ -54,14 +63,12 @@ masteringProfileRouter
 			.catch((err) => next(err));
 	})
 	.delete((req, res, next) => {
-		let profile;
 		const id = req.params.userId;
 
 		MasteringProfile.find({ userId: id })
 			.then((profiles) => {
 				if (profiles[0]) {
-					profile = profiles[0];
-					MasteringProfile.findByIdAndDelete(profile._id)
+					MasteringProfile.findByIdAndDelete(profiles[0]._id)
 						.then((response) => {
 							res.statusCode = 200;
 							res.setHeader('Content-Type', 'application/json');
@@ -76,14 +83,12 @@ masteringProfileRouter
 			.catch((err) => next(err));
 	})
 	.put((req, res, next) => {
-		let profile;
 		const id = req.params.userId;
 
 		MasteringProfile.find({ userId: id })
 			.then((profiles) => {
 				if (profiles[0]) {
-					profile = profiles[0];
-					MasteringProfile.findByIdAndUpdate(profile._id, { $set: req.body }, { new: true })
+					MasteringProfile.findByIdAndUpdate(profiles[0]._id, { $set: req.body }, { new: true })
 						.then((response) => {
 							res.statusCode = 200;
 							res.setHeader('Content-Type', 'application/json');

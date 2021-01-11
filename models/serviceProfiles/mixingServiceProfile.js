@@ -32,9 +32,9 @@ const extraServices = new Schema(
 
 const mixingProfileSchema = new Schema(
 	{
-		doesOffer: {
-			type: Boolean,
-			default: false,
+		userId: {
+			type: String,
+			required: true,
 		},
 		extraServices: {
 			type: extraServices,

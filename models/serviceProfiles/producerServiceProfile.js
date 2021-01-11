@@ -4,9 +4,9 @@ const shared = require('./sharedSubSchemas');
 
 const producerProfileSchema = new Schema(
 	{
-		doesOffer: {
-			type: Boolean,
-			default: false,
+		userId: {
+			type: String,
+			required: true,
 		},
 		emotionsAndFeelings: {
 			type: Array,
