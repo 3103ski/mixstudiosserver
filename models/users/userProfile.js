@@ -6,10 +6,12 @@ require('mongoose-type-email');
 
 // FULL PROFILE SCHEMA ASSEMBELED AT BOTTOM
 
-//----------------------
-//----------------------
+//*******************************/
+//______________________________
+//______________________________
 // SCHEMA FOR USER INFO
 //----------------------
+
 const userInfoSchema = new Schema(
 	{
 		username: {
@@ -41,17 +43,19 @@ const userInfoSchema = new Schema(
 	},
 	{
 		_id: false,
+		timestamps: true,
 	}
 );
 
-//-------------------------
-//-------------------------
+//*******************************/
+//______________________________
+//______________________________
 //  SCHEMA FOR STYLES INFO
 //-------------------------
 
-//___________
+//************* */
 // MUSIC
-//----------
+//------
 const musicSchema = new Schema(
 	{
 		confidentGenres: {
@@ -72,11 +76,10 @@ const musicSchema = new Schema(
 	}
 );
 
-//________________
+//************* */
 // TV
-//--------------
+//------
 
-// TYPE
 const tvTypeSchema = new Schema(
 	{
 		tvAndFilm: {
@@ -113,7 +116,6 @@ const tvGenresSchema = new Schema(
 	}
 );
 
-// TV MUSIC
 const tvMusicSchema = new Schema(
 	{
 		doesOffer: {
@@ -146,7 +148,7 @@ const tvMusicSchema = new Schema(
 	}
 );
 
-// Assembled TV SCHEMA
+// ASSEMBLED tv schema
 const tvSchema = new Schema(
 	{
 		doesOffer: {
@@ -162,7 +164,7 @@ const tvSchema = new Schema(
 	}
 );
 
-// assembled parts for user profile
+// ******  Assembled parts for userProfile.styleInfo
 const styleInfoSchema = new Schema(
 	{
 		music: musicSchema,
@@ -175,18 +177,79 @@ const styleInfoSchema = new Schema(
 	},
 	{
 		_id: false,
+		timestamps: true,
 	}
 );
 
-//*******************************/
-//______________________________
-//______________________________
-//      Assembled Schema
-//------------------------------
+//************************* */
+// ASSEMBLED Service Profile Schema
+//----
+
+const service = new Schema(
+	{
+		doesOffer: {
+			type: Boolean,
+			default: false,
+		},
+		profileId: {
+			type: String,
+			default: null,
+		},
+	},
+	{
+		_id: false,
+	}
+);
+
+const serviceProfileSchema = new Schema(
+	{
+		offersServices: {
+			type: Boolean,
+			default: false,
+		},
+		mixing: {
+			type: service,
+			default: () => ({}),
+		},
+		mastering: {
+			type: service,
+			default: () => ({}),
+		},
+		producer: {
+			type: service,
+			default: () => ({}),
+		},
+		singer: {
+			type: service,
+			default: () => ({}),
+		},
+		songwriter: {
+			type: service,
+			default: () => ({}),
+		},
+		studioMusician: {
+			type: service,
+			default: () => ({}),
+		},
+	},
+	{
+		_id: false,
+	}
+);
+
+//*****************************/
+//*****************************/
+//__________________________
+//__________________________
+//  Assembled User Profile
+//     Schema for export
+//--------------------------
+
 const userProfileSchema = new Schema(
 	{
 		userInfo: userInfoSchema,
 		styleInfo: styleInfoSchema,
+		serviceProfiles: { type: serviceProfileSchema, default: () => ({}) },
 	},
 	{
 		timestamps: true,

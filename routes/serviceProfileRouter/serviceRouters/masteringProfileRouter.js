@@ -1,49 +1,101 @@
 const express = require('express');
-const fd = require('../../../constants/fakeData');
-const masteringServiceProfiles = fd.masteringServiceProfiles;
+
+const MasteringProfile = require('../../../models/serviceProfiles/masteringServiceProfile');
 
 const masteringProfileRouter = express.Router();
 
 masteringProfileRouter
 	.route('/')
-	.all((req, res, next) => {
-		res.statusCode = 200;
-		res.setHeader('Content-Type', 'text/json');
-		next();
+	.get((req, res, next) => {
+		MasteringProfile.find()
+			.then((profiles) => {
+				res.statusCode = 200;
+				res.setHeader('Content-Type', 'application/json');
+				res.json(profiles);
+			})
+			.catch((err) => next(err));
 	})
-	.get((req, res) => {
-		res.send(masteringServiceProfiles);
-	})
-	.post((req, res) => {
-		res.end('We will add the new mastering service profile');
-	})
-	.put((req, res) => {
-		res.end('You cannot PUT at this endpoint');
+	.post((req, res, next) => {
+		MasteringProfile.create(req.body)
+			.then((profile) => {
+				res.statusCode = 200;
+				res.setHeader('Content-Type', 'application/data');
+				res.json(profile);
+			})
+			.catch((err) => next(err));
 	})
 	.delete((req, res) => {
-		res.end('You cannot DELETE this endpoint');
+		MasteringProfile.deleteMany().then((response) => {
+			res.statusCode = 200;
+			res.setHeader('Content-Type', 'application/data');
+			res.json(response);
+		});
+	})
+	.put((req, res) => {
+		res.end('You cannot PUT at this endpoint.');
 	});
 
 masteringProfileRouter
 	.route('/:userId')
-	.all((req, res, next) => {
-		res.statusCode = 200;
-		res.setHeader('Content-Type', 'text/json');
-		next();
-	})
-	.get((req, res) => {
+	.get((req, res, next) => {
 		const id = req.params.userId;
-		const profile = masteringServiceProfiles.filter((profile) => profile.userId === id);
-		if (profile.length === 0) {
-			res.end(`User ${req.params.userId} does not have a mastering service profile`);
-		}
-		res.send(profile[0]);
+		MasteringProfile.find({ userId: id })
+			.then((profiles) => {
+				if (profiles[0]) {
+					const masteringProfile = profiles[0];
+					res.statusCode = 200;
+					res.setHeader('Content-Type', 'application/json');
+					res.json(masteringProfile);
+				} else {
+					res.statusCode = 404;
+					res.end(`There was no mastering profile for the user id ${id}`);
+				}
+			})
+			.catch((err) => next(err));
 	})
-	.delete((req, res) => {
-		res.end(`User with id: ${req.params.userId}\nwill be deleted.`);
+	.delete((req, res, next) => {
+		let profile;
+		const id = req.params.userId;
+
+		MasteringProfile.find({ userId: id })
+			.then((profiles) => {
+				if (profiles[0]) {
+					profile = profiles[0];
+					MasteringProfile.findByIdAndDelete(profile._id)
+						.then((response) => {
+							res.statusCode = 200;
+							res.setHeader('Content-Type', 'application/json');
+							res.json(response);
+						})
+						.catch((err) => next(err));
+				} else {
+					res.statusCode = 404;
+					res.end(`There was no mastering profile for the user id ${id}`);
+				}
+			})
+			.catch((err) => next(err));
 	})
-	.put((req, res) => {
-		res.end(`We will update the profile for user ${req.params.userId}`);
+	.put((req, res, next) => {
+		let profile;
+		const id = req.params.userId;
+
+		MasteringProfile.find({ userId: id })
+			.then((profiles) => {
+				if (profiles[0]) {
+					profile = profiles[0];
+					MasteringProfile.findByIdAndUpdate(profile._id, { $set: req.body }, { new: true })
+						.then((response) => {
+							res.statusCode = 200;
+							res.setHeader('Content-Type', 'application/json');
+							res.json(response);
+						})
+						.catch((err) => next(err));
+				} else {
+					res.statusCode = 404;
+					res.end(`There was no mastering profile for the user id ${id}`);
+				}
+			})
+			.catch((err) => next(err));
 	})
 	.post((req, res) => {
 		res.end('You cannot POST at this endpoint');

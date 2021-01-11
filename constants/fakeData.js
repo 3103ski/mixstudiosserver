@@ -147,52 +147,52 @@ exports.userProfiles = [
 		},
 	},
 ];
-exports.artistSoundsLikeCollection = [
-	{
-		soundsLike: 'drake',
-		userId: '892d3658927tbcr82o36gf93g623456f2gb',
-	},
-	{
-		soundsLike: 'bear hands',
-		userId: '892d3658927tbcr82o36gf93g623456f2gb',
-	},
-	{
-		soundsLike: 'young the giant',
-		userId: '892d3658927tbcr82o36gf93g623456f2gb',
-	},
-	{
-		soundsLike: 'coldplay',
-		userId: '892d3658927tbcr82o36gf93g623456f2gb',
-	},
-	{
-		soundsLike: 'kanye west',
-		userId: '892d3658927tbcr82o36gf93g623456f2gb',
-	},
-	{
-		soundsLike: 'jay-z',
-		userId: '892d3658927tbcr82o36gf93g623456f2gb',
-	},
-	{
-		soundsLike: 'conor oberst',
-		userId: '80167tg803vct965cn8vberyibufwejryv83',
-	},
-	{
-		soundsLike: 'lambchop',
-		userId: '80167tg803vct965cn8vberyibufwejryv83',
-	},
-	{
-		soundsLike: 'bill evans',
-		userId: '80167tg803vct965cn8vberyibufwejryv83',
-	},
-	{
-		soundsLike: 'ratatat',
-		userId: '80167tg803vct965cn8vberyibufwejryv83',
-	},
-	{
-		soundsLike: 'the swell season',
-		userId: '892d3658927tbcr82o36gf93g623456f2gb', // user that created the 'sounds like' object
-	},
-];
+// exports.artistSoundsLikeCollection = [
+// 	{
+// 		soundsLike: 'drake',
+// 		userId: '892d3658927tbcr82o36gf93g623456f2gb',
+// 	},
+// 	{
+// 		soundsLike: 'bear hands',
+// 		userId: '892d3658927tbcr82o36gf93g623456f2gb',
+// 	},
+// 	{
+// 		soundsLike: 'young the giant',
+// 		userId: '892d3658927tbcr82o36gf93g623456f2gb',
+// 	},
+// 	{
+// 		soundsLike: 'coldplay',
+// 		userId: '892d3658927tbcr82o36gf93g623456f2gb',
+// 	},
+// 	{
+// 		soundsLike: 'kanye west',
+// 		userId: '892d3658927tbcr82o36gf93g623456f2gb',
+// 	},
+// 	{
+// 		soundsLike: 'jay-z',
+// 		userId: '892d3658927tbcr82o36gf93g623456f2gb',
+// 	},
+// 	{
+// 		soundsLike: 'conor oberst',
+// 		userId: '80167tg803vct965cn8vberyibufwejryv83',
+// 	},
+// 	{
+// 		soundsLike: 'lambchop',
+// 		userId: '80167tg803vct965cn8vberyibufwejryv83',
+// 	},
+// 	{
+// 		soundsLike: 'bill evans',
+// 		userId: '80167tg803vct965cn8vberyibufwejryv83',
+// 	},
+// 	{
+// 		soundsLike: 'ratatat',
+// 		userId: '80167tg803vct965cn8vberyibufwejryv83',
+// 	},
+// 	{
+// 		soundsLike: 'the swell season',
+// 		userId: '892d3658927tbcr82o36gf93g623456f2gb', // user that created the 'sounds like' object
+// 	},
+// ];
 exports.userInstrumentProfiles = [
 	{
 		name: 'guitar',
@@ -210,9 +210,6 @@ exports.mixingServiceGenreRates = [
 	{
 		pricingProfileId: '2c4h7025n1gnm9gtn812nuc451486gt5678cn',
 		userId: '892d3658927tbcr82o36gf93g623456f2gb',
-		id: '8927c6t89671y9r81c349gr61i87',
-		createdOn: new Date(),
-		lastModified: new Date(),
 		genre: 'rock',
 		isConfidentRate: true,
 		flatRate: {
@@ -229,9 +226,6 @@ exports.mixingServiceGenreRates = [
 	{
 		pricingProfileId: '2c4h7025n1gnm9gtn812nuc451486gt5678cn',
 		userId: '892d3658927tbcr82o36gf93g623456f2gb',
-		id: 'v7903g64t03784m0h8cm0542',
-		createdOn: new Date(),
-		lastModified: new Date(),
 		genre: 'salsa',
 		isConfidentRate: false,
 		flatRate: {
@@ -246,37 +240,31 @@ exports.mixingServiceGenreRates = [
 		},
 	},
 ];
-exports.mixingServiceProfiles = [
-	{
-		userId: '892d3658927tbcr82o36gf93g623456f2gb',
-		id: '902vnty907ntv804gtb280tn0524tv645t',
-		createdOn: new Date(),
-		lastModified: new Date(),
-		serviceDetails: {
-			type: 'mixing',
-			alsoDoesMastering: false,
-			extraServices: {
-				drumReplacement: false,
-				manualPitchCorrection: false,
-				autoPitchCorrection: false,
-				replay: false,
-				mixingActousticDrums: false,
-			},
-		},
-		pricing: {
-			manualQuotingIsActive: true,
-			pricingProfiles: [],
-		},
-	},
-];
+
+// exports.mixingServiceProfiles = [
+// 	{
+// 		serviceDetails: {
+// 			alsoDoesMastering: false,
+// 			extraServices: {
+// 				drumReplacement: false,
+// 				manualPitchCorrection: false,
+// 				autoPitchCorrection: false,
+// 				replay: false,
+// 				mixingActousticDrums: false,
+// 			},
+// 		},
+// 		pricing: {
+// 			manualQuotingIsActive: true,
+// 			pricingProfiles: [], // other collection
+// 		},
+// 	},
+// ];
+
 exports.mixingPricingProfiles = [
 	{
 		userId: '892d3658927tbcr82o36gf93g623456f2gb',
-		id: '2c4h7025n1gnm9gtn812nuc451486gt5678cn',
 		details: {
 			name: 'default pricing',
-			createdOn: new Date(),
-			lastModified: new Date(),
 		},
 		pricing: {
 			isFlatRate: false,
@@ -417,31 +405,28 @@ exports.singerServiceGenreRates = [
 		perPartRate: null,
 	},
 ];
-exports.singerServiceProfiles = [
-	{
-		userId: '892d3658927tbcr82o36gf93g623456f2gb',
-		id: '2v093ty18067ctgy651vbt106tngvg61v',
-		createdOn: new Date(),
-		lastModified: new Date(),
-		serviceDetails: {
-			type: 'singer',
-			isRapper: true,
-			isSinger: true,
-			rappingStyles: ['slow', 'fast', 'trap', 'east coast vibes', 'west coast vibes', 'island', 'uk', 'british'],
-			singingRanges: ['baritone', 'super low', 'low', 'mid range'],
-			vocalEffects: ['sultry', 'raspy', 'screaming', 'whisper', 'soft'],
-		},
-		pricing: {
-			manualQuotingIsActive: true,
-			pricingProfiles: [],
-		},
-	},
-];
+// exports.singerServiceProfiles = [
+// 	{
+// 		userId: '892d3658927tbcr82o36gf93g623456f2gb',
+// 		id: '2v093ty18067ctgy651vbt106tngvg61v',
+// 		createdOn: new Date(),
+// 		lastModified: new Date(),
+// 		serviceDetails: {
+// 			type: 'singer',
+// 			isRapper: true,
+// 			isSinger: true,
+// 			rappingStyles: ['slow', 'fast', 'trap', 'east coast vibes', 'west coast vibes', 'island', 'uk', 'british'],
+// 			singingRanges: ['baritone', 'super low', 'low', 'mid range'],
+// 			vocalEffects: ['sultry', 'raspy', 'screaming', 'whisper', 'soft'],
+// 		},
+// 		pricing: {
+// 			manualQuotingIsActive: true,
+// 			pricingProfiles: [],
+// 		},
+// 	},
+// ];
 exports.singerPricingProfiles = [
 	{
-		id: 'h12345012ht01c8tnm06nmtg334t3434g',
-		userId: '892d3658927tbcr82o36gf93g623456f2gb',
-		type: 'vocals',
 		details: {
 			name: 'default pricing',
 			createdOn: new Date(),
@@ -478,46 +463,40 @@ exports.singerPricingProfiles = [
 ];
 
 // ************ SONGWRITER SERVICE
-exports.songwriterServiceProfiles = [
-	{
-		userId: '892d3658927tbcr82o36gf93g623456f2gb',
-		id: 'c01247tr1036gt1xn34bn1fr7c3c143t',
-		createdOn: new Date(),
-		lastModified: new Date(),
-		serviceDetails: {
-			type: 'songwriter',
-			lyrics: {
-				isOffering: false,
-				emotions: [],
-			},
-			music: {
-				isOffering: false,
-				dynamicRating: {
-					ambientSoundsAndBeds: 1,
-					relaxingAndLaidBack: 4,
-					movingAndAwake: 4,
-					activeAndFun: 5,
-					intenseAndSlow: 5,
-					intenseAndFast: 3,
-					excitingAndFun: 3,
-				},
-				contentBoundaries: {
-					children: false,
-					ratedG: false,
-					ratedPG: false,
-					ratedPG13: false,
-					ratedR: false,
-					ratedX: false,
-					ratedXXX: false,
-				},
-			},
-		},
-		pricing: {
-			manualQuotingIsActive: true,
-			pricingProfiles: [], //fetch from api
-		},
-	},
-];
+// exports.songwriterServiceProfiles = [
+// 	{
+// 		lyrics: {
+// 			isOffering: false,
+// 			emotions: [],
+// 		},
+// 		music: {
+// 			isOffering: false,
+// 			dynamicRating: {
+// 				ambientSoundsAndBeds: 1,
+// 				relaxingAndLaidBack: 4,
+// 				movingAndAwake: 4,
+// 				activeAndFun: 5,
+// 				intenseAndSlow: 5,
+// 				intenseAndFast: 3,
+// 				excitingAndFun: 3,
+// 			},
+// 			contentBoundaries: {
+// 				children: false,
+// 				ratedG: false,
+// 				ratedPG: false,
+// 				ratedPG13: false,
+// 				ratedR: false,
+// 				ratedX: false,
+// 				ratedXXX: false,
+// 			},
+// 		},
+
+// 		pricing: {
+// 			manualQuotingIsActive: true,
+// 			pricingProfiles: [], //fetch from api
+// 		},
+// 	},
+// ];
 exports.songwriterServiceGenreRates = [
 	{
 		pricingProfileId: '20x84w347iv7iobcngyurny83674368',
@@ -601,31 +580,26 @@ exports.songwritingPricingProfiles = [
 ];
 
 // ************ STUDIO MUSICIAN SERVICE
-exports.studioMusicianServiceProfiles = [
-	{
-		userId: '892d3658927tbcr82o36gf93g623456f2gb',
-		id: '2v05jty0287cmt862v4t2683vn2vb2',
-		createdOn: new Date(),
-		lastModified: new Date(),
-		serviceDetails: {
-			type: 'studio musician',
-			instruments: [], // fetch from db when needed
-			dynamicRating: {
-				ambientSoundsAndBeds: 1,
-				relaxingAndLaidBack: 4,
-				movingAndAwake: 4,
-				activeAndFun: 5,
-				intenseAndSlow: 5,
-				intenseAndFast: 3,
-				excitingAndFun: 3,
-			},
-		},
-		pricing: {
-			manualQuotingIsActive: true,
-			pricingProfiles: ['34578t73nv0tng53vt68fm18t01f6013vb'], // fetch from api - studioMusicianPricingProfiles
-		},
-	},
-];
+// exports.studioMusicianServiceProfiles = [
+// 	{
+// 		serviceDetails: {
+// 			instruments: [], // fetch from db when needed
+// 			dynamicRating: {
+// 				ambientSoundsAndBeds: 1,
+// 				relaxingAndLaidBack: 4,
+// 				movingAndAwake: 4,
+// 				activeAndFun: 5,
+// 				intenseAndSlow: 5,
+// 				intenseAndFast: 3,
+// 				excitingAndFun: 3,
+// 			},
+// 		},
+// 		pricing: {
+// 			manualQuotingIsActive: true,
+// 			pricingProfiles: ['34578t73nv0tng53vt68fm18t01f6013vb'], // fetch from api - studioMusicianPricingProfiles
+// 		},
+// 	},
+// ];
 exports.studioMusicianPricingProfiles = [
 	{
 		id: '34578t73nv0tng53vt68fm18t01f6013vb',
@@ -707,40 +681,35 @@ exports.studioMusicianServiceGenreRates = [
 ];
 
 // ************ PRODUCER SERVICE
-exports.producerServiceProfiles = [
-	{
-		userId: '892d3658927tbcr82o36gf93g623456f2gb',
-		id: '2vn90ty20c67yctm064tg456tng45',
-		createdOn: new Date(),
-		lastModified: new Date(),
-		serviceDetails: {
-			type: 'producer',
-			emotionsAndFeelings: [],
-			dynamicRating: {
-				ambientSoundsAndBeds: 1,
-				relaxingAndLaidBack: 4,
-				movingAndAwake: 4,
-				activeAndFun: 5,
-				intenseAndSlow: 5,
-				intenseAndFast: 3,
-				excitingAndFun: 3,
-			},
-			contentBoundaries: {
-				children: false,
-				ratedG: false,
-				ratedPG: false,
-				ratedPG13: false,
-				ratedR: false,
-				ratedX: false,
-				ratedXXX: false,
-			},
-		},
-		pricing: {
-			manualQuotingIsActive: true,
-			pricingProfiles: [], // fetch from api
-		},
-	},
-];
+// exports.producerServiceProfiles = [
+// 	{
+// 		serviceDetails: {
+// 			emotionsAndFeelings: [],
+// 			dynamicRating: {
+// 				ambientSoundsAndBeds: 1,
+// 				relaxingAndLaidBack: 4,
+// 				movingAndAwake: 4,
+// 				activeAndFun: 5,
+// 				intenseAndSlow: 5,
+// 				intenseAndFast: 3,
+// 				excitingAndFun: 3,
+// 			},
+// 			contentBoundaries: {
+// 				children: false,
+// 				ratedG: false,
+// 				ratedPG: false,
+// 				ratedPG13: false,
+// 				ratedR: false,
+// 				ratedX: false,
+// 				ratedXXX: false,
+// 			},
+// 		},
+// 		pricing: {
+// 			manualQuotingIsActive: true,
+// 			pricingProfiles: [], // fetch from api
+// 		},
+// 	},
+// ];
 exports.producingServiceGenreRates = [
 	{
 		pricingProfileId: '2v59y872tcn4524x5j5jnm2cn26589',

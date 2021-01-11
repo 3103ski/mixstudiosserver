@@ -32,44 +32,201 @@ the users overall style profile.
 
 ```
 {
-    "userInfo": {
-        "username": "",
-        "email": "",
-        "languages": [],
-        "firstName": "",
-        "lastName": "",
-        "location": ""
-    },
-    "styleInfo": {
-        "music": {
-            "confidentGenres": [],
-            "lessExperiencedGenres": [],
-            "unwillingGenres": []
+        "_id": "5ffbae35fab160c271658b3c",
+        "userInfo": {
+            "languages": [
+                "english",
+                "spanish"
+            ],
+            "username": "bjastski",
+            "email": "bjastski@gmail.com",
+            "firstName": "bryan",
+            "lastName": "jastrzembski",
+            "location": "New York, NY",
+            "createdAt": "2021-01-11T01:47:33.921Z",
+            "updatedAt": "2021-01-11T01:47:33.921Z"
         },
-        "tv": {
-            "doesOffer": false,
-            "types": {
-                "tvAndFilm": false,
-                "commercials": false,
-                "theater": false
+        "styleInfo": {
+            "soundsLike": [],
+            "music": {
+                "confidentGenres": [
+                    "rock",
+                    "hip-hop",
+                    "acoustic",
+                    "pop",
+                    "country"
+                ],
+                "lessExperiencedGenres": [
+                    "edm",
+                    "reggae",
+                    "latin"
+                ],
+                "unwillingGenres": [
+                    "death-metal",
+                    "heavy-metal"
+                ]
             },
-            "tvGenres": {
-                "confidentGenres": [],
-                "lessExperiencedGenres": [],
-                "unwillingGenres": []
+            "tv": {
+                "doesOffer": false,
+                "tvType": {
+                    "tvAndFilm": false,
+                    "commercials": false,
+                    "theater": false
+                },
+                "tvGenres": {
+                    "confidentGenres": [],
+                    "lessExperiencedGenres": []
+                },
+                "tvMusic": {
+                    "doesOffer": false,
+                    "confidentGenres": [],
+                    "lessConfidentGenres": [],
+                    "unwillingGenres": [],
+                    "moods": [],
+                    "scenes": []
+                }
             },
-            "tvMusic": {
-                "offersService": false,
-                "confidentGenres": [],
-                "lessExperiencedGenres": [],
-                "unwillingGenres": [],
-                "moodes": [],
-                "scenes": []
+            "createdAt": "2021-01-11T01:47:33.921Z",
+            "updatedAt": "2021-01-11T01:47:33.921Z"
+        },
+        "serviceProfiles": {
+            "offersServices": false,
+            "mixingEngineer": {
+                "doesOffer": false,
+                "alsoDoesMastering": false,
+                "extraServices": {
+                    "drumReplacement": false,
+                    "manualPitchCorrection": false,
+                    "autoPitchCorrection": false,
+                    "replay": false,
+                    "mixingActousticDrums": false
+                },
+                "pricing": {
+                    "manualQuotingIsActive": true,
+                    "pricingProfiles": []
+                },
+                "createdAt": "2021-01-11T01:47:33.921Z",
+                "updatedAt": "2021-01-11T01:47:33.921Z"
+            },
+            "masteringEngineer": {
+                "doesOffer": false,
+                "masteringMethods": {
+                    "analog": false,
+                    "digital": false
+                },
+                "extraMasteringServices": {
+                    "twoStem": false,
+                    "fourStem": false,
+                    "eightStem": false,
+                    "digitalThroughAnalog": false
+                },
+                "pricing": {
+                    "manualQuotingIsActive": true,
+                    "pricingProfiles": []
+                },
+                "createdAt": "2021-01-11T01:47:33.921Z",
+                "updatedAt": "2021-01-11T01:47:33.921Z"
+            },
+            "singer": {
+                "doesOffer": false,
+                "isRapper": false,
+                "isSinger": false,
+                "rappingStyles": [],
+                "singingRanges": [],
+                "vocalEffects": [],
+                "pricing": {
+                    "manualQuotingIsActive": true,
+                    "pricingProfiles": []
+                },
+                "createdAt": "2021-01-11T01:47:33.921Z",
+                "updatedAt": "2021-01-11T01:47:33.921Z"
+            },
+            "studioMusician": {
+                "doesOffer": false,
+                "instruments": [],
+                "dynamicsConfidenceRatings": {
+                    "ambientSoundsAndBeds": 3,
+                    "relaxingAndLaidBack": 3,
+                    "movingAndAwake": 3,
+                    "activeAndFun": 3,
+                    "intenseAndSlow": 3,
+                    "intenseAndFast": 3,
+                    "excitingAndFun": 3
+                },
+                "pricing": {
+                    "manualQuotingIsActive": true,
+                    "pricingProfiles": []
+                },
+                "createdAt": "2021-01-11T01:47:33.921Z",
+                "updatedAt": "2021-01-11T01:47:33.921Z"
+            },
+            "producer": {
+                "doesOffer": false,
+                "emotionsAndFeelings": [],
+                "dynamicsConfidenceRatings": {
+                    "ambientSoundsAndBeds": 3,
+                    "relaxingAndLaidBack": 3,
+                    "movingAndAwake": 3,
+                    "activeAndFun": 3,
+                    "intenseAndSlow": 3,
+                    "intenseAndFast": 3,
+                    "excitingAndFun": 3
+                },
+                "contentBoundaries": {
+                    "children": false,
+                    "ratedG": false,
+                    "ratedPG": false,
+                    "ratedPG13": false,
+                    "ratedR": false,
+                    "ratedX": false,
+                    "ratedXXX": false
+                },
+                "pricing": {
+                    "manualQuotingIsActive": true,
+                    "pricingProfiles": []
+                },
+                "createdAt": "2021-01-11T01:47:33.922Z",
+                "updatedAt": "2021-01-11T01:47:33.922Z"
+            },
+            "songwriter": {
+                "doesOffer": false,
+                "lyrics": {
+                    "offersLyrics": false,
+                    "emotions": []
+                },
+                "music": {
+                    "isOfferingMusic": false,
+                    "dynamicRating": {
+                        "ambientSoundsAndBeds": 3,
+                        "relaxingAndLaidBack": 3,
+                        "movingAndAwake": 3,
+                        "activeAndFun": 3,
+                        "intenseAndSlow": 3,
+                        "intenseAndFast": 3,
+                        "excitingAndFun": 3
+                    },
+                    "contentBoundaries": {
+                        "children": false,
+                        "ratedG": false,
+                        "ratedPG": false,
+                        "ratedPG13": false,
+                        "ratedR": false,
+                        "ratedX": false,
+                        "ratedXXX": false
+                    }
+                },
+                "pricing": {
+                    "manualQuotingIsActive": true,
+                    "pricingProfiles": []
+                },
+                "createdAt": "2021-01-11T01:47:33.922Z",
+                "updatedAt": "2021-01-11T01:47:33.922Z"
             }
         },
-        "soundsLike": []
+        "createdAt": "2021-01-11T01:47:33.922Z",
+        "updatedAt": "2021-01-11T01:47:33.922Z",
+        "__v": 0
     }
-}
 ```
 
 ## Sounds Like Objects
