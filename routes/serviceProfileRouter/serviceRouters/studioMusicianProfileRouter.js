@@ -1,5 +1,6 @@
 const express = require('express');
 const StudioMusicianProfile = require('../../../models/serviceProfiles/studioMusicianServiceProfile');
+const UserProfile = require('../../../models/users/userProfile');
 
 const studioMusicianProfileRouter = express.Router();
 
@@ -15,21 +16,26 @@ studioMusicianProfileRouter
 			.catch((err) => next(err));
 	})
 	.post((req, res, next) => {
-		StudioMusicianProfile.find({ userId: req.body.userId }).then((profiles) => {
-			if (profiles[0]) {
-				res.statusCode = 400;
-				res.setHeader('Content-Type', 'application/json');
-				res.end(`User ${req.body.userId} already has a studio musician service profile`);
-			} else {
-				StudioMusicianProfile.create(req.body)
-					.then((profile) => {
-						res.statusCode = 200;
-						res.setHeader('Content-Type', 'application/json');
-						res.json(profile);
-					})
-					.catch((err) => next(err));
-			}
-		});
+		StudioMusicianProfile.find({ userId: req.body.userId })
+			.then((profiles) => {
+				if (profiles[0]) {
+					res.statusCode = 400;
+					res.setHeader('Content-Type', 'application/json');
+					res.end(`User ${req.body.userId} already has a studio musician service profile`);
+				} else {
+					return StudioMusicianProfile.create(req.body);
+				}
+			})
+			.then((studioMusicianProfile) => {
+				UserProfile.findById(studioMusicianProfile.userId).then((profile) => {
+					profile.serviceProfiles.studioMusician.profileId = studioMusicianProfile._id;
+					profile.save();
+					res.statusCode = 200;
+					res.setHeader('Content-Type', 'application/json');
+					res.json(studioMusicianProfile);
+				});
+			})
+			.catch((err) => next(err));
 	})
 	.delete((req, res, next) => {
 		StudioMusicianProfile.deleteMany()

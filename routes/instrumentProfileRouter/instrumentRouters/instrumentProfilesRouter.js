@@ -1,64 +1,81 @@
 const express = require('express');
-const fd = require('../../../constants/fakeData');
-const userInstrumentProfiles = fd.userInstrumentProfiles;
-
+const InstrumentProfile = require('../../../models/serviceProfiles/instrumentProfile');
 const instrumentProfilesRouter = express.Router();
 
 instrumentProfilesRouter
 	.route('/')
-	.all((req, res, next) => {
-		res.statusCode = 200;
-		res.setHeader('Content-Type', 'text/json');
-		next();
+	.get((req, res, next) => {
+		InstrumentProfile.find()
+			.then((profiles) => {
+				res.statusCode = 200;
+				res.setHeader('Content-Type', 'application/json');
+				res.json(profiles);
+			})
+			.catch((err) => next(err));
 	})
-	.get((req, res) => {
-		res.send(userInstrumentProfiles);
+	.post((req, res, next) => {
+		// make sure user doesn't already have this instrument
+		InstrumentProfile.create(req.body)
+			.then((profile) => {
+				res.statusCode = 200;
+				res.setHeader('Content-Type', 'application/json');
+				res.json(profile);
+			})
+			.catch((err) => next(err));
 	})
-	.post((req, res) => {
-		res.end('will add new instrument profile');
+	.delete((req, res, next) => {
+		InstrumentProfile.deleteMany()
+			.then((response) => {
+				res.statusCode = 200;
+				res.setHeader('Content-Type', 'application/json');
+				res.json(response);
+			})
+			.catch((err) => next(err));
 	})
 	.put((req, res) => {
+		res.statusCode = 405;
 		res.end('PUT not supported at this endpoint');
-	})
-	.delete((req, res) => {
-		res.end('DELETE not supported at this endpoint');
 	});
 
 instrumentProfilesRouter
 	.route('/user-instrument-collection/:userId')
-	.all((req, res, next) => {
-		res.statusCode = 200;
-		res.setHeader('Content-Type', 'text/json');
-		next();
-	})
-	.get((req, res) => {
+	.get((req, res, next) => {
 		const id = req.params.userId;
-		const userInstrumentCollection = userInstrumentProfiles.map((instrument) => (instrument.userId === id ? instrument : null));
-
-		res.send(userInstrumentCollection);
+		InstrumentProfile.find({ userId: id })
+			.then((profiles) => {
+				if (profiles[0]) {
+					res.statusCode = 200;
+					res.setHeader('Content-Header', 'application/json');
+					res.json(profiles);
+				} else {
+					res.statusCode = 404;
+					res.end(`There was no instrument profiles found for user id ${id}`);
+				}
+			})
+			.catch((err) => next(err));
 	})
-	.delete((req, res) => {
-		res.end('Will delete all instrument profiles for a user');
+	.delete((req, res, next) => {
+		InstrumentProfile.deleteMany({ userId: req.params.userId })
+			.then((response) => {
+				res.statusCode = 200;
+				res.setHeader('Content-Header', 'appplication/json');
+				res.json(response);
+			})
+			.catch((err) => next(err));
 	})
 	.put((req, res) => {
+		res.statusCode = 405;
 		res.end('PUT not supported at this endpoint');
 	})
 	.post((req, res) => {
+		res.statusCode = 405;
 		res.end('POST not supported at this endpoint');
 	});
 
 instrumentProfilesRouter
 	.route('/user-instrument/:instrumentId')
-	.all((req, res, next) => {
-		res.statusCode = 200;
-		res.setHeader('Content-Type', 'text/json');
-		next();
-	})
-	.get((req, res) => {
+	.get((req, res, next) => {
 		const id = req.params.instrumentId;
-		const instrument = userInstrumentProfiles.filter((instrument) => (instrument.id === id ? instrument : null))[0];
-
-		res.send(instrument);
 	})
 	.delete((req, res) => {
 		res.end('Will delete instrument');

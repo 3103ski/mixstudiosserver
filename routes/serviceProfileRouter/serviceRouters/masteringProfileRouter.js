@@ -1,5 +1,6 @@
 const express = require('express');
 const MasteringProfile = require('../../../models/serviceProfiles/masteringServiceProfile');
+const UserProfile = require('../../../models/users/userProfile');
 
 const masteringProfileRouter = express.Router();
 
@@ -15,21 +16,26 @@ masteringProfileRouter
 			.catch((err) => next(err));
 	})
 	.post((req, res, next) => {
-		MasteringProfile.find({ userId: req.body.userId }).then((profiles) => {
-			if (profiles[0]) {
-				res.statusCode = 400;
-				res.setHeader('Content-Type', 'application/json');
-				res.end(`User ${req.body.userId} already has a mastering service profile`);
-			} else {
-				MasteringProfile.create(req.body)
-					.then((profile) => {
-						res.statusCode = 200;
-						res.setHeader('Content-Type', 'application/json');
-						res.json(profile);
-					})
-					.catch((err) => next(err));
-			}
-		});
+		MasteringProfile.find({ userId: req.body.userId })
+			.then((profiles) => {
+				if (profiles[0]) {
+					res.statusCode = 400;
+					res.setHeader('Content-Type', 'application/json');
+					res.end(`User ${req.body.userId} already has a mastering service profile`);
+				} else {
+					return MasteringProfile.create(req.body);
+				}
+			})
+			.then((masteringProfile) => {
+				UserProfile.findById(masteringProfile.userId).then((profile) => {
+					profile.serviceProfiles.mastering.profileId = masteringProfile._id;
+					profile.save();
+					res.statusCode = 200;
+					res.setHeader('Content-Type', 'application/json');
+					res.json(masteringProfile);
+				});
+			})
+			.catch((err) => next(err));
 	})
 	.delete((req, res) => {
 		MasteringProfile.deleteMany()

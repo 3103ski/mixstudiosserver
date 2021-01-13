@@ -66,7 +66,7 @@ userProfileRouter
 			.catch((err) => next(err));
 	});
 
-// All SLOs not by user, but by artist users say they sound like. Artist name in endpoint should separate multiple words in name with '-'.
+// All SLOs not by user, but by artist users say they sound like. Artist name in endpoint should seperate multiple words in name with '-'.
 userProfileRouter.route('/sounds-like/:artist').get((req, res, next) => {
 	let artist = req.params.artist.split('-');
 	if (artist.length > 1) {
@@ -99,7 +99,7 @@ userProfileRouter
 				res.statusCode = 200;
 				res.setHeader('Content-Type', 'application/json');
 				// SLOs here is just listing names as strings in an array for UI usage.
-				// For details on one or a group of SLOs, you shoulds make a separate call to the db and not
+				// For details on one or a group of SLOs, you shoulds make a seperate call to the db and not
 				// depend on '[profile].styleInfo.soundsLike' for other SLO info.
 				SoundsLikeObject.find({ userId: userId }).then((SLOs) => {
 					const soundsLikeNames = SLOs.map((slo) => slo.soundsLike);

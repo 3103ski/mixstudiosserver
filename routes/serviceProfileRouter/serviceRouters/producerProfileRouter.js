@@ -1,5 +1,6 @@
 const express = require('express');
 const ProducerProfile = require('../../../models/serviceProfiles/producerServiceProfile');
+const UserProfile = require('../../../models/users/userProfile');
 
 const producerProfilesRouter = express.Router();
 
@@ -15,21 +16,26 @@ producerProfilesRouter
 			.catch((err) => next(err));
 	})
 	.post((req, res, next) => {
-		ProducerProfile.find({ userId: req.body.userId }).then((profiles) => {
-			if (profiles[0]) {
-				res.statusCode = 400;
-				res.setHeader('Content-Type', 'application/json');
-				res.end(`User ${req.body.userId} already has a producer service profile`);
-			} else {
-				ProducerProfile.create(req.body)
-					.then((profile) => {
-						res.statusCode = 200;
-						res.setHeader('Content-Type', 'application/json');
-						res.json(profile);
-					})
-					.catch((err) => next(err));
-			}
-		});
+		ProducerProfile.find({ userId: req.body.userId })
+			.then((profiles) => {
+				if (profiles[0]) {
+					res.statusCode = 400;
+					res.setHeader('Content-Type', 'application/json');
+					res.end(`User ${req.body.userId} already has a producer service profile`);
+				} else {
+					return ProducerProfile.create(req.body);
+				}
+			})
+			.then((producerProfile) => {
+				UserProfile.findById(producerProfile.userId).then((profile) => {
+					profile.serviceProfiles.producer.profileId = producerProfile._id;
+					profile.save();
+					res.statusCode = 200;
+					res.setHeader('Content-Type', 'application/json');
+					res.json(producerProfile);
+				});
+			})
+			.catch((err) => next(err));
 	})
 	.delete((req, res, next) => {
 		ProducerProfile.deleteMany()

@@ -1,5 +1,6 @@
 const express = require('express');
 const MixingProfile = require('../../../models/serviceProfiles/mixingServiceProfile');
+const UserProfile = require('../../../models/users/userProfile');
 
 const mixingProfileRouter = express.Router();
 
@@ -15,21 +16,26 @@ mixingProfileRouter
 			.catch((err) => next(err));
 	})
 	.post((req, res, next) => {
-		MixingProfile.find({ userId: req.body.userId }).then((profiles) => {
-			if (profiles[0]) {
-				res.statusCode = 400;
-				res.setHeader('Content-Type', 'application/json');
-				res.end(`User ${req.body.userId} already has a mixing service profile`);
-			} else {
-				MixingProfile.create(req.body)
-					.then((profile) => {
-						res.statusCode = 200;
-						res.setHeader('Content-Type', 'application/json');
-						res.json(profile);
-					})
-					.catch((err) => next(err));
-			}
-		});
+		MixingProfile.find({ userId: req.body.userId })
+			.then((profiles) => {
+				if (profiles[0]) {
+					res.statusCode = 400;
+					res.setHeader('Content-Type', 'application/json');
+					res.end(`User ${req.body.userId} already has a mixing service profile`);
+				} else {
+					return MixingProfile.create(req.body);
+				}
+			})
+			.then((mixingProfile) => {
+				UserProfile.findById(mixingProfile.userId).then((profile) => {
+					profile.serviceProfiles.mixing.profileId = mixingProfile._id;
+					profile.save();
+					res.statusCode = 200;
+					res.setHeader('Content-Type', 'application/json');
+					res.json(mixingProfile);
+				});
+			})
+			.catch((err) => next(err));
 	})
 	.delete((req, res, next) => {
 		MixingProfile.deleteMany()

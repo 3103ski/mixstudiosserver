@@ -1,5 +1,6 @@
 const express = require('express');
 const SongwriterServiceProfile = require('../../../models/serviceProfiles/songwriterServiceProfile');
+const UserProfile = require('../../../models/users/userProfile');
 const songwriterProfileRouter = express.Router();
 
 songwriterProfileRouter
@@ -14,21 +15,26 @@ songwriterProfileRouter
 			.catch((err) => next(err));
 	})
 	.post((req, res, next) => {
-		SongwriterServiceProfile.find({ userId: req.body.userId }).then((profiles) => {
-			if (profiles[0]) {
-				res.statusCode = 400;
-				res.setHeader('Content-Type', 'application/json');
-				res.end(`User ${req.body.userId} already has a songwriter service profile`);
-			} else {
-				SongwriterServiceProfile.create(req.body)
-					.then((profile) => {
-						res.statusCode = 200;
-						res.setHeader('Content-Type', 'application/json');
-						res.json(profile);
-					})
-					.catch((err) => next(err));
-			}
-		});
+		SongwriterServiceProfile.find({ userId: req.body.userId })
+			.then((profiles) => {
+				if (profiles[0]) {
+					res.statusCode = 400;
+					res.setHeader('Content-Type', 'application/json');
+					res.end(`User ${req.body.userId} already has a songwriter service profile`);
+				} else {
+					return SongwriterServiceProfile.create(req.body);
+				}
+			})
+			.then((songwriterProfile) => {
+				UserProfile.findById(songwriterProfile.userId).then((profile) => {
+					profile.serviceProfiles.songwriter.profileId = songwriterProfile._id;
+					profile.save();
+					res.statusCode = 200;
+					res.setHeader('Content-Type', 'application/json');
+					res.json(songwriterProfile);
+				});
+			})
+			.catch((err) => next(err));
 	})
 	.delete((req, res, next) => {
 		SongwriterServiceProfile.deleteMany()

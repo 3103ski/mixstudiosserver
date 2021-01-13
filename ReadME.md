@@ -334,7 +334,7 @@ endpoint is more for information purposes.
 -   A studio musician will then have an array at `musicianprofile.serviceDetails.instruments` which will hold profiles for all the instruments the
     musician offers. These **instrument profiles** _are not_ pricing details, but instrument and skill level details being attached to musicians.
 -   **Pricing profiles** are more dynamic and change participation based on which is active and what genres/instruments are being priced inside; so
-    they are separated into pricing profiles endpoint. These larger pricing profiles will _then_ have **instrument pricing profiles** within them
+    they are seperated into pricing profiles endpoint. These larger pricing profiles will _then_ have **instrument pricing profiles** within them
     located at `pricingProfile.pricing.instrumentPricingProfiles`.
 -   **Instrument pricing profiles** exist so that the user can break down their pricing **per** instrument **per** pricing profile.
 
