@@ -1,6 +1,6 @@
 const express = require('express');
 // Service Routers
-const profiles = require('./serviceRouters/index');
+const profiles = require('./serviceRoutes/index');
 // Mongoose Models
 const SingerServiceProfiles = require('../../models/serviceProfiles/singerServiceProfile');
 const MixingServiceProfiles = require('../../models/serviceProfiles/mixingServiceProfile');

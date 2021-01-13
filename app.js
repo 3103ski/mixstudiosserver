@@ -5,11 +5,12 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
 // Router Imports
-var indexRouter = require('./routes/index');
+// var indexRouter = require('./routes/index');
 
-const userProfileRouter = require('./routes/userProfilesRouter');
+const userProfileRouter = require('./routes/userProfileRouter');
+const soundsLikeObjectsRouter = require('./routes/soundsLikeObjectsRouter');
 const serviceProfilesRouter = require('./routes/serviceProfileRouter/serviceProfilesRouter');
-const instrumentProfilesRouter = require('./routes/instrumentProfileRouter/instrumentProfilesRouter');
+const instrumentProfilesRouter = require('./routes/instrumentsRouter/instrumentRouter');
 
 const mongoose = require('mongoose');
 
@@ -41,8 +42,9 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // ROUTES
-app.use('/', indexRouter);
+// app.use('/', indexRouter);
 app.use('/users', userProfileRouter);
+app.use('/sounds-like', soundsLikeObjectsRouter);
 app.use('/service-profiles', serviceProfilesRouter);
 app.use('/instruments', instrumentProfilesRouter);
 

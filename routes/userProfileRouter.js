@@ -4,9 +4,6 @@ const SoundsLikeObject = require('../models/users/soundsLikeObject');
 
 const userProfileRouter = express.Router();
 
-//_________________________
-//	ALL USER DOCS
-//-------------------------
 userProfileRouter
 	.route('/')
 	.get((req, res, next) => {
@@ -42,54 +39,6 @@ userProfileRouter
 		res.end('PUT not supported at this endpoint');
 	});
 
-userProfileRouter
-	.route('/sounds-like')
-	.post((req, res) => {
-		res.end('You cannot POST to this endpoint');
-	})
-	.get((req, res, next) => {
-		SoundsLikeObject.find()
-			.then((slos) => {
-				res.statusCode = 200;
-				res.setHeader('Content-Type', 'application/json');
-				res.json(slos);
-			})
-			.catch((err) => next(err));
-	})
-	.delete((req, res, next) => {
-		SoundsLikeObject.deleteMany()
-			.then((respsone) => {
-				res.statusCode = 200;
-				res.setHeader('Content-Type', 'application/json');
-				res.json(respsone);
-			})
-			.catch((err) => next(err));
-	});
-
-// All SLOs not by user, but by artist users say they sound like. Artist name in endpoint should seperate multiple words in name with '-'.
-userProfileRouter.route('/sounds-like/:artist').get((req, res, next) => {
-	let artist = req.params.artist.split('-');
-	if (artist.length > 1) {
-		artist = artist.join(' ').toLowerCase();
-	} else {
-		artist = artist[0].toLowerCase();
-	}
-	console.log(artist);
-
-	SoundsLikeObject.find({ soundsLike: artist })
-		.then((results) => {
-			res.statusCode = 200;
-			res.setHeader('Content-Type', 'application/json');
-			res.json(results);
-		})
-		.catch((err) => next(err));
-});
-
-//_________________________
-//	SPECIFIC USER DOCS
-//-------------------------
-
-// Core Profiles
 userProfileRouter
 	.route('/:userId')
 	.get((req, res, next) => {
@@ -137,44 +86,6 @@ userProfileRouter
 	.post((req, res) => {
 		res.statusCode = 403;
 		res.end('POST is not supported at this endpoint');
-	});
-
-// 'Sounds Like' Objects
-userProfileRouter
-	.route('/:userId/sounds-like/')
-	.post((req, res, next) => {
-		let slo = { ...req.body, userId: req.params.userId };
-		slo.soundsLike = slo.soundsLike.toLowerCase();
-		SoundsLikeObject.create(slo)
-			.then((SLO) => {
-				res.statusCode = 200;
-				res.setHeader('Content-Type', 'application/json');
-				res.json(SLO);
-			})
-			.catch((err) => next(err));
-	})
-	.get((req, res, next) => {
-		SoundsLikeObject.find({ userId: req.params.userId })
-			.then((SLOs) => {
-				res.statusCode = 200;
-				res.setHeader('Content-Type', 'application/json');
-				res.json(SLOs);
-			})
-			.catch((err) => next(err));
-	})
-	.delete((req, res, next) => {
-		SoundsLikeObject.deleteMany({ userId: req.params.userId })
-			.then((response) => {
-				res.statusCode = 200;
-				res.setHeader('Content-Type', 'application/json');
-				res.json(response);
-			})
-			.catch((err) => next(err));
-	})
-	.put((req, res) => {
-		res.statusCode = 403;
-		res.setHeader('Content-Type', 'application/json');
-		res.end('PUT not supported at this endpoint');
 	});
 
 module.exports = userProfileRouter;

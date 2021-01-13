@@ -1,7 +1,7 @@
 const express = require('express');
 
-const instrumentProfiles = require('./instrumentRouters/instrumentProfilesRouter');
-const instrumentPricing = require('./instrumentRouters/instrumentPricingRouter');
+const instrumentProfiles = require('./instrumentRoutes/instrumentProfilesRouter');
+const instrumentPricing = require('./instrumentRoutes/instrumentPricingProfileRouter');
 
 const instrumentProfilesRouter = express.Router();
 
