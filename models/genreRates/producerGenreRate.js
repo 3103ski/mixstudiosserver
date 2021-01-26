@@ -5,7 +5,7 @@ const Currency = mongoose.Types.Currency;
 
 const producerGenreRate = new Schema(
 	{
-		pricingProfileId: {
+		producerPricingProfileId: {
 			type: String,
 			required: true,
 		},

@@ -53,7 +53,7 @@ const genre = new Schema(
 
 const mixingGenreRate = new Schema(
 	{
-		pricingProfileId: {
+		masteringPricingProfileId: {
 			type: String,
 			required: true,
 		},

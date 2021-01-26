@@ -11,6 +11,7 @@ const userProfileRouter = require('./routes/userProfileRouter');
 const soundsLikeObjectsRouter = require('./routes/soundsLikeObjectsRouter');
 const serviceProfilesRouter = require('./routes/serviceProfileRouter/serviceProfilesRouter');
 const instrumentProfilesRouter = require('./routes/instrumentsRouter/instrumentRouter');
+const servicesPricingRouter = require('./routes/servicePricingProfilesRouter/servicePricingProfilesRouter');
 
 const mongoose = require('mongoose');
 
@@ -46,6 +47,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/users', userProfileRouter);
 app.use('/sounds-like', soundsLikeObjectsRouter);
 app.use('/service-profiles', serviceProfilesRouter);
+app.use('/service-pricing', servicesPricingRouter);
 app.use('/instruments', instrumentProfilesRouter);
 
 // catch 404 and forward to error handler

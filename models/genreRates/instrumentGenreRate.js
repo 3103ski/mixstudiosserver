@@ -42,4 +42,5 @@ const instrumentGenreRate = new Schema(
 	}
 );
 
-const InstrumentGenreRate;
+const InstrumentGenreRate = mongoose.model('InstrumentGenreRate', instrumentGenreRate);
+module.exports = InstrumentGenreRate;

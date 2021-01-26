@@ -1,12 +1,13 @@
 const express = require('express');
+const MasteringGenreRate = require('../../../models/genreRates/masteringGenreRate');
 const MasteringPricingProfile = require('../../../models/pricingProfiles/masteringPricingProfile');
 
-const masteringPricingRouter = express.Router();
+const masteringGenreRateRouter = express.Router();
 
-masteringPricingRouter
+masteringGenreRateRouter
 	.route('/')
 	.get((req, res, next) => {
-		MasteringPricingProfile.find()
+		InstrumentGenreRates.find()
 			.then((profiles) => {
 				res.statusCode = 200;
 				res.setHeader('Content-Type', 'application/json');
@@ -15,7 +16,7 @@ masteringPricingRouter
 			.catch((err) => next(err));
 	})
 	.post((req, res, next) => {
-		MasteringPricingProfile.create(req.body)
+		InstrumentGenreRates.create(req.body)
 			.then((profile) => {
 				res.statusCode = 200;
 				res.setHeader('Content-Type', 'application/json');
@@ -23,8 +24,8 @@ masteringPricingRouter
 			})
 			.catch((err) => next(err));
 	})
-	.delete((req, res, next) => {
-		MasteringPricingProfile.deleteMany()
+	.delete((req, res) => {
+		InstrumentGenreRates.deleteMany()
 			.then((response) => {
 				res.statusCode = 200;
 				res.setHeader('Content-Type', 'application/json');
@@ -34,78 +35,72 @@ masteringPricingRouter
 	})
 	.put((req, res) => {
 		res.statusCode = 405;
-		res.end('You can not PUT at this endpoing');
+		res.end('You cannot PUT at this endpoint.');
 	});
-
-// ALL PRICING PROFILES FOR A USER'S SERVICE PROFILE
-masteringPricingRouter
-	.route('/collection/:userId')
+// pretty sure there is a MISTAKE; collect rates, not pricing profiles
+masteringGenreRateRouter
+	.route('/profile-collection/:instrumentPricingProfileId')
 	.get((req, res, next) => {
-		MasteringPricingProfile.find({ userId: req.params.userId })
+		const id = req.params.instrumentPricingProfileId;
+		InstrumentPricingProfile.find({ instrumentPricingProfileId: id })
 			.then((profiles) => {
 				res.statusCode = 200;
-				res.setHeader('Content-Type', 'application/json');
+				res.setHeader('Content-Header', 'application/json');
 				res.json(profiles);
 			})
 			.catch((err) => next(err));
 	})
-	.post((req, res, next) => {
-		MasteringPricingProfile.create(req.body)
-			.then((profile) => {
-				res.statusCode = 200;
-				res.setHeader('Content-Type', 'application/json');
-				res.json(profile);
-			})
-			.catch((err) => next(err));
-	})
 	.delete((req, res, next) => {
-		MasteringPricingProfile.deleteMany()
+		const id = req.params.instrumentPricingProfileId;
+		InstrumentPricingProfile.deleteMany({ instrumentPricingProfileId: id })
 			.then((response) => {
 				res.statusCode = 200;
-				res.setHeader('Content-Type', 'application/json');
-				res.json(response);
-			})
-			.catch((err) => next(err));
-	})
-	.put((req, res) => {
-		res.statusCode = 405;
-		res.end('You can not PUT at this endpoing');
-	});
-
-// GET A SPECIFIC PRICING PROFILE
-masteringPricingRouter
-	.route('/:profileId')
-	.get((req, res, next) => {
-		MasteringPricingProfile.findById({ _id: req.params.profileId })
-			.then((profile) => {
-				res.statusCode = 200;
-				res.setHeader('Content-Type', 'application/json');
-				res.json(profile);
-			})
-			.catch((err) => next(err));
-	})
-
-	.delete((req, res, next) => {
-		MasteringPricingProfile.findByIdAndDelete(req.params.profileId)
-			.then((response) => {
-				res.statusCode = 200;
-				res.setHeader('Content-Type', 'application/json');
+				res.setHeader('Content-Header', 'application/json');
 				res.json(response);
 			})
 			.catch((err) => next(err));
 	})
 	.put((req, res, next) => {
-		MasteringPricingProfile.findByIdAndUpdate(req.params.profileId, { $set: req.body }, { new: true })
-			.then((profile) => {
+		res.statusCode = 405;
+		res.end('You cannot POST at this endpoint');
+	})
+	.post((req, res) => {
+		res.statusCode = 405;
+		res.end('You cannot POST at this endpoint');
+	});
+
+masteringGenreRateRouter
+	.route('/:genreRateId')
+	.get((req, res, next) => {
+		InstrumentPricingProfile.findById(req.params.genreRateId)
+			.then((genreRate) => {
 				res.statusCode = 200;
 				res.setHeader('Content-Type', 'application/json');
-				res.json(profile);
+				res.json(genreRate);
+			})
+			.catch((err) => next(err));
+	})
+	.put((req, res, next) => {
+		InstrumentPricingProfile.findByIdAndUpdate(req.params.genreRateId, { $set: req.body }, { new: true })
+			.then((response) => {
+				res.statusCode = 200;
+				res.setHeader('Content-Type', 'application/json');
+				res.json(response);
+			})
+			.catch((err) => next(err));
+	})
+	.delete((req, res, next) => {
+		InstrumentPricingProfile.findByIdAndDelete(req.params.genreRateId)
+			.then((response) => {
+				res.statusCode = 200;
+				res.setHeader('Content-Type', 'application/json');
+				res.json(response);
 			})
 			.catch((err) => next(err));
 	})
 	.post((req, res) => {
 		res.statusCode = 405;
-		res.end('You can not POST at this endpoing');
+		res.end('You can not POST to this endpoint');
 	});
 
-module.exports = masteringPricingRouter;
+module.exports = masteringGenreRateRouter;
