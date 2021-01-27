@@ -1,8 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 require('mongoose-type-email');
-// require('mongoose-currency').loadType(mongoose);
-// const Currency = mongoose.Types.Currency;
+const passportLocalMongoose = require('passport-local-mongoose');
 
 // FULL PROFILE SCHEMA ASSEMBELED AT BOTTOM
 
@@ -14,11 +13,6 @@ require('mongoose-type-email');
 
 const userInfoSchema = new Schema(
 	{
-		username: {
-			type: String,
-			required: true,
-			unique: true,
-		},
 		email: {
 			type: mongoose.SchemaTypes.Email,
 			required: true,
@@ -38,7 +32,6 @@ const userInfoSchema = new Schema(
 		},
 		location: {
 			type: String,
-			required: true,
 		},
 	},
 	{
@@ -167,9 +160,9 @@ const tvSchema = new Schema(
 // ******  Assembled parts for userProfile.styleInfo
 const styleInfoSchema = new Schema(
 	{
-		music: musicSchema,
-		tv: tvSchema,
-		tvMusic: tvMusicSchema,
+		music: { type: musicSchema, default: () => ({}) },
+		tv: { type: tvSchema, default: () => ({}) },
+		tvMusic: { type: tvMusicSchema, default: () => ({}) },
 		soundsLike: {
 			type: Array,
 			default: [], // will hold ids referencing sounds like objects
@@ -248,14 +241,18 @@ const serviceProfileSchema = new Schema(
 const userProfileSchema = new Schema(
 	{
 		userInfo: userInfoSchema,
-		styleInfo: styleInfoSchema,
+		styleInfo: { type: styleInfoSchema, default: () => ({}) },
 		serviceProfiles: { type: serviceProfileSchema, default: () => ({}) },
+		isAdmin: {
+			type: Boolean,
+			default: false,
+		},
 	},
 	{
 		timestamps: true,
 	}
 );
 
-const UserProfile = mongoose.model('UserProfile', userProfileSchema);
+userProfileSchema.plugin(passportLocalMongoose);
 
-module.exports = UserProfile;
+module.exports = mongoose.model('UserProfile', userProfileSchema);
