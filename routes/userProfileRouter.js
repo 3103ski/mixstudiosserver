@@ -7,10 +7,12 @@ const auth = require('../authenticate');
 
 const userProfileRouter = express.Router();
 
+userProfileRouter.options('*', cors.corsWithOptions, (req, res) => res.sendStatus(200));
+
 userProfileRouter
 	.route('/')
 	.options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
-	.get(cors.cors, auth.verifyUser, auth.verifyAdmin, (req, res, next) => {
+	.get(cors.cors, auth.verifyUser, (req, res, next) => {
 		UserProfile.find()
 			.then((userProfiles) => {
 				res.statusCode = 200;
@@ -40,45 +42,80 @@ userProfileRouter
 userProfileRouter
 	.route('/signup')
 	.options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
-	.post((req, res) => {
-		UserProfile.register(new UserProfile({ username: req.body.username, userInfo: req.body.userInfo }), req.body.password, (err, user) => {
-			if (err) {
-				res.statusCode = 500;
-				res.setHeader('Content-Type', 'application/json');
-				res.json({ err: err });
-			} else {
-				if (req.body.firstname) {
-					user.firstname = req.body.firstname;
-				}
-				if (req.body.lastname) {
-					user.lastname = req.body.lastname;
-				}
-				user.save((err) => {
-					if (err) {
-						res.statusCode = 500;
-						res.setHeader('Content-Type', 'application/json');
-						res.json({ err: err });
-						return;
-					}
-					passport.authenticate('local')(req, res, () => {
-						res.statusCode = 200;
-						res.setHeader('Content-Type', 'application/json');
-						res.json({ success: true, status: 'Registration Successful!' });
+	.post(cors.corsWithOptions, (req, res) => {
+		UserProfile.register(
+			new UserProfile({ username: req.body.username, userInfo: req.body.userInfo }),
+			req.body.password,
+			(err, user) => {
+				if (err) {
+					res.statusCode = 500;
+					res.setHeader('Content-Type', 'application/json');
+					res.json({ err: err });
+				} else {
+					user.save((err) => {
+						if (err) {
+							res.statusCode = 500;
+							res.setHeader('Content-Type', 'application/json');
+							res.json({ err: err });
+							return;
+						}
+						passport.authenticate('local')(req, res, () => {
+							res.statusCode = 200;
+							res.setHeader('Content-Type', 'application/json');
+							res.json({
+								success: true,
+								status: 'Registration Successful!',
+								user: user,
+							});
+						});
 					});
-				});
+				}
 			}
-		});
+		);
 	});
 
-userProfileRouter.post('/login', cors.corsWithOptions, passport.authenticate('local'), (req, res) => {
+userProfileRouter.post('/login', cors.cors, passport.authenticate('local'), (req, res) => {
 	const token = auth.getToken({ _id: req.user._id });
 	res.statusCode = 200;
 	res.setHeader('Content-Type', 'application/json');
-	res.json({ success: true, token: token, status: 'You are successfully logged in!' });
+	res.json({
+		success: true,
+		token: token,
+		status: 'You are successfully logged in!',
+		user: req.user,
+	});
 });
+
+// 'fetch-user' endpoint used by front-end to easily grab data of the currently authenticated user. '/:userId' endpoint is for any
+// account or instance of the app to get info on any user; given they have the permissions
+userProfileRouter
+	.route('/fetch-user')
+	.options(cors.corsWithOptions, (req, res, next) => res.sendStatus(200))
+	.get(cors.cors, auth.verifyUser, (req, res) => {
+		UserProfile.findById(req.user._id)
+			.then((user) => {
+				res.statusCode = 200;
+				res.setHeader('Content-Type', 'application/json');
+				res.json(user);
+			})
+			.catch((err) => next(err));
+	})
+	.post(cors.corsWithOptions, auth.verifyUser, (req, res) => {
+		res.statusCode = 403;
+		res.end('Method not supported at this endpoing');
+	})
+	.put(cors.corsWithOptions, auth.verifyUser, (req, res) => {
+		res.statusCode = 403;
+		res.end('Method not supported at this endpoing');
+	})
+	.delete(cors.corsWithOptions, auth.verifyUser, (req, res) => {
+		res.statusCode = 403;
+		res.end('Method not supported at this endpoing');
+	});
 
 userProfileRouter
 	.route('/:userId')
+	.options(cors.corsWithOptions, (req, res, next) => res.sendStatus(200))
 	.get((req, res, next) => {
 		const userId = req.params.userId;
 		UserProfile.findById(userId)
@@ -97,20 +134,25 @@ userProfileRouter
 			})
 			.catch((err) => next(err));
 	})
-	.put((req, res, next) => {
-		UserProfile.findByIdAndUpdate(
-			req.params.userId,
-			{
-				$set: req.body,
-			},
-			{ new: true }
-		)
-			.then((userProfile) => {
-				res.statusCode = 200;
-				res.setHeader('Content-Type', 'application/json');
-				res.json(userProfile);
-			})
-			.catch((err) => next(err));
+	.put(cors.corsWithOptions, auth.verifyUser, (req, res, next) => {
+		if (req.user._id.toString() === req.params.userId) {
+			UserProfile.findByIdAndUpdate(
+				req.params.userId,
+				{
+					$set: req.body,
+				},
+				{ new: true }
+			)
+				.then((userProfile) => {
+					res.statusCode = 200;
+					res.setHeader('Content-Type', 'application/json');
+					res.json(userProfile);
+				})
+				.catch((err) => next(err));
+		} else {
+			res.statusCode = 403;
+			res.end('the authorized user is not the owner of this profile');
+		}
 	})
 	.delete((req, res, next) => {
 		UserProfile.findByIdAndDelete(req.params.userId)
