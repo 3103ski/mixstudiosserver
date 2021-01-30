@@ -40,6 +40,9 @@ const userProfileSchema = new Schema(
 			location: {
 				type: String,
 			},
+			avatar: {
+				type: String,
+			},
 		},
 		styleInfo: {
 			music: {

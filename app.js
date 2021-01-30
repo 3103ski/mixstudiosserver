@@ -8,7 +8,7 @@ const config = require('./config');
 
 // Router Imports
 // const indexRouter = require('./routes/index');
-
+const uploadsRouter = require('./routes/uploadRouter');
 const userProfileRouter = require('./routes/userProfileRouter');
 const soundsLikeObjectsRouter = require('./routes/soundsLikeObjectsRouter');
 const serviceProfilesRouter = require('./routes/serviceProfileRouter/serviceProfilesRouter');
@@ -60,6 +60,7 @@ app.use('/sounds-like', soundsLikeObjectsRouter);
 app.use('/service-profiles', serviceProfilesRouter);
 app.use('/service-pricing', servicesPricingRouter);
 app.use('/instruments', instrumentProfilesRouter);
+app.use('/uploads', uploadsRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
