@@ -3,13 +3,13 @@ const Schema = mongoose.Schema;
 
 const soundsLikeObjectSchema = new Schema(
 	{
-		soundsLike: {
+		title: {
 			type: String,
 			required: true,
 		},
 		userId: {
-			type: String,
-			required: true,
+			type: Schema.Types.ObjectId,
+			ref: 'UserProfile',
 		},
 	},
 	{

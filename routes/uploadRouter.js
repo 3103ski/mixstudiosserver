@@ -2,6 +2,7 @@ const express = require('express');
 const multer = require('multer');
 const authenticate = require('../authenticate');
 const cors = require('./cors');
+const deleteWithFSFromRoot = require('../fs');
 
 const User = require('../models/users/userProfile');
 
@@ -24,9 +25,6 @@ const avatarStorage = multer.diskStorage({
 	destination: (req, file, cb) => {
 		cb(null, 'public/images/avatars');
 	},
-	filename: (req, file, cb) => {
-		cb(null, file.originalname);
-	},
 });
 
 const avatarUpload = multer({ storage: avatarStorage, fileFilter: imageFileFilter });
@@ -45,13 +43,19 @@ uploadRouter
 		(req, res, next) => {
 			User.findById(req.user._id)
 				.then((user) => {
-					user.userInfo.avatar = req.file.filename;
-					user.save();
-					console.log('The User that needs an avatar: \n', user);
-
-					res.statusCode = 200;
-					res.setHeader('Content-Type', 'application/json');
-					res.json(req.file);
+					return deleteWithFSFromRoot.publicAccessDelete(
+						'/images/avatars/',
+						user.userInfo.avatar
+					);
+				})
+				.then((response) => {
+					User.findById(req.user._id).then((user) => {
+						user.userInfo.avatar = req.file.filename;
+						user.save();
+						res.statusCode = 200;
+						res.setHeader('Content-Type', 'application/json');
+						res.json(user);
+					});
 				})
 				.catch((err) => next(err));
 		}

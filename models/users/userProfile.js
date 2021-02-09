@@ -42,6 +42,7 @@ const userProfileSchema = new Schema(
 			},
 			avatar: {
 				type: String,
+				default: '',
 			},
 		},
 		styleInfo: {
@@ -117,7 +118,7 @@ const userProfileSchema = new Schema(
 			},
 			soundsLike: {
 				type: Array,
-				default: [], // will hold ids referencing sounds like objects
+				default: [],
 			},
 		},
 		serviceProfiles: {
@@ -135,6 +136,14 @@ const userProfileSchema = new Schema(
 		isAdmin: {
 			type: Boolean,
 			default: false,
+		},
+		followers: {
+			type: Array,
+			default: [],
+		},
+		following: {
+			type: Array,
+			default: [],
 		},
 	},
 	{
