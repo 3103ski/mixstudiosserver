@@ -2,7 +2,6 @@ const express = require('express');
 const cors = require('../../cors');
 const auth = require('../../../authenticate');
 const ProducerProfile = require('../../../models/serviceProfiles/producerServiceProfile');
-const UserProfile = require('../../../models/users/userProfile');
 
 const producerProfilesRouter = express.Router();
 
@@ -72,7 +71,8 @@ producerProfilesRouter
 
 producerProfilesRouter
 	.route('/:userId')
-	.get((req, res, next) => {
+	.options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
+	.get(cors.cors, (req, res, next) => {
 		const id = req.params.userId;
 		ProducerProfile.find({ userId: id })
 			.then((profiles) => {
@@ -88,12 +88,11 @@ producerProfilesRouter
 			})
 			.catch((err) => next(err));
 	})
-	.delete((req, res, next) => {
+	.delete(cors.corsWithOptions, auth.verifyUser, (req, res, next) => {
 		const id = req.params.userId;
-
 		ProducerProfile.find({ userId: id })
 			.then((profiles) => {
-				if (profiles[0]) {
+				if (profiles[0] && id === req.user._id) {
 					ProducerProfile.findByIdAndDelete(profiles[0]._id)
 						.then((response) => {
 							res.statusCode = 200;
@@ -103,12 +102,14 @@ producerProfilesRouter
 						.catch((err) => next(err));
 				} else {
 					res.statusCode = 404;
-					res.end(`There was no producer profile for the user id ${id}`);
+					res.end(
+						`There was no producer profile for the user id ${id} or you are not the owner`
+					);
 				}
 			})
 			.catch((err) => next(err));
 	})
-	.put((req, res, next) => {
+	.put(cors.corsWithOptions, auth.verifyUser, (req, res, next) => {
 		const id = req.params.userId;
 
 		ProducerProfile.find({ userId: id })

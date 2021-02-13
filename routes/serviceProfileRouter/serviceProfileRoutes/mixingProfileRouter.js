@@ -1,6 +1,5 @@
 const express = require('express');
 const MixingProfile = require('../../../models/serviceProfiles/mixingServiceProfile');
-// const UserProfile = require('../../../models/users/userProfile');
 
 const cors = require('../../cors');
 const auth = require('../../../authenticate');

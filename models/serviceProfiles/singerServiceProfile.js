@@ -32,10 +32,7 @@ const singerProfileSchema = new Schema(
 			type: Array,
 			default: [],
 		},
-		pricing: {
-			type: shared.pricing,
-			default: () => ({}),
-		},
+		pricing: shared.pricing,
 	},
 	{
 		timestamps: true,

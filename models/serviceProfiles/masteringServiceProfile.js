@@ -2,50 +2,6 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const shared = require('./sharedSubSchemas');
 
-const masteringMethods = new Schema(
-	{
-		analog: {
-			type: Boolean,
-			default: false,
-		},
-		digital: {
-			type: Boolean,
-			default: false,
-		},
-		hybrid: {
-			type: Boolean,
-			deafult: false,
-		},
-	},
-	{
-		_id: false,
-	}
-);
-
-const extraMasteringServices = new Schema(
-	{
-		twoStem: {
-			type: Boolean,
-			default: false,
-		},
-		fourStem: {
-			type: Boolean,
-			default: false,
-		},
-		eightStem: {
-			type: Boolean,
-			default: false,
-		},
-		digitalThroughAnalog: {
-			type: Boolean,
-			default: false,
-		},
-	},
-	{
-		_id: false,
-	}
-);
-
 const masteringProfileSchema = new Schema(
 	{
 		userId: {
@@ -57,17 +13,38 @@ const masteringProfileSchema = new Schema(
 			default: 'mastering',
 		},
 		masteringMethods: {
-			type: masteringMethods,
-			default: () => ({}),
+			analog: {
+				type: Boolean,
+				default: false,
+			},
+			digital: {
+				type: Boolean,
+				default: false,
+			},
+			hybrid: {
+				type: Boolean,
+				deafult: false,
+			},
 		},
 		extraMasteringServices: {
-			type: extraMasteringServices,
-			default: () => ({}),
+			twoStem: {
+				type: Boolean,
+				default: false,
+			},
+			fourStem: {
+				type: Boolean,
+				default: false,
+			},
+			eightStem: {
+				type: Boolean,
+				default: false,
+			},
+			digitalThroughAnalog: {
+				type: Boolean,
+				default: false,
+			},
 		},
-		pricing: {
-			type: shared.pricing,
-			default: () => ({}),
-		},
+		pricing: shared.pricing,
 	},
 	{
 		timestamps: true,

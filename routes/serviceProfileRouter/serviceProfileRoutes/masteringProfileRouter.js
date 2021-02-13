@@ -1,12 +1,14 @@
 const express = require('express');
 const MasteringProfile = require('../../../models/serviceProfiles/masteringServiceProfile');
-const UserProfile = require('../../../models/users/userProfile');
+const cors = require('../../cors');
+const auth = require('../../../authenticate');
 
 const masteringProfileRouter = express.Router();
 
 masteringProfileRouter
 	.route('/')
-	.get((req, res, next) => {
+	.options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
+	.get(cors.cors, auth.verifyUser, (req, res, next) => {
 		MasteringProfile.find()
 			.then((profiles) => {
 				res.statusCode = 200;
@@ -15,29 +17,27 @@ masteringProfileRouter
 			})
 			.catch((err) => next(err));
 	})
-	.post((req, res, next) => {
-		MasteringProfile.find({ userId: req.body.userId })
+	.post(cors.corsWithOptions, auth.verifyUser, (req, res, next) => {
+		MasteringProfile.find({ userId: req.user._id })
 			.then((profiles) => {
 				if (profiles[0]) {
 					res.statusCode = 400;
 					res.setHeader('Content-Type', 'application/json');
-					res.end(`User ${req.body.userId} already has a mastering service profile`);
+					res.end(`User ${req.user._id} already has a mastering service profile`);
 				} else {
+					const newprofile = req.body;
+					newprofile.userId = req.user._id;
 					return MasteringProfile.create(req.body);
 				}
 			})
 			.then((masteringProfile) => {
-				UserProfile.findById(masteringProfile.userId).then((profile) => {
-					profile.serviceProfiles.mastering.profileId = masteringProfile._id;
-					profile.save();
-					res.statusCode = 200;
-					res.setHeader('Content-Type', 'application/json');
-					res.json(masteringProfile);
-				});
+				res.statusCode = 200;
+				res.setHeader('Content-Type', 'application/json');
+				res.json(masteringProfile);
 			})
 			.catch((err) => next(err));
 	})
-	.delete((req, res) => {
+	.delete(cors.corsWithOptions, auth.verifyUser, auth.verifyAdmin, (req, res) => {
 		MasteringProfile.deleteMany()
 			.then((response) => {
 				res.statusCode = 200;
@@ -46,13 +46,33 @@ masteringProfileRouter
 			})
 			.catch((err) => next(err));
 	})
-	.put((req, res) => {
-		res.end('You cannot PUT at this endpoint.');
+	.put(cors.corsWithOptions, auth.verifyUser, (req, res, next) => {
+		MasteringProfile.find({ userId: req.user._id })
+			.then((profiles) => {
+				if (profiles[0]) {
+					MasteringProfile.findByIdAndUpdate(
+						profiles[0]._id,
+						{ $set: req.body },
+						{ new: true }
+					)
+						.then((response) => {
+							res.statusCode = 200;
+							res.setHeader('Content-Type', 'application/json');
+							res.json(response);
+						})
+						.catch((err) => next(err));
+				} else {
+					res.statusCode = 404;
+					res.end(`There was no mastering profile for the user id ${id}`);
+				}
+			})
+			.catch((err) => next(err));
 	});
 
 masteringProfileRouter
 	.route('/:userId')
-	.get((req, res, next) => {
+	.options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
+	.get(cors.cors, (req, res, next) => {
 		const id = req.params.userId;
 		MasteringProfile.find({ userId: id })
 			.then((profiles) => {
@@ -68,12 +88,11 @@ masteringProfileRouter
 			})
 			.catch((err) => next(err));
 	})
-	.delete((req, res, next) => {
+	.delete(cors.corsWithOptions, auth.verifyUser, (req, res, next) => {
 		const id = req.params.userId;
-
 		MasteringProfile.find({ userId: id })
 			.then((profiles) => {
-				if (profiles[0]) {
+				if ((profiles[0] && id === req.user._id) || req.user.isAdmin) {
 					MasteringProfile.findByIdAndDelete(profiles[0]._id)
 						.then((response) => {
 							res.statusCode = 200;
@@ -88,13 +107,17 @@ masteringProfileRouter
 			})
 			.catch((err) => next(err));
 	})
-	.put((req, res, next) => {
+	.put(cors.corsWithOptions, auth.verifyUser, (req, res, next) => {
 		const id = req.params.userId;
 
 		MasteringProfile.find({ userId: id })
 			.then((profiles) => {
 				if (profiles[0]) {
-					MasteringProfile.findByIdAndUpdate(profiles[0]._id, { $set: req.body }, { new: true })
+					MasteringProfile.findByIdAndUpdate(
+						profiles[0]._id,
+						{ $set: req.body },
+						{ new: true }
+					)
 						.then((response) => {
 							res.statusCode = 200;
 							res.setHeader('Content-Type', 'application/json');

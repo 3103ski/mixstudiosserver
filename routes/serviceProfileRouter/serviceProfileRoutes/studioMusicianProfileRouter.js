@@ -1,12 +1,14 @@
 const express = require('express');
 const StudioMusicianProfile = require('../../../models/serviceProfiles/studioMusicianServiceProfile');
-const UserProfile = require('../../../models/users/userProfile');
+const cors = require('../../cors');
+const auth = require('../../../authenticate');
 
 const studioMusicianProfileRouter = express.Router();
 
 studioMusicianProfileRouter
 	.route('/')
-	.get((req, res, next) => {
+	.options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
+	.get(cors.cors, auth.verifyUser, (req, res, next) => {
 		StudioMusicianProfile.find()
 			.then((profiles) => {
 				res.statusCode = 200;
@@ -15,29 +17,29 @@ studioMusicianProfileRouter
 			})
 			.catch((err) => next(err));
 	})
-	.post((req, res, next) => {
-		StudioMusicianProfile.find({ userId: req.body.userId })
+	.post(cors.corsWithOptions, auth.verifyUser, (req, res, next) => {
+		StudioMusicianProfile.find({ userId: req.user._id })
 			.then((profiles) => {
 				if (profiles[0]) {
 					res.statusCode = 400;
 					res.setHeader('Content-Type', 'application/json');
-					res.end(`User ${req.body.userId} already has a studio musician service profile`);
+					res.end(
+						`User ${req.body.userId} already has a studio musician service profile`
+					);
 				} else {
+					const newprofile = req.body;
+					newprofile.userId = req.user._id;
 					return StudioMusicianProfile.create(req.body);
 				}
 			})
 			.then((studioMusicianProfile) => {
-				UserProfile.findById(studioMusicianProfile.userId).then((profile) => {
-					profile.serviceProfiles.studioMusician.profileId = studioMusicianProfile._id;
-					profile.save();
-					res.statusCode = 200;
-					res.setHeader('Content-Type', 'application/json');
-					res.json(studioMusicianProfile);
-				});
+				res.statusCode = 200;
+				res.setHeader('Content-Type', 'application/json');
+				res.json(studioMusicianProfile);
 			})
 			.catch((err) => next(err));
 	})
-	.delete((req, res, next) => {
+	.delete(cors.corsWithOptions, auth.verifyUser, auth.verifyAdmin, (req, res, next) => {
 		StudioMusicianProfile.deleteMany()
 			.then((response) => {
 				res.statusCode = 200;
@@ -46,14 +48,33 @@ studioMusicianProfileRouter
 			})
 			.catch((err) => next(err));
 	})
-	.put((req, res) => {
-		res.statusCode = 405;
-		res.end('You cannot PUT at this endpoint.');
+	.put(cors.corsWithOptions, auth.verifyUser, (req, res, next) => {
+		StudioMusicianProfile.find({ userId: req.user._id })
+			.then((profiles) => {
+				if (profiles[0]) {
+					StudioMusicianProfile.findByIdAndUpdate(
+						profiles[0]._id,
+						{ $set: req.body },
+						{ new: true }
+					)
+						.then((response) => {
+							res.statusCode = 200;
+							res.setHeader('Content-Type', 'application/json');
+							res.json(response);
+						})
+						.catch((err) => next(err));
+				} else {
+					res.statusCode = 404;
+					res.end(`There was no mixing profile for the user id ${id}`);
+				}
+			})
+			.catch((err) => next(err));
 	});
 
 studioMusicianProfileRouter
 	.route('/:userId')
-	.get((req, res, next) => {
+	.options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
+	.get(cors.cors, (req, res, next) => {
 		const id = req.params.userId;
 		StudioMusicianProfile.find({ userId: id })
 			.then((profiles) => {
@@ -69,11 +90,11 @@ studioMusicianProfileRouter
 			})
 			.catch((err) => next(err));
 	})
-	.delete((req, res, next) => {
+	.delete(cors.corsWithOptions, auth.verifyUser, (req, res, next) => {
 		const id = req.params.userId;
-		StudioMusicianProfile.find({ userId: id })
+		StudioMusicianProfile.find({ userId: req.user._id })
 			.then((profiles) => {
-				if (profiles[0]) {
+				if ((profiles[0] && req.user._id === id) || req.user.isAdmin) {
 					StudioMusicianProfile.findByIdAndDelete(profiles[0]._id)
 						.then((response) => {
 							res.statusCode = 200;
@@ -88,12 +109,16 @@ studioMusicianProfileRouter
 			})
 			.catch((err) => next(err));
 	})
-	.put((req, res, next) => {
+	.put(cors.corsWithOptions, auth.verifyUser, (req, res, next) => {
 		const id = req.params.userId;
 		StudioMusicianProfile.find({ userId: id })
 			.then((profiles) => {
-				if (profiles[0]) {
-					StudioMusicianProfile.findByIdAndUpdate(profiles[0]._id, { $set: req.body }, { new: true })
+				if ((profiles[0] && req.user._id === id) || req.user.isAdmin) {
+					StudioMusicianProfile.findByIdAndUpdate(
+						profiles[0]._id,
+						{ $set: req.body },
+						{ new: true }
+					)
 						.then((response) => {
 							res.statusCode = 200;
 							res.setHeader('Content-Type', 'application/json');
@@ -107,7 +132,7 @@ studioMusicianProfileRouter
 			})
 			.catch((err) => next(err));
 	})
-	.post((req, res) => {
+	.post(cors.cors, (req, res) => {
 		res.statusCode = 405;
 		res.end('You cannot POST at this endpoint');
 	});
