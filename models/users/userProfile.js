@@ -3,15 +3,9 @@ const Schema = mongoose.Schema;
 require('mongoose-type-email');
 const passportLocalMongoose = require('passport-local-mongoose');
 
-const service = {
-	doesOffer: {
-		type: Boolean,
-		default: false,
-	},
-	profileId: {
-		type: String,
-		default: null,
-	},
+const falseDefaultBoolean = {
+	type: Boolean,
+	default: false,
 };
 
 const userProfileSchema = new Schema(
@@ -116,22 +110,14 @@ const userProfileSchema = new Schema(
 					},
 				},
 			},
-			soundsLike: {
-				type: Array,
-				default: [],
-			},
 		},
-		serviceProfiles: {
-			offersServices: {
-				type: Boolean,
-				default: false,
-			},
-			mixing: service,
-			mastering: service,
-			producer: service,
-			singer: service,
-			songwriter: service,
-			studioMusician: service,
+		artistServices: {
+			mixing: falseDefaultBoolean,
+			mastering: falseDefaultBoolean,
+			producer: falseDefaultBoolean,
+			singer: falseDefaultBoolean,
+			songwriter: falseDefaultBoolean,
+			studioMusician: falseDefaultBoolean,
 		},
 		isAdmin: {
 			type: Boolean,

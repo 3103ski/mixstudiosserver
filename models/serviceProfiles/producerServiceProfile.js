@@ -6,7 +6,6 @@ const producerProfileSchema = new Schema(
 	{
 		userId: {
 			type: String,
-			required: true,
 		},
 		serviceType: {
 			type: String,
@@ -16,18 +15,9 @@ const producerProfileSchema = new Schema(
 			type: Array,
 			default: [],
 		},
-		dynamicsConfidenceRatings: {
-			type: shared.dynamicsConfidenceRatings,
-			default: () => ({}),
-		},
-		contentBoundaries: {
-			type: shared.contentBoundaries,
-			default: () => ({}),
-		},
-		pricing: {
-			type: shared.pricing,
-			default: () => ({}),
-		},
+		dynamicsConfidenceRatings: shared.dynamicsConfidenceRatings,
+		contentBoundaries: shared.contentBoundaries,
+		pricing: shared.pricing,
 	},
 	{
 		timestamps: true,

@@ -2,56 +2,42 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const shared = require('./sharedSubSchemas');
 
-const extraServices = new Schema(
-	{
-		drumReplacement: {
-			type: Boolean,
-			default: false,
-		},
-		manualPitchCorrection: {
-			type: Boolean,
-			default: false,
-		},
-		autoPitchCorrection: {
-			type: Boolean,
-			default: false,
-		},
-		replay: {
-			type: Boolean,
-			default: false,
-		},
-		mixingActousticDrums: {
-			type: Boolean,
-			default: false,
-		},
-	},
-	{
-		_id: false,
-	}
-);
-
 const mixingProfileSchema = new Schema(
 	{
 		userId: {
 			type: String,
-			required: true,
 		},
 		serviceType: {
 			type: String,
 			default: 'mixing',
 		},
 		extraServices: {
-			type: extraServices,
-			default: () => ({}),
+			drumReplacement: {
+				type: Boolean,
+				default: false,
+			},
+			manualPitchCorrection: {
+				type: Boolean,
+				default: false,
+			},
+			autoPitchCorrection: {
+				type: Boolean,
+				default: false,
+			},
+			replay: {
+				type: Boolean,
+				default: false,
+			},
+			mixingAcousticDrums: {
+				type: Boolean,
+				default: false,
+			},
 		},
 		alsoDoesMastering: {
 			type: Boolean,
 			default: false,
 		},
-		pricing: {
-			type: shared.pricing,
-			default: () => ({}),
-		},
+		pricing: shared.pricing,
 	},
 	{
 		timestamps: true,

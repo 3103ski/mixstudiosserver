@@ -1,12 +1,16 @@
 const express = require('express');
 const MixingProfile = require('../../../models/serviceProfiles/mixingServiceProfile');
-const UserProfile = require('../../../models/users/userProfile');
+// const UserProfile = require('../../../models/users/userProfile');
+
+const cors = require('../../cors');
+const auth = require('../../../authenticate');
 
 const mixingProfileRouter = express.Router();
 
 mixingProfileRouter
 	.route('/')
-	.get((req, res, next) => {
+	.options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
+	.get(cors.cors, (req, res, next) => {
 		MixingProfile.find()
 			.then((profiles) => {
 				res.statusCode = 200;
@@ -15,29 +19,27 @@ mixingProfileRouter
 			})
 			.catch((err) => next(err));
 	})
-	.post((req, res, next) => {
-		MixingProfile.find({ userId: req.body.userId })
+	.post(cors.corsWithOptions, auth.verifyUser, (req, res, next) => {
+		MixingProfile.find({ userId: req.user._id })
 			.then((profiles) => {
 				if (profiles[0]) {
 					res.statusCode = 400;
 					res.setHeader('Content-Type', 'application/json');
 					res.end(`User ${req.body.userId} already has a mixing service profile`);
 				} else {
-					return MixingProfile.create(req.body);
+					const newProfile = req.body;
+					newProfile.userId = req.user._id;
+					return MixingProfile.create(newProfile);
 				}
 			})
 			.then((mixingProfile) => {
-				UserProfile.findById(mixingProfile.userId).then((profile) => {
-					profile.serviceProfiles.mixing.profileId = mixingProfile._id;
-					profile.save();
-					res.statusCode = 200;
-					res.setHeader('Content-Type', 'application/json');
-					res.json(mixingProfile);
-				});
+				res.statusCode = 200;
+				res.setHeader('Content-Type', 'application/json');
+				res.json(mixingProfile);
 			})
 			.catch((err) => next(err));
 	})
-	.delete((req, res, next) => {
+	.delete(cors.corsWithOptions, auth.verifyUser, auth.verifyAdmin, (req, res, next) => {
 		MixingProfile.deleteMany()
 			.then((response) => {
 				res.statusCode = 200;
@@ -46,14 +48,33 @@ mixingProfileRouter
 			})
 			.catch((err) => next(err));
 	})
-	.put((req, res) => {
-		res.statusCode = 405;
-		res.end('You cannot PUT at this endpoint.');
+	.put(cors.corsWithOptions, auth.verifyUser, (req, res, next) => {
+		MixingProfile.find({ userId: req.user._id })
+			.then((profiles) => {
+				if (profiles[0]) {
+					MixingProfile.findByIdAndUpdate(
+						profiles[0]._id,
+						{ $set: req.body },
+						{ new: true }
+					)
+						.then((response) => {
+							res.statusCode = 200;
+							res.setHeader('Content-Type', 'application/json');
+							res.json(response);
+						})
+						.catch((err) => next(err));
+				} else {
+					res.statusCode = 404;
+					res.end(`There was no mixing profile for the user id ${id}`);
+				}
+			})
+			.catch((err) => next(err));
 	});
 
 mixingProfileRouter
 	.route('/:userId')
-	.get((req, res, next) => {
+	.options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
+	.get(cors.cors, (req, res, next) => {
 		const id = req.params.userId;
 		MixingProfile.find({ userId: id })
 			.then((profiles) => {
@@ -69,7 +90,7 @@ mixingProfileRouter
 			})
 			.catch((err) => next(err));
 	})
-	.delete((req, res, next) => {
+	.delete(cors.corsWithOptions, auth.verifyUser, auth.verifyAdmin, (req, res, next) => {
 		const id = req.params.userId;
 
 		MixingProfile.find({ userId: id })
@@ -89,13 +110,15 @@ mixingProfileRouter
 			})
 			.catch((err) => next(err));
 	})
-	.put((req, res, next) => {
-		const id = req.params.userId;
-
-		MixingProfile.find({ userId: id })
+	.put(cors.corsWithOptions, auth.verifyUser, (req, res, next) => {
+		MixingProfile.find({ userId: req.user._id })
 			.then((profiles) => {
 				if (profiles[0]) {
-					MixingProfile.findByIdAndUpdate(profiles[0]._id, { $set: req.body }, { new: true })
+					MixingProfile.findByIdAndUpdate(
+						profiles[0]._id,
+						{ $set: req.body },
+						{ new: true }
+					)
 						.then((response) => {
 							res.statusCode = 200;
 							res.setHeader('Content-Type', 'application/json');

@@ -94,12 +94,12 @@ userProfileRouter
 	.get(cors.cors, auth.verifyUser, (req, res) => {
 		UserProfile.findById(req.user._id)
 			.then((user) => {
-				SoundsLikeObject.find({ userId: req.user._id }).then((soundsLikeList) => {
-					user.styleInfo.soundsLike = soundsLikeList;
-					res.statusCode = 200;
-					res.setHeader('Content-Type', 'application/json');
-					res.json(user);
-				});
+				// SoundsLikeObject.find({ userId: req.user._id }).then((soundsLikeList) => {
+				// 	user.styleInfo.soundsLike = soundsLikeList;
+				// });
+				res.statusCode = 200;
+				res.setHeader('Content-Type', 'application/json');
+				res.json(user);
 			})
 			.catch((err) => next(err));
 	})

@@ -62,10 +62,10 @@ soundsLikeObjectRouter
 
 // 'Sounds Like' Objects
 soundsLikeObjectRouter
-	.route('/user-collections/:userId')
+	.route('/user-collection')
 	.options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
 	.get(cors.cors, auth.verifyUser, (req, res, next) => {
-		SoundsLikeObject.find({ userId: req.params.userId })
+		SoundsLikeObject.find({ userId: req.user._id })
 			.then((SLOs) => {
 				res.statusCode = 200;
 				res.setHeader('Content-Type', 'application/json');
@@ -74,8 +74,8 @@ soundsLikeObjectRouter
 			.catch((err) => next(err));
 	})
 	.delete(cors.corsWithOptions, auth.verifyUser, (req, res, next) => {
-		if (req.params.userId === req.user._id) {
-			SoundsLikeObject.deleteMany({ userId: req.params.userId })
+		if (req.user._id) {
+			SoundsLikeObject.deleteMany({ userId: req.user._id })
 				.then((response) => {
 					res.statusCode = 200;
 					res.setHeader('Content-Type', 'application/json');
