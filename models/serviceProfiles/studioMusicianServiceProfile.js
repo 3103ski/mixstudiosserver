@@ -16,20 +16,17 @@ const studioMusicianSchema = new Schema(
 			type: Array,
 			default: [],
 		},
-		dynamicsConfidenceRatings: {
-			type: shared.dynamicsConfidenceRatings,
-			default: () => ({}),
-		},
-		pricing: {
-			type: shared.pricing,
-			default: () => ({}),
-		},
+		dynamicsConfidenceRatings: shared.dynamicsConfidenceRatings,
+		pricing: shared.pricing,
 	},
 	{
 		timestamps: true,
 	}
 );
 
-const StudioMusicianServiceProfile = mongoose.model('StudioMusicianServiceProfile', studioMusicianSchema);
+const StudioMusicianServiceProfile = mongoose.model(
+	'StudioMusicianServiceProfile',
+	studioMusicianSchema
+);
 
 module.exports = StudioMusicianServiceProfile;
