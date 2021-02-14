@@ -12,24 +12,20 @@ const songwriterProfileSchema = new Schema(
 			type: String,
 			default: 'songwriter',
 		},
-		lyrics: {
-			offersLyrics: {
-				type: Boolean,
-				default: false,
-			},
-			emotions: {
-				type: Array,
-				default: [],
-			},
+		doesWriteLyrics: {
+			type: Boolean,
+			default: false,
 		},
-		music: {
-			isOfferingMusic: {
-				type: Boolean,
-				default: false,
-			},
-			dynamicRating: shared.dynamicsConfidenceRatings,
-			contentBoundaries: shared.contentBoundaries,
+		doesWriteMusic: {
+			type: Boolean,
+			default: false,
 		},
+		emotionsAndFeelings: {
+			type: Array,
+			default: [],
+		},
+		dynamicsConfidenceRatings: shared.dynamicsConfidenceRatings,
+		contentBoundaries: shared.contentBoundaries,
 		pricing: shared.pricing,
 	},
 	{

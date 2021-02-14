@@ -1,11 +1,14 @@
 const express = require('express');
 const SingerPricingProfile = require('../../../models/pricingProfiles/singerPricingProfile');
+const cors = require('../../cors');
+const auth = require('../../../authenticate');
 
 const singerPricingRouter = express.Router();
 
 singerPricingRouter
 	.route('/')
-	.get((req, res, next) => {
+	.options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
+	.get(cors.cors, (req, res, next) => {
 		SingerPricingProfile.find()
 			.then((profiles) => {
 				res.statusCode = 200;
@@ -40,7 +43,8 @@ singerPricingRouter
 // ALL PRICING PROFILES FOR A USER'S SERVICE PROFILE
 singerPricingRouter
 	.route('/collection/:userId')
-	.get((req, res, next) => {
+	.options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
+	.get(cors.cors, (req, res, next) => {
 		SingerPricingProfile.find({ userId: req.params.userId })
 			.then((profiles) => {
 				res.statusCode = 200;
@@ -95,7 +99,11 @@ singerPricingRouter
 			.catch((err) => next(err));
 	})
 	.put((req, res, next) => {
-		SingerPricingProfile.findByIdAndUpdate(req.params.profileId, { $set: req.body }, { new: true })
+		SingerPricingProfile.findByIdAndUpdate(
+			req.params.profileId,
+			{ $set: req.body },
+			{ new: true }
+		)
 			.then((profile) => {
 				res.statusCode = 200;
 				res.setHeader('Content-Type', 'application/json');
