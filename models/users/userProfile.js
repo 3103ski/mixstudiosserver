@@ -111,6 +111,10 @@ const userProfileSchema = new Schema(
 				},
 			},
 		},
+		isOfferingServices: {
+			type: Boolean,
+			default: false,
+		},
 		artistServices: {
 			mixing: falseDefaultBoolean,
 			mastering: falseDefaultBoolean,
@@ -130,6 +134,14 @@ const userProfileSchema = new Schema(
 		following: {
 			type: Array,
 			default: [],
+		},
+		isLoggedIn: {
+			type: Boolean,
+			default: false,
+		},
+		lastLogin: {
+			type: Date,
+			default: null,
 		},
 	},
 	{

@@ -1,5 +1,6 @@
 const express = require('express');
 const MixingProfile = require('../../../models/serviceProfiles/mixingServiceProfile');
+const MixingPricingProfile = require('../../../models/pricingProfiles/mixingPricingProfile');
 
 const cors = require('../../cors');
 const auth = require('../../../authenticate');
@@ -51,12 +52,14 @@ mixingProfileRouter
 		MixingProfile.find({ userId: req.user._id })
 			.then((profiles) => {
 				if (profiles[0]) {
+					console.log('wants to add this', req.body);
 					MixingProfile.findByIdAndUpdate(
 						profiles[0]._id,
 						{ $set: req.body },
 						{ new: true }
 					)
 						.then((response) => {
+							console.log('we updated and I got this', response);
 							res.statusCode = 200;
 							res.setHeader('Content-Type', 'application/json');
 							res.json(response);
@@ -79,9 +82,14 @@ mixingProfileRouter
 			.then((profiles) => {
 				if (profiles[0]) {
 					const profile = profiles[0];
-					res.statusCode = 200;
-					res.setHeader('Content-Type', 'application/json');
-					res.json(profile);
+					MixingPricingProfile.find({ mixingServiceProfileId: profile._id }).then(
+						(pricingProfiles) => {
+							profile.pricing.pricingProfiles = pricingProfiles;
+							res.statusCode = 200;
+							res.setHeader('Content-Type', 'application/json');
+							res.json(profile);
+						}
+					);
 				} else {
 					res.statusCode = 404;
 					res.end(`There was no mixing profile for the user id ${id}`);

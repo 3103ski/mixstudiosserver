@@ -5,7 +5,6 @@ const shared = require('./sharedSubSchemas');
 const studioMusicianSchema = new Schema(
 	{
 		userId: {
-			required: true,
 			type: String,
 		},
 		serviceType: {

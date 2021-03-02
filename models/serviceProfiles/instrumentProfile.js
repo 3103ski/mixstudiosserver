@@ -9,7 +9,6 @@ const userInstrumentProfile = new Schema(
 		},
 		userId: {
 			type: String,
-			required: true,
 		},
 		skillLevel: {
 			type: Number,

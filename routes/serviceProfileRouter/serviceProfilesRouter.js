@@ -10,6 +10,8 @@ const MasteringServiceProfiles = require('../../models/serviceProfiles/mastering
 const StudioMusicianServiceProfiles = require('../../models/serviceProfiles/studioMusicianServiceProfile');
 const ProducerServiceProfiles = require('../../models/serviceProfiles/producerServiceProfile');
 const SongwriterServiceProfiles = require('../../models/serviceProfiles/songwriterServiceProfile');
+// pricing
+const MixingPricingProfile = require('../../models/pricingProfiles/mixingPricingProfile');
 
 const serviceProfilesRouter = express.Router();
 
@@ -67,7 +69,6 @@ serviceProfilesRouter
 	.route('/fetch-user-profiles')
 	.options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
 	.get(cors.cors, auth.verifyUser, (req, res, next) => {
-		console.log(req.user);
 		let allProfiles = {};
 		SingerServiceProfiles.find({ userId: req.user._id })
 			.then((profiles) => {
@@ -78,8 +79,15 @@ serviceProfilesRouter
 			})
 			.then((profiles) => {
 				if (profiles[0]) {
-					// console.log('found in mixing: ', profiles[0]);
-					allProfiles.mixing = profiles[0];
+					let foundMixingProfile = profiles[0];
+					MixingPricingProfile.find({
+						mixingServiceProfileId: foundMixingProfile._id,
+					})
+						.then((prices) => {
+							foundMixingProfile.pricing.pricingProfiles = prices;
+						})
+						.catch((err) => next(err));
+					allProfiles.mixing = foundMixingProfile;
 				}
 				return MasteringServiceProfiles.find({ userId: req.user._id });
 			})
@@ -105,7 +113,76 @@ serviceProfilesRouter
 				if (profiles[0]) {
 					allProfiles.songwriter = profiles[0];
 				}
-				console.log('+_+_+_+_+_', allProfiles);
+				res.statusCode = 200;
+				res.setHeader('Content-Header', 'application/json');
+				res.json(allProfiles);
+			})
+			.catch((err) => next(err));
+	})
+	.post((req, res) => {
+		res.statusCode = 405;
+		res.setHeader('Content-Header', 'application/json');
+		res.end('You cannot post to this endpoint');
+	})
+	.delete((req, res) => {
+		res.statusCode = 405;
+		res.setHeader('Content-Header', 'application/json');
+		res.end('You cannot delete to this endpoint');
+	})
+	.put((req, res) => {
+		res.statusCode = 405;
+		res.setHeader('Content-Header', 'application/json');
+		res.end('You cannot put to this endpoint');
+	});
+
+serviceProfilesRouter
+	.route('/fetch-user-profiles/:userId')
+	.options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
+	.get(cors.cors, (req, res, next) => {
+		let allProfiles = {};
+		SingerServiceProfiles.find({ userId: req.params.userId })
+			.then((profiles) => {
+				if (profiles[0]) {
+					allProfiles.singer = profiles[0];
+				}
+				return MixingServiceProfiles.find({ userId: req.params.userId });
+			})
+			.then((profiles) => {
+				if (profiles[0]) {
+					let foundMixingProfile = profiles[0];
+					MixingPricingProfile.find({
+						mixingServiceProfileId: foundMixingProfile._id,
+					})
+						.then((prices) => {
+							foundMixingProfile.pricing.pricingProfiles = prices;
+						})
+						.catch((err) => next(err));
+					allProfiles.mixing = foundMixingProfile;
+				}
+				return MasteringServiceProfiles.find({ userId: req.params.userId });
+			})
+			.then((profiles) => {
+				if (profiles[0]) {
+					allProfiles.mastering = profiles[0];
+				}
+				return StudioMusicianServiceProfiles.find({ userId: req.params.userId });
+			})
+			.then((profiles) => {
+				if (profiles[0]) {
+					allProfiles.studioMusician = profiles[0];
+				}
+				return ProducerServiceProfiles.find({ userId: req.params.userId });
+			})
+			.then((profiles) => {
+				if (profiles[0]) {
+					allProfiles.producer = profiles[0];
+				}
+				return SongwriterServiceProfiles.find({ userId: req.params.userId });
+			})
+			.then((profiles) => {
+				if (profiles[0]) {
+					allProfiles.songwriter = profiles[0];
+				}
 				res.statusCode = 200;
 				res.setHeader('Content-Header', 'application/json');
 				res.json(allProfiles);

@@ -3,6 +3,10 @@ exports.pricing = {
 		type: Boolean,
 		default: true,
 	},
+	activeProfile: {
+		type: Object,
+		default: null,
+	},
 	pricingProfiles: {
 		type: Array,
 		default: [],

@@ -33,6 +33,20 @@ const mixingProfileSchema = new Schema(
 				default: false,
 			},
 		},
+		serviceCardPlayer: {
+			songOne: {
+				type: Object,
+				default: null,
+			},
+			songTwo: {
+				type: Object,
+				default: null,
+			},
+			songThree: {
+				type: Object,
+				default: null,
+			},
+		},
 		alsoDoesMastering: {
 			type: Boolean,
 			default: false,

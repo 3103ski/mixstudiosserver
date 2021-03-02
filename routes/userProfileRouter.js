@@ -1,23 +1,55 @@
 const express = require('express');
-const UserProfile = require('../models/users/userProfile');
-const SoundsLikeObject = require('../models/users/soundsLikeObject');
-const cors = require('./cors');
-const passport = require('passport');
 const auth = require('../authenticate');
+const cors = require('./cors');
+const SoundsLikeObject = require('../models/users/soundsLikeObject');
+const UserProfile = require('../models/users/userProfile');
+const passport = require('passport');
 
 const userProfileRouter = express.Router();
-
-userProfileRouter.options('*', cors.corsWithOptions, (req, res) => res.sendStatus(200));
 
 userProfileRouter
 	.route('/')
 	.options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
-	.get(cors.cors, auth.verifyUser, (req, res, next) => {
+	.get(cors.cors, (req, res, next) => {
 		UserProfile.find()
 			.then((userProfiles) => {
-				res.statusCode = 200;
-				res.setHeader('Content-Header', 'application/json');
-				res.json(userProfiles);
+				const getServiceProviders = async () => {
+					let usersWithServices = await userProfiles.filter((profile) => {
+						if (profile.artistServices.mixing) {
+							return profile;
+						}
+						if (profile.artistServices.mastering) {
+							return profile;
+						}
+						if (profile.artistServices.singer) {
+							return profile;
+						}
+						if (profile.artistServices.producer) {
+							return profile;
+						}
+						if (profile.artistServices.studioMusician) {
+							return profile;
+						}
+						if (profile.artistServices.songwriter) {
+							return profile;
+						}
+					});
+					return usersWithServices;
+				};
+				getServiceProviders().then((profiles) => {
+					const page = req.query.page;
+					const limit = req.query.limit;
+					const startIndex = page * limit;
+					const endIndex =
+						startIndex + limit < profiles.length - 1
+							? profiles.length
+							: startIndex + limit;
+					const returnList = profiles.slice(startIndex, endIndex);
+					console.log(profiles);
+					res.statusCode = 200;
+					res.setHeader('Content-Header', 'application/json');
+					res.json(returnList);
+				});
 			})
 			.catch((err) => next(err));
 	})
@@ -119,21 +151,28 @@ userProfileRouter
 userProfileRouter
 	.route('/:userId')
 	.options(cors.corsWithOptions, (req, res, next) => res.sendStatus(200))
-	.get((req, res, next) => {
+	.get(cors.cors, (req, res, next) => {
 		const userId = req.params.userId;
 		UserProfile.findById(userId)
 			.then((userProfile) => {
-				res.statusCode = 200;
-				res.setHeader('Content-Type', 'application/json');
 				// SLOs here is just listing names as strings in an array for UI usage.
 				// For details on one or a group of SLOs, you shoulds make a seperate call to the db and not
 				// depend on '[profile].styleInfo.soundsLike' for other SLO info.
-				SoundsLikeObject.find({ userId: userId }).then((SLOs) => {
-					const soundsLikeNames = SLOs.map((slo) => slo.soundsLike);
-					userProfile.styleInfo.soundsLike = soundsLikeNames;
-					userProfile.save();
-					res.json(userProfile);
-				});
+				SoundsLikeObject.find({ userId: userId })
+					.then((SLOs) => {
+						const soundsLikeNames = SLOs.map((slo) => slo.title);
+						userProfile.soundsLike = soundsLikeNames;
+						const returnProfile = {
+							...userProfile._doc,
+							soundsLike: soundsLikeNames,
+						};
+						// userProfile.save();
+						console.log(returnProfile);
+						res.statusCode = 200;
+						res.setHeader('Content-Type', 'application/json');
+						res.json(returnProfile);
+					})
+					.catch((err) => next(err));
 			})
 			.catch((err) => next(err));
 	})

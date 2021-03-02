@@ -11,7 +11,6 @@ const instrumentGenreRate = new Schema(
 		},
 		userId: {
 			type: String,
-			required: true,
 		},
 		genre: {
 			type: String,

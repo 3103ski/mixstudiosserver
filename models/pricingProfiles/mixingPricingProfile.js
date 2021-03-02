@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 require('mongoose-currency').loadType(mongoose);
 const Currency = mongoose.Types.Currency;
 
-const rateBrackets = new Schema(
+const rateStructure = new Schema(
 	{
 		upToFiveTracks: {
 			type: Currency,
@@ -37,52 +37,19 @@ const rateBrackets = new Schema(
 			type: Currency,
 			min: 0,
 		},
-	},
-	{
-		_id: false,
-	}
-);
-
-const genre = new Schema(
-	{
-		isFlatRate: {
-			type: Boolean,
-			default: false,
-		},
-		flatRate: {
-			type: rateBrackets,
-			default: () => ({}),
-		},
-		genreRates: {
-			type: Array,
-			default: [], // populate on client side from seperate endpoint
-		},
-	},
-	{
-		timestamps: true,
-		_id: false,
-	}
-);
-
-const extraServiceRates = new Schema(
-	{
-		drumReplacement: {
+		globalRate: {
 			type: Currency,
 			min: 0,
 		},
-		manualPitchCorrection: {
+		lowAvg: {
 			type: Currency,
 			min: 0,
 		},
-		autoPitchCorrection: {
+		avgRate: {
 			type: Currency,
 			min: 0,
 		},
-		replay: {
-			type: Currency,
-			min: 0,
-		},
-		mixingAcousticDrums: {
+		avgHigh: {
 			type: Currency,
 			min: 0,
 		},
@@ -94,11 +61,10 @@ const extraServiceRates = new Schema(
 
 const mixingPricingProfile = new Schema(
 	{
-		title: {
-			type: String,
-			required: true,
-		},
 		userId: {
+			type: String,
+		},
+		title: {
 			type: String,
 			required: true,
 		},
@@ -106,35 +72,257 @@ const mixingPricingProfile = new Schema(
 			type: String,
 			required: true,
 		},
-		isFlatRate: false,
-		flatRate: {
-			type: rateBrackets,
-			default: () => ({}),
-		},
-		hasConfidentFlatRate: {
+		ratesAreBySize: {
 			type: Boolean,
-			default: false,
+			default: null,
 		},
-		hasGenreFlateRate: {
+		ratesAreByGenre: {
 			type: Boolean,
-			default: false,
+			default: null,
 		},
-		addMasteringRate: {
-			type: Currency,
-			min: 0,
+		ratesAreByConfidence: {
+			type: Boolean,
+			default: null,
+		},
+		confidenceRates: {
+			lessExperiencedRates: {
+				type: rateStructure,
+				default: {},
+			},
+			condfidentRates: {
+				type: rateStructure,
+				default: {},
+			},
+		},
+		ratesBySize: {
+			type: rateStructure,
+			default: {},
+		},
+		genreRates: {
+			type: Array,
+			default: [],
+		},
+		globaleFlatRate: {
+			type: Number,
+			default: null,
+		},
+		genreAverages: {
+			type: Array,
+			default: null,
 		},
 		extraServiceRates: {
-			type: extraServiceRates,
-			default: () => ({}),
+			type: Object,
+			default: {},
 		},
-		confidentGenres: {
-			type: genre,
-			default: () => ({}),
-		},
-		lessExperiencedGenres: {
-			type: genre,
-			default: () => ({}),
-		},
+		//••••••••••••••••••••••••••••••••••••••
+		// isFlatRate: {
+		// 	type: Boolean,
+		// 	default: false,
+		// },
+		// hasGenreFlateRate: {
+		// 	type: Boolean,
+		// 	default: false,
+		// },
+		// confidenceLevelsAreSameRate: {
+		// 	type: Boolean,
+		// 	default: false,
+		// },
+		// genreRates: {
+		// 	type: Array,
+		// 	default: [], // populate at endpoint before serving to client
+		// },
+		// flatRate: {
+		// 	upToFiveTracks: {
+		// 		type: Currency,
+		// 		min: 0,
+		// 	},
+		// 	upToTenTracks: {
+		// 		type: Currency,
+		// 		min: 0,
+		// 	},
+		// 	upToTwentyTracks: {
+		// 		type: Currency,
+		// 		min: 0,
+		// 	},
+		// 	upToThirtyTracks: {
+		// 		type: Currency,
+		// 		min: 0,
+		// 	},
+		// 	upToFortyFiveTracks: {
+		// 		type: Currency,
+		// 		min: 0,
+		// 	},
+		// 	upToSixtyTracks: {
+		// 		type: Currency,
+		// 		min: 0,
+		// 	},
+		// 	upToSeventyTracks: {
+		// 		type: Currency,
+		// 		min: 0,
+		// 	},
+		// 	upToNinetyTracks: {
+		// 		type: Currency,
+		// 		min: 0,
+		// 	},
+		// },
+		// equalConfidenceRates: {
+		// 	genresAreFlatRate: {
+		// 		type: Boolean,
+		// 		default: false,
+		// 	},
+		// 	flatRate: {
+		// 		upToFiveTracks: {
+		// 			type: Currency,
+		// 			min: 0,
+		// 		},
+		// 		upToTenTracks: {
+		// 			type: Currency,
+		// 			min: 0,
+		// 		},
+		// 		upToTwentyTracks: {
+		// 			type: Currency,
+		// 			min: 0,
+		// 		},
+		// 		upToThirtyTracks: {
+		// 			type: Currency,
+		// 			min: 0,
+		// 		},
+		// 		upToFortyFiveTracks: {
+		// 			type: Currency,
+		// 			min: 0,
+		// 		},
+		// 		upToSixtyTracks: {
+		// 			type: Currency,
+		// 			min: 0,
+		// 		},
+		// 		upToSeventyTracks: {
+		// 			type: Currency,
+		// 			min: 0,
+		// 		},
+		// 		upToNinetyTracks: {
+		// 			type: Currency,
+		// 			min: 0,
+		// 		},
+		// 	},
+		// 	genreRates: {
+		// 		type: Array,
+		// 		default: [], // populate on client side from seperate endpoint
+		// 	},
+		// },
+		// confidentGenres: {
+		// 	isFlatRate: {
+		// 		type: Boolean,
+		// 		default: false,
+		// 	},
+		// 	flatRate: {
+		// 		upToFiveTracks: {
+		// 			type: Currency,
+		// 			min: 0,
+		// 		},
+		// 		upToTenTracks: {
+		// 			type: Currency,
+		// 			min: 0,
+		// 		},
+		// 		upToTwentyTracks: {
+		// 			type: Currency,
+		// 			min: 0,
+		// 		},
+		// 		upToThirtyTracks: {
+		// 			type: Currency,
+		// 			min: 0,
+		// 		},
+		// 		upToFortyFiveTracks: {
+		// 			type: Currency,
+		// 			min: 0,
+		// 		},
+		// 		upToSixtyTracks: {
+		// 			type: Currency,
+		// 			min: 0,
+		// 		},
+		// 		upToSeventyTracks: {
+		// 			type: Currency,
+		// 			min: 0,
+		// 		},
+		// 		upToNinetyTracks: {
+		// 			type: Currency,
+		// 			min: 0,
+		// 		},
+		// 	},
+		// 	genreRates: {
+		// 		type: Array,
+		// 		default: [], // populate on client side from seperate endpoint
+		// 	},
+		// },
+		// lessExperiencedGenres: {
+		// 	isFlatRate: {
+		// 		type: Boolean,
+		// 		default: false,
+		// 	},
+		// 	flatRate: {
+		// 		upToFiveTracks: {
+		// 			type: Currency,
+		// 			min: 0,
+		// 		},
+		// 		upToTenTracks: {
+		// 			type: Currency,
+		// 			min: 0,
+		// 		},
+		// 		upToTwentyTracks: {
+		// 			type: Currency,
+		// 			min: 0,
+		// 		},
+		// 		upToThirtyTracks: {
+		// 			type: Currency,
+		// 			min: 0,
+		// 		},
+		// 		upToFortyFiveTracks: {
+		// 			type: Currency,
+		// 			min: 0,
+		// 		},
+		// 		upToSixtyTracks: {
+		// 			type: Currency,
+		// 			min: 0,
+		// 		},
+		// 		upToSeventyTracks: {
+		// 			type: Currency,
+		// 			min: 0,
+		// 		},
+		// 		upToNinetyTracks: {
+		// 			type: Currency,
+		// 			min: 0,
+		// 		},
+		// 	},
+		// 	genreRates: {
+		// 		type: Array,
+		// 		default: [], // populate on client side from seperate endpoint
+		// 	},
+		// },
+		// addMasteringRate: {
+		// 	type: Currency,
+		// 	min: 0,
+		// },
+		// extraServiceRates: {
+		// 	drumReplacement: {
+		// 		type: Currency,
+		// 		min: 0,
+		// 	},
+		// 	manualPitchCorrection: {
+		// 		type: Currency,
+		// 		min: 0,
+		// 	},
+		// 	autoPitchCorrection: {
+		// 		type: Currency,
+		// 		min: 0,
+		// 	},
+		// 	replay: {
+		// 		type: Currency,
+		// 		min: 0,
+		// 	},
+		// 	mixingAcousticDrums: {
+		// 		type: Currency,
+		// 		min: 0,
+		// 	},
+		// },
 	},
 	{
 		timestamps: true,

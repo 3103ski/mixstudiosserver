@@ -1,5 +1,7 @@
 const express = require('express');
 const priceProfiles = require('./servicePricingRoutes/index');
+const cors = require('../cors');
+const auth = require('../../authenticate');
 
 const ProducerPricingProfile = require('../../models/pricingProfiles/producerPricingProfile');
 const MixingPricingProfile = require('../../models/pricingProfiles/mixingPricingProfile');
@@ -12,7 +14,55 @@ const servicePricingProfileRouter = express.Router();
 
 servicePricingProfileRouter
 	.route('/')
+	.options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
 	.get((req, res, next) => {
+		let allProfiles = [];
+		ProducerPricingProfile.find()
+			.then((producerProfiles) => {
+				allProfiles = [...allProfiles, ...producerProfiles];
+				return MixingPricingProfile.find();
+			})
+			.then((mixingProfiles) => {
+				allProfiles = [...allProfiles, ...mixingProfiles];
+				return MasteringPricingProfile.find();
+			})
+			.then((masteringProfiles) => {
+				allProfiles = [...allProfiles, ...masteringProfiles];
+				return SongwriterPricingProfile.find();
+			})
+			.then((songwriterProfiles) => {
+				allProfiles = [...allProfiles, ...songwriterProfiles];
+				return SingerPricingProfile.find();
+			})
+			.then((singerProfiles) => {
+				allProfiles = [...allProfiles, ...singerProfiles];
+				return StudioMusicianPricingProfile.find();
+			})
+			.then((musicianProfiles) => {
+				allProfiles = [...allProfiles, ...musicianProfiles];
+				res.statusCode = 200;
+				res.setHeader('Content-Type', 'application/json');
+				res.json(allProfiles);
+			})
+			.catch((err) => next(err));
+	})
+	.put((req, res) => {
+		res.statusCode = 405;
+		res.end('PUT not allowed at this endpoint');
+	})
+	.delete((req, res) => {
+		res.statusCode = 405;
+		res.end('DELETE not allowed at this endpoint');
+	})
+	.post((req, res) => {
+		res.statusCode = 405;
+		res.end('POST not allowed at this endpoint');
+	});
+
+servicePricingProfileRouter
+	.route('/fetch-user-pricing/:userId')
+	.options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
+	.get(cors.cors, (req, res, next) => {
 		let allProfiles = [];
 		ProducerPricingProfile.find()
 			.then((producerProfiles) => {

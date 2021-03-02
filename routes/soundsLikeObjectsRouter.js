@@ -49,7 +49,6 @@ soundsLikeObjectRouter
 		} else {
 			artist = artist[0].toLowerCase();
 		}
-		console.log(artist);
 
 		SoundsLikeObject.find({ soundsLike: artist })
 			.then((results) => {
@@ -111,8 +110,6 @@ soundsLikeObjectRouter
 	})
 	.delete(cors.corsWithOptions, auth.verifyUser, (req, res, next) => {
 		SoundsLikeObject.findById(req.params.soundsLikeID).then((slo) => {
-			console.log('SLO ID', slo);
-			console.log('USER ID', req.user);
 			if (req.user._id.equals(slo.userId)) {
 				SoundsLikeObject.findByIdAndDelete(req.params.soundsLikeID)
 					.then((respsone) => {

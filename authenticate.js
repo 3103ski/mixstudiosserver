@@ -30,6 +30,9 @@ exports.jwtPassport = passport.use(
 			if (err) {
 				return done(err, false);
 			} else if (user) {
+				let newLastLogin = Date.now();
+				user.lastLogin = newLastLogin;
+				user.save();
 				return done(null, user);
 			} else {
 				return done(null, false);
