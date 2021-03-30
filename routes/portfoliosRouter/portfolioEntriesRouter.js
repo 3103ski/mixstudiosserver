@@ -22,9 +22,12 @@ portfolioEntryRouter
 		let portfolioEntry = {
 			userId: req.user._id,
 			title: req.body.title,
-			description: null,
+			description: req.body.description,
+			genreOne: req.body.genreOne,
+			genreTwo: req.body.genreTwo,
 			category: req.body.category,
-			image: null,
+			serviceAssignment: req.body.serviceAssignment,
+			image: req.body.image ? req.body.image : null,
 			isBeforeAfter: req.body.isBeforeAfter,
 			audioOne: req.files[0].filename,
 			audioOneOriginalName: req.files[0].originalname,
@@ -70,7 +73,6 @@ portfolioEntryRouter
 		PortfolioEntry.findById(entryId)
 			.then((profile) => {
 				if (req.user._id.toString() === profile.userId) {
-					console.log('+_+_+_DELETEING THIS: ', profile);
 					if (profile.audioOne) {
 						deleteWithFSFromRoot.publicAccessDelete('/audio/', profile.audioOne);
 					}

@@ -31,6 +31,10 @@ const portfolioEntry = new Schema(
 			type: String,
 			default: 'default',
 		},
+		serviceAssignment: {
+			type: String,
+			default: null,
+		},
 		image: {
 			type: String,
 			default: '',

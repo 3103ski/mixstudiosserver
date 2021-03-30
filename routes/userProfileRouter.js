@@ -37,18 +37,26 @@ userProfileRouter
 					return usersWithServices;
 				};
 				getServiceProviders().then((profiles) => {
-					const page = req.query.page;
-					const limit = req.query.limit;
+					const page = req.query.page ? parseInt(req.query.page) : 1;
+					const limit = parseInt(req.query.limit);
 					const startIndex = page * limit;
 					const endIndex =
 						startIndex + limit < profiles.length - 1
 							? profiles.length
 							: startIndex + limit;
-					const returnList = profiles.slice(startIndex, endIndex);
-					console.log(profiles);
+					console.log(startIndex);
+					console.log(endIndex);
+					const returnList = profiles.slice(startIndex, startIndex + limit);
+					console.log("I'm the return list", {
+						list: returnList,
+						profileCount: profiles.length,
+					});
 					res.statusCode = 200;
 					res.setHeader('Content-Header', 'application/json');
-					res.json(returnList);
+					res.json({
+						list: returnList,
+						profileCount: profiles.length,
+					});
 				});
 			})
 			.catch((err) => next(err));

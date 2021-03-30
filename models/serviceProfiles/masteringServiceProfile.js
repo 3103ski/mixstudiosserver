@@ -26,6 +26,20 @@ const masteringProfileSchema = new Schema(
 				deafult: false,
 			},
 		},
+		serviceCardPlayer: {
+			songOne: {
+				type: Object,
+				default: null,
+			},
+			songTwo: {
+				type: Object,
+				default: null,
+			},
+			songThree: {
+				type: Object,
+				default: null,
+			},
+		},
 		extraMasteringServices: {
 			twoStem: {
 				type: Boolean,

@@ -15,6 +15,20 @@ const producerProfileSchema = new Schema(
 			type: Array,
 			default: [],
 		},
+		serviceCardPlayer: {
+			songOne: {
+				type: Object,
+				default: null,
+			},
+			songTwo: {
+				type: Object,
+				default: null,
+			},
+			songThree: {
+				type: Object,
+				default: null,
+			},
+		},
 		dynamicsConfidenceRatings: shared.dynamicsConfidenceRatings,
 		contentBoundaries: shared.contentBoundaries,
 		pricing: shared.pricing,
