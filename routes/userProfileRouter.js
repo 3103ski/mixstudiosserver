@@ -11,52 +11,22 @@ userProfileRouter
 	.route('/')
 	.options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
 	.get(cors.cors, (req, res, next) => {
-		UserProfile.find()
-			.then((userProfiles) => {
-				const getServiceProviders = async () => {
-					let usersWithServices = await userProfiles.filter((profile) => {
-						if (profile.artistServices.mixing) {
-							return profile;
-						}
-						if (profile.artistServices.mastering) {
-							return profile;
-						}
-						if (profile.artistServices.singer) {
-							return profile;
-						}
-						if (profile.artistServices.producer) {
-							return profile;
-						}
-						if (profile.artistServices.studioMusician) {
-							return profile;
-						}
-						if (profile.artistServices.songwriter) {
-							return profile;
-						}
-					});
-					return usersWithServices;
-				};
-				getServiceProviders().then((profiles) => {
-					const page = req.query.page ? parseInt(req.query.page) : 1;
-					const limit = parseInt(req.query.limit);
-					const startIndex = page * limit;
-					const endIndex =
-						startIndex + limit < profiles.length - 1
-							? profiles.length
-							: startIndex + limit;
-					console.log(startIndex);
-					console.log(endIndex);
-					const returnList = profiles.slice(startIndex, startIndex + limit);
-					console.log("I'm the return list", {
-						list: returnList,
-						profileCount: profiles.length,
-					});
-					res.statusCode = 200;
-					res.setHeader('Content-Header', 'application/json');
-					res.json({
-						list: returnList,
-						profileCount: profiles.length,
-					});
+		const filters = JSON.parse(req.query.filters);
+		console.log('Applied browse filters', filters);
+		UserProfile.find(filters)
+			.then((profiles) => {
+				const page = req.query.page ? parseInt(req.query.page) : 1;
+				const limit = parseInt(req.query.limit);
+				const startIndex = page * limit;
+				const endIndex =
+					startIndex + limit < profiles.length - 1 ? profiles.length : startIndex + limit;
+				const returnList = profiles.slice(startIndex, startIndex + limit);
+				console.log('I return', returnList);
+				res.statusCode = 200;
+				res.setHeader('Content-Header', 'application/json');
+				res.json({
+					list: returnList,
+					profileCount: profiles.length,
 				});
 			})
 			.catch((err) => next(err));
