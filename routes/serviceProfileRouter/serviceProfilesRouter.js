@@ -13,6 +13,7 @@ const SongwriterServiceProfiles = require('../../models/serviceProfiles/songwrit
 // pricing
 const MixingPricingProfile = require('../../models/pricingProfiles/mixingPricingProfile');
 const MasteringPricingProfile = require('../../models/pricingProfiles/masteringPricingProfile');
+const SongwriterPricingProfile = require('../../models//pricingProfiles/songwriterPricingProfile');
 
 const serviceProfilesRouter = express.Router();
 
@@ -93,15 +94,12 @@ serviceProfilesRouter
 				return MasteringServiceProfiles.find({ userId: req.user._id });
 			})
 			.then((profiles) => {
-				console.log(profiles);
 				if (profiles[0]) {
 					let foundMasteringProfile = profiles[0];
-					// console.log('dis dis ?', foundMasteringProfile);
 					MasteringPricingProfile.find({
 						masteringServiceProfileId: foundMasteringProfile._id,
 					})
 						.then((prices) => {
-							// console.log(prices);
 							foundMasteringProfile.pricing.pricingProfiles = prices;
 						})
 						.catch((err) => next(err));
@@ -123,11 +121,23 @@ serviceProfilesRouter
 			})
 			.then((profiles) => {
 				if (profiles[0]) {
-					allProfiles.songwriter = profiles[0];
+					let foundSongwriterProfile = profiles[0];
+					SongwriterPricingProfile.find({
+						songwriterServiceProfileId: foundSongwriterProfile._id,
+					})
+						.then((prices) => {
+							foundSongwriterProfile.pricing.pricingProfiles = prices;
+						})
+						.then(() => {
+							allProfiles.songwriter = foundSongwriterProfile;
+						})
+						.then(() => {
+							res.statusCode = 200;
+							res.setHeader('Content-Header', 'application/json');
+							res.json(allProfiles);
+						})
+						.catch((err) => next(err));
 				}
-				res.statusCode = 200;
-				res.setHeader('Content-Header', 'application/json');
-				res.json(allProfiles);
 			})
 			.catch((err) => next(err));
 	})

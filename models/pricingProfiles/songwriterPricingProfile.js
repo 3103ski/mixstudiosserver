@@ -3,30 +3,22 @@ const Schema = mongoose.Schema;
 require('mongoose-currency').loadType(mongoose);
 const Currency = mongoose.Types.Currency;
 
-const genre = new Schema(
+const rateStructure = new Schema(
 	{
-		isFlatRate: {
-			type: Boolean,
-			default: false,
-		},
-		vocalsRate: {
+		smallSong: {
 			type: Currency,
 			default: null,
 			min: 0,
 		},
-		smallIdeaRate: {
+		largeSong: {
 			type: Currency,
 			default: null,
 			min: 0,
 		},
-		largeIdeaRate: {
+		flatRate: {
 			type: Currency,
 			default: null,
 			min: 0,
-		},
-		genreRates: {
-			type: Array,
-			default: [], // populate on client side with seperate endpoint
 		},
 	},
 	{
@@ -48,30 +40,39 @@ const songwriterPricingProfile = new Schema(
 			type: String,
 			required: true,
 		},
-		isFlatRate: {
+		ratesAreBySong: {
 			type: Boolean,
 			default: false,
 		},
-		hasGenreFlatRate: {
+		ratesAreByConfidence: {
 			type: Boolean,
 			default: false,
 		},
-		hasConfidentFlatRate: {
+		ratesAreByGenre: {
 			type: Boolean,
 			default: false,
 		},
-		flatRate: {
+		bySongRates: {
+			type: rateStructure,
+			default: {},
+		},
+		startingAt: {
 			type: Currency,
-			default: null,
 			min: 0,
 		},
-		confidentGenres: {
-			type: genre,
-			default: () => ({}),
+		confidenceRates: {
+			confidentRates: {
+				type: rateStructure,
+				default: {},
+			},
+			lessExperiencedRates: {
+				type: rateStructure,
+				default: {},
+			},
 		},
-		lessExperiencedGenres: {
-			type: genre,
-			default: () => ({}),
+		genreRates: {
+			type: Array,
+			default: [],
 		},
 	},
 	{
@@ -79,5 +80,8 @@ const songwriterPricingProfile = new Schema(
 	}
 );
 
-const SongwriterPricingProfile = mongoose.model('SongwriterPricingProfile', songwriterPricingProfile);
+const SongwriterPricingProfile = mongoose.model(
+	'SongwriterPricingProfile',
+	songwriterPricingProfile
+);
 module.exports = SongwriterPricingProfile;

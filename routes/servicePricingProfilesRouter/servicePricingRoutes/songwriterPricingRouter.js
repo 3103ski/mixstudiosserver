@@ -1,11 +1,15 @@
 const express = require('express');
 const SongwriterPricingProfile = require('../../../models/pricingProfiles/songwriterPricingProfile');
 
+const cors = require('../../cors');
+const auth = require('../../../authenticate');
+
 const songwriterPricingRouter = express.Router();
 
 songwriterPricingRouter
 	.route('/')
-	.get((req, res, next) => {
+	.options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
+	.get(cors.cors, (req, res, next) => {
 		SongwriterPricingProfile.find()
 			.then((profiles) => {
 				res.statusCode = 200;
@@ -14,8 +18,12 @@ songwriterPricingRouter
 			})
 			.catch((err) => next(err));
 	})
-	.post((req, res, next) => {
-		SongwriterPricingProfile.create(req.body)
+	.post(cors.corsWithOptions, auth.verifyUser, (req, res, next) => {
+		const newProfile = {
+			userId: req.user._id,
+			...req.body,
+		};
+		SongwriterPricingProfile.create(newProfile)
 			.then((profile) => {
 				res.statusCode = 200;
 				res.setHeader('Content-Type', 'application/json');
@@ -23,8 +31,8 @@ songwriterPricingRouter
 			})
 			.catch((err) => next(err));
 	})
-	.delete((req, res, next) => {
-		SongwriterPricingProfile.deleteMany()
+	.delete(cors.corsWithOptions, auth.verifyUser, (req, res, next) => {
+		SongwriterPricingProfile.deleteMany({ userId: req.user._id })
 			.then((response) => {
 				res.statusCode = 200;
 				res.setHeader('Content-Type', 'application/json');
@@ -95,7 +103,11 @@ songwriterPricingRouter
 			.catch((err) => next(err));
 	})
 	.put((req, res, next) => {
-		SongwriterPricingProfile.findByIdAndUpdate(req.params.profileId, { $set: req.body }, { new: true })
+		SongwriterPricingProfile.findByIdAndUpdate(
+			req.params.profileId,
+			{ $set: req.body },
+			{ new: true }
+		)
 			.then((profile) => {
 				res.statusCode = 200;
 				res.setHeader('Content-Type', 'application/json');
