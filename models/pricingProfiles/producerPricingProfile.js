@@ -2,35 +2,22 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 require('mongoose-currency').loadType(mongoose);
 const Currency = mongoose.Types.Currency;
-
-const genre = new Schema(
+const rateStructure = new Schema(
 	{
-		isFlatRate: {
-			type: Boolean,
-			default: false,
-		},
-		flateRateSmallProduction: {
+		smallSong: {
 			type: Currency,
-			min: 0,
 			default: null,
+			min: 0,
 		},
-		flateRateLargeProduction: {
+		largeSong: {
 			type: Currency,
-			min: 0,
 			default: null,
+			min: 0,
 		},
-		hasContributionRate: {
-			type: Boolean,
-			default: false,
-		},
-		contributionRate: {
+		flatRate: {
 			type: Currency,
-			min: 0,
 			default: null,
-		},
-		genreRates: {
-			type: Array,
-			default: [], // Populate on client side from seperate endpoint
+			min: 0,
 		},
 	},
 	{
@@ -52,48 +39,39 @@ const producerPricingProfile = new Schema(
 			type: String,
 			required: true,
 		},
-		isFlatRate: {
+		ratesAreBySong: {
 			type: Boolean,
 			default: false,
 		},
-		hasFlatContributionRate: {
+		ratesAreByConfidence: {
 			type: Boolean,
 			default: false,
 		},
-		hasFromScratchRate: {
+		ratesAreByGenre: {
 			type: Boolean,
 			default: false,
 		},
-		hasGenreFlateRate: {
-			type: Boolean,
-			default: false,
+		bySongRates: {
+			type: rateStructure,
+			default: {},
 		},
-		hasConfidentFlatRate: {
-			type: Boolean,
-			default: false,
-		},
-		flatRate: {
+		startingAt: {
 			type: Currency,
 			min: 0,
-			default: null,
 		},
-		flateContributionRate: {
-			type: Currency,
-			min: 0,
-			default: null,
+		confidenceRates: {
+			confidentRates: {
+				type: rateStructure,
+				default: {},
+			},
+			lessExperiencedRates: {
+				type: rateStructure,
+				default: {},
+			},
 		},
-		fromScratchRate: {
-			type: Currency,
-			min: 0,
-			default: null,
-		},
-		confidentGenres: {
-			type: genre,
-			default: () => ({}),
-		},
-		lessExperiencedGenres: {
-			type: genre,
-			default: () => ({}),
+		genreRates: {
+			type: Array,
+			default: [],
 		},
 	},
 	{

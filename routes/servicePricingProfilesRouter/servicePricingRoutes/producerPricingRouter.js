@@ -1,11 +1,15 @@
 const express = require('express');
 const ProducerPricingProfile = require('../../../models/pricingProfiles/producerPricingProfile');
 
+const cors = require('../../cors');
+const auth = require('../../../authenticate');
+
 const producerPricingRouter = express.Router();
 
 producerPricingRouter
 	.route('/')
-	.get((req, res, next) => {
+	.options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
+	.get(cors.cors, (req, res, next) => {
 		ProducerPricingProfile.find()
 			.then((profiles) => {
 				res.statusCode = 200;
@@ -14,8 +18,12 @@ producerPricingRouter
 			})
 			.catch((err) => next(err));
 	})
-	.post((req, res, next) => {
-		ProducerPricingProfile.create(req.body)
+	.post(cors.corsWithOptions, auth.verifyUser, (req, res, next) => {
+		const newProfile = {
+			userId: req.user._id,
+			...req.body,
+		};
+		ProducerPricingProfile.create(newProfile)
 			.then((profile) => {
 				res.statusCode = 200;
 				res.setHeader('Content-Type', 'application/json');
@@ -23,8 +31,8 @@ producerPricingRouter
 			})
 			.catch((err) => next(err));
 	})
-	.delete((req, res, next) => {
-		ProducerPricingProfile.deleteMany()
+	.delete(cors.corsWithOptions, auth.verifyUser, (req, res, next) => {
+		ProducerPricingProfile.deleteMany({ userId: req.user._id })
 			.then((response) => {
 				res.statusCode = 200;
 				res.setHeader('Content-Type', 'application/json');
@@ -95,7 +103,11 @@ producerPricingRouter
 			.catch((err) => next(err));
 	})
 	.put((req, res, next) => {
-		ProducerPricingProfile.findByIdAndUpdate(req.params.profileId, { $set: req.body }, { new: true })
+		ProducerPricingProfile.findByIdAndUpdate(
+			req.params.profileId,
+			{ $set: req.body },
+			{ new: true }
+		)
 			.then((profile) => {
 				res.statusCode = 200;
 				res.setHeader('Content-Type', 'application/json');

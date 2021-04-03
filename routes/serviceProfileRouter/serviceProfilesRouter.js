@@ -14,6 +14,7 @@ const SongwriterServiceProfiles = require('../../models/serviceProfiles/songwrit
 const MixingPricingProfile = require('../../models/pricingProfiles/mixingPricingProfile');
 const MasteringPricingProfile = require('../../models/pricingProfiles/masteringPricingProfile');
 const SongwriterPricingProfile = require('../../models//pricingProfiles/songwriterPricingProfile');
+const ProducerPricingProfile = require('../../models//pricingProfiles//producerPricingProfile');
 
 const serviceProfilesRouter = express.Router();
 
@@ -116,6 +117,17 @@ serviceProfilesRouter
 			.then((profiles) => {
 				if (profiles[0]) {
 					allProfiles.producer = profiles[0];
+				}
+				if (profiles[0]) {
+					let foundProducerProfile = profiles[0];
+					ProducerPricingProfile.find({
+						producerServiceProfileId: foundProducerProfile._id,
+					})
+						.then((prices) => {
+							foundProducerProfile.pricing.pricingProfiles = prices;
+						})
+						.catch((err) => next(err));
+					allProfiles.mastering = foundProducerProfile;
 				}
 				return SongwriterServiceProfiles.find({ userId: req.user._id });
 			})
