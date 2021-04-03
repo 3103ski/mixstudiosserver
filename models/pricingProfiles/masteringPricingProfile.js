@@ -3,47 +3,34 @@ const Schema = mongoose.Schema;
 require('mongoose-currency').loadType(mongoose);
 const Currency = mongoose.Types.Currency;
 
-const genre = new Schema(
+const rateStructure = new Schema(
 	{
-		isFlatRate: {
-			type: Boolean,
-			default: false,
+		twoStem: {
+			type: Currency,
+			min: 0,
+		},
+		fourStem: {
+			type: Currency,
+			min: 0,
+		},
+		eightStem: {
+			type: Currency,
+			min: 0,
+		},
+		analog: {
+			type: Currency,
+			min: 0,
+		},
+		digital: {
+			type: Currency,
+			min: 0,
+		},
+		hybrid: {
+			type: Currency,
+			min: 0,
 		},
 		flatRate: {
 			type: Currency,
-			default: null,
-			min: 0,
-		},
-		genreRates: {
-			type: Array,
-			default: [], // populate on client side from seperate endpoint
-		},
-	},
-	{
-		_id: false,
-	}
-);
-
-const extraServices = new Schema(
-	{
-		twoStemMastering: {
-			type: Currency,
-			default: null,
-			min: 0,
-		},
-		fourStemMastering: {
-			type: Currency,
-			default: null,
-			min: 0,
-		},
-		eightStemMastering: {
-			type: Currency,
-			default: null,
-			min: 0,
-		},
-		digitalThroughAnalog: {
-			type: Currency,
-			default: null,
 			min: 0,
 		},
 	},
@@ -66,30 +53,42 @@ const masteringPricingProfile = new Schema(
 			type: String,
 			required: true,
 		},
-		isFlatRate: {
+		ratesAreBySong: {
+			type: Boolean,
+		},
+		ratesAreByConfidence: {
 			type: Boolean,
 			default: null,
 		},
-		flatRate: {
+		ratesAreByGenre: {
+			type: Boolean,
+			default: null,
+		},
+		bySongRates: {
+			type: rateStructure,
+			default: {},
+		},
+		confidenceRates: {
+			confidentRates: {
+				type: rateStructure,
+				default: {},
+			},
+			lessExperiencedRates: {
+				type: rateStructure,
+				default: {},
+			},
+		},
+		startingAt: {
 			type: Currency,
 			min: 0,
-			default: null,
 		},
-		extraServices: {
-			type: extraServices,
-			default: () => ({}),
+		genreRates: {
+			type: Array,
+			default: [],
 		},
-		hasGenreFlatRate: {
-			type: Boolean,
-			default: null,
-		},
-		confidentGenreRates: {
-			type: genre,
-			default: () => ({}),
-		},
-		lessExperiencedGenreRates: {
-			type: genre,
-			default: () => ({}),
+		extraServiceRates: {
+			type: Object,
+			default: {},
 		},
 	},
 	{

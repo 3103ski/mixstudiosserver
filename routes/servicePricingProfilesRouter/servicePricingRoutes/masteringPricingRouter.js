@@ -1,11 +1,15 @@
 const express = require('express');
 const MasteringPricingProfile = require('../../../models/pricingProfiles/masteringPricingProfile');
 
+const cors = require('../../cors');
+const auth = require('../../../authenticate');
+
 const masteringPricingRouter = express.Router();
 
 masteringPricingRouter
 	.route('/')
-	.get((req, res, next) => {
+	.options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
+	.get(cors.cors, (req, res, next) => {
 		MasteringPricingProfile.find()
 			.then((profiles) => {
 				res.statusCode = 200;
@@ -14,8 +18,12 @@ masteringPricingRouter
 			})
 			.catch((err) => next(err));
 	})
-	.post((req, res, next) => {
-		MasteringPricingProfile.create(req.body)
+	.post(cors.corsWithOptions, auth.verifyUser, (req, res, next) => {
+		const newProfile = {
+			userId: req.user._id,
+			...req.body,
+		};
+		MasteringPricingProfile.create(newProfile)
 			.then((profile) => {
 				res.statusCode = 200;
 				res.setHeader('Content-Type', 'application/json');
@@ -23,8 +31,8 @@ masteringPricingRouter
 			})
 			.catch((err) => next(err));
 	})
-	.delete((req, res, next) => {
-		MasteringPricingProfile.deleteMany()
+	.delete(cors.corsWithOptions, auth.verifyUser, (req, res, next) => {
+		MasteringPricingProfile.deleteMany({ userId: req.user._id })
 			.then((response) => {
 				res.statusCode = 200;
 				res.setHeader('Content-Type', 'application/json');
@@ -95,7 +103,11 @@ masteringPricingRouter
 			.catch((err) => next(err));
 	})
 	.put((req, res, next) => {
-		MasteringPricingProfile.findByIdAndUpdate(req.params.profileId, { $set: req.body }, { new: true })
+		MasteringPricingProfile.findByIdAndUpdate(
+			req.params.profileId,
+			{ $set: req.body },
+			{ new: true }
+		)
 			.then((profile) => {
 				res.statusCode = 200;
 				res.setHeader('Content-Type', 'application/json');

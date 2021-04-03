@@ -25,6 +25,10 @@ const masteringProfileSchema = new Schema(
 				type: Boolean,
 				deafult: false,
 			},
+			stemMastering: {
+				type: Boolean,
+				deafult: false,
+			},
 		},
 		serviceCardPlayer: {
 			songOne: {
@@ -41,15 +45,7 @@ const masteringProfileSchema = new Schema(
 			},
 		},
 		extraMasteringServices: {
-			twoStem: {
-				type: Boolean,
-				default: false,
-			},
-			fourStem: {
-				type: Boolean,
-				default: false,
-			},
-			eightStem: {
+			extraPasses: {
 				type: Boolean,
 				default: false,
 			},
