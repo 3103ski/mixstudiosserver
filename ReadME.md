@@ -1,3 +1,5 @@
+ssh -i "mixstudiosaws.pem" ubuntu@ec2-3-141-97-2.us-east-2.compute.amazonaws.com
+
 # Mix Studios API
 
 A backend server built using Express and Node.
@@ -6,9 +8,10 @@ A backend server built using Express and Node.
 
 # Users
 
-Used to interact with a user's **core profile**. The user's core profile is common among all users. User's can attach service profiles and then to
-service profiles add pricing profiles and all will be connected to this core profile. The core profile should be limited to personal information and
-the users overall style profile.
+Used to interact with a user's **core profile**. The user's core profile is common among all users.
+User's can attach service profiles and then to service profiles add pricing profiles and all will be
+connected to this core profile. The core profile should be limited to personal information and the
+users overall style profile.
 
 ### Fetch ALL user core profiles
 
@@ -24,7 +27,8 @@ the users overall style profile.
 -   GET: returns a user core profile object as an `Object`.
 -   POST: not supported at this endpoint.
 -   PUT: will update user profile
--   DELETE: will remove user's core profile but then **ALSO remove all their service and pricing profiles**
+-   DELETE: will remove user's core profile but then **ALSO remove all their service and pricing
+    profiles**
 
 > `/users/[userId]`
 
@@ -231,8 +235,8 @@ the users overall style profile.
 
 ## Sounds Like Objects
 
-Sounds like objects are intended to track what artists users suggest they sounds like. This is a popular metric for artists trying to find people to
-work on their audio project.
+Sounds like objects are intended to track what artists users suggest they sounds like. This is a
+popular metric for artists trying to find people to work on their audio project.
 
 ### Fetch ALL sounds like objects for ALL users
 
@@ -256,8 +260,9 @@ work on their audio project.
 
 # Service Profiles
 
-Used to interact with service profiles for users. Each user can have up to one service profile per service. These profiles **do not** include pricing,
-but do include a list of pricing profile ids at `serviceProfile.pricing.pricingProfiles` to get more info. To interact with pricing using those ids,
+Used to interact with service profiles for users. Each user can have up to one service profile per
+service. These profiles **do not** include pricing, but do include a list of pricing profile ids at
+`serviceProfile.pricing.pricingProfiles` to get more info. To interact with pricing using those ids,
 refer to the **service rates** section.
 
 ## All Service Profiles
@@ -273,9 +278,10 @@ refer to the **service rates** section.
 
 ## A Specific User or Service
 
-To get service profiles for a specific user, you must access the specific service. To get all service profiles for a user in one call you can filter
-all the service profiles on the client side using the `/service-profiles` endpoint, but the intention is to access each profile as needed and that
-endpoint is more for information purposes.
+To get service profiles for a specific user, you must access the specific service. To get all
+service profiles for a user in one call you can filter all the service profiles on the client side
+using the `/service-profiles` endpoint, but the intention is to access each profile as needed and
+that endpoint is more for information purposes.
 
 ## Mixing
 
@@ -329,14 +335,17 @@ endpoint is more for information purposes.
 
 ## Studio Musicians & Instruments
 
--   Studio musicians have their service profile which holds all their information regarding their service details and active preferences for that
-    service.
--   A studio musician will then have an array at `musicianprofile.serviceDetails.instruments` which will hold profiles for all the instruments the
-    musician offers. These **instrument profiles** _are not_ pricing details, but instrument and skill level details being attached to musicians.
--   **Pricing profiles** are more dynamic and change participation based on which is active and what genres/instruments are being priced inside; so
-    they are seperated into pricing profiles endpoint. These larger pricing profiles will _then_ have **instrument pricing profiles** within them
-    located at `pricingProfile.pricing.instrumentPricingProfiles`.
--   **Instrument pricing profiles** exist so that the user can break down their pricing **per** instrument **per** pricing profile.
+-   Studio musicians have their service profile which holds all their information regarding their
+    service details and active preferences for that service.
+-   A studio musician will then have an array at `musicianprofile.serviceDetails.instruments` which
+    will hold profiles for all the instruments the musician offers. These **instrument profiles**
+    _are not_ pricing details, but instrument and skill level details being attached to musicians.
+-   **Pricing profiles** are more dynamic and change participation based on which is active and what
+    genres/instruments are being priced inside; so they are seperated into pricing profiles
+    endpoint. These larger pricing profiles will _then_ have **instrument pricing profiles** within
+    them located at `pricingProfile.pricing.instrumentPricingProfiles`.
+-   **Instrument pricing profiles** exist so that the user can break down their pricing **per**
+    instrument **per** pricing profile.
 
 ### Reaching all studio musician service profiles
 
@@ -352,14 +361,16 @@ endpoint is more for information purposes.
 -   GET: expects a valid user id of a user who _has a studio musician profile setup_.
 -   PUT: will update service profile
 -   POST: not supported at this endpoint
--   DELETE: will remove a studio musician's profile and **then also remove all of their instrument profiles**.
+-   DELETE: will remove a studio musician's profile and **then also remove all of their instrument
+    profiles**.
 
 > `/service-profiles/studio-musicians/[userId]`
 
 ## Instrument Profiles
 
-Instrument profiles will return a profile of an instrument with details about the user's skill. These are used to list isntruments a studio musician
-can play. These are not intended for pricing; for pricing, see **instrument pricing profiles**
+Instrument profiles will return a profile of an instrument with details about the user's skill.
+These are used to list isntruments a studio musician can play. These are not intended for pricing;
+for pricing, see **instrument pricing profiles**
 
 ### Reaching all instrument profiles
 
@@ -381,8 +392,8 @@ can play. These are not intended for pricing; for pricing, see **instrument pric
 
 ### Specific instrument profiles
 
-Reach a specific instrument profile with its id; to get the id you must already have loaded a user's studio musician profile where the collection of
-ids lives.
+Reach a specific instrument profile with its id; to get the id you must already have loaded a user's
+studio musician profile where the collection of ids lives.
 
 -   GET: expects a valid instrument profile id; returns instrument object
 -   DELETE: expects valid instrument id; will remove specific instrument
@@ -395,26 +406,31 @@ ids lives.
 
 **\*Not to be confused with pricing profiles for a service.**
 
-Instrument pricing profiles are all intended to be matched to a studio musician service pricing profile. The intention for these are to track
-isntrument rates for artist who have decided to have different rates for different genres **within** a pricing profile for studio musician.
+Instrument pricing profiles are all intended to be matched to a studio musician service pricing
+profile. The intention for these are to track isntrument rates for artist who have decided to have
+different rates for different genres **within** a pricing profile for studio musician.
 
 ### ALL _instrument_ pricing profiles for ALL pricing profiles
 
--   GET: Will returnan `Array` of ALL _instrument pricing profiles_ for ALL _studio musician pricing profiles_.
+-   GET: Will returnan `Array` of ALL _instrument pricing profiles_ for ALL _studio musician pricing
+    profiles_.
 -   POST: expects valid _instrument pricing profile_ and will add
--   PUT: not supported at this endpoint. **To update a specific profile**, use the endpoint for _instrument pricing profile_
--   DELETE: will delete ALL _instrument pricing profiles_ for a SPECIFIC _studio musician pricing profile_. **To delete a single profile**, use the
-    endpoint for _instrument pricing profile_
+-   PUT: not supported at this endpoint. **To update a specific profile**, use the endpoint for
+    _instrument pricing profile_
+-   DELETE: will delete ALL _instrument pricing profiles_ for a SPECIFIC _studio musician pricing
+    profile_. **To delete a single profile**, use the endpoint for _instrument pricing profile_
 
 > `/instruments/pricing-profiles`
 
 ### ALL _instrument_ pricing profiles for a SPECIFIC pricing profile
 
--   GET: Will returnan `Array` of ALL _instrument pricing profiles_ for a SPECIFIC _studio musician pricing profile_.
+-   GET: Will returnan `Array` of ALL _instrument pricing profiles_ for a SPECIFIC _studio musician
+    pricing profile_.
 -   POST: not supported at this endpoint.
--   PUT: not supported at this endpoint. **To update a specific profile**, use the endpoint for _instrument pricing profile_
--   DELETE: will delete ALL _instrument pricing profiles_ for a SPECIFIC _studio musician pricing profile_. **To delete a single profile**, use the
-    endpoint for _instrument pricing profile_
+-   PUT: not supported at this endpoint. **To update a specific profile**, use the endpoint for
+    _instrument pricing profile_
+-   DELETE: will delete ALL _instrument pricing profiles_ for a SPECIFIC _studio musician pricing
+    profile_. **To delete a single profile**, use the endpoint for _instrument pricing profile_
 
 > `/instruments/pricing-profiles/[pricingProfileId]`
 

@@ -72,7 +72,14 @@ serviceProfilesRouter
 	.route('/fetch-user-profiles')
 	.options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
 	.get(cors.cors, auth.verifyUser, (req, res, next) => {
-		let allProfiles = {};
+		let allProfiles = {
+			singer: null,
+			mixing: null,
+			mastering: null,
+			producer: null,
+			songwriter: null,
+			studioMusician: null,
+		};
 		SingerServiceProfiles.find({ userId: req.user._id })
 			.then((profiles) => {
 				if (profiles[0]) {
@@ -116,9 +123,6 @@ serviceProfilesRouter
 			})
 			.then((profiles) => {
 				if (profiles[0]) {
-					allProfiles.producer = profiles[0];
-				}
-				if (profiles[0]) {
 					let foundProducerProfile = profiles[0];
 					ProducerPricingProfile.find({
 						producerServiceProfileId: foundProducerProfile._id,
@@ -127,12 +131,13 @@ serviceProfilesRouter
 							foundProducerProfile.pricing.pricingProfiles = prices;
 						})
 						.catch((err) => next(err));
-					allProfiles.mastering = foundProducerProfile;
+					allProfiles.producer = foundProducerProfile;
 				}
 				return SongwriterServiceProfiles.find({ userId: req.user._id });
 			})
 			.then((profiles) => {
 				if (profiles[0]) {
+					console.log('yes it is in');
 					let foundSongwriterProfile = profiles[0];
 					SongwriterPricingProfile.find({
 						songwriterServiceProfileId: foundSongwriterProfile._id,
@@ -149,6 +154,10 @@ serviceProfilesRouter
 							res.json(allProfiles);
 						})
 						.catch((err) => next(err));
+				} else {
+					res.statusCode = 200;
+					res.setHeader('Content-Header', 'application/json');
+					res.json(allProfiles);
 				}
 			})
 			.catch((err) => next(err));

@@ -3,6 +3,50 @@ const Schema = mongoose.Schema;
 require('mongoose-currency').loadType(mongoose);
 const Currency = mongoose.Types.Currency;
 
+const rateStructure = new Schema(
+	{
+		flatRate: {
+			type: Currency,
+			min: 0,
+		},
+		verseRate: {
+			type: Currency,
+			min: 0,
+		},
+		chorusRate: {
+			type: Currency,
+			min: 0,
+		},
+		rappingFlatRate: {
+			type: Currency,
+			min: 0,
+		},
+		rappingVerse: {
+			type: Currency,
+			min: 0,
+		},
+		rappingChorus: {
+			type: Currency,
+			min: 0,
+		},
+		singingFlatRate: {
+			type: Currency,
+			min: 0,
+		},
+		singingVerse: {
+			type: Currency,
+			min: 0,
+		},
+		singingChorus: {
+			type: Currency,
+			min: 0,
+		},
+	},
+	{
+		_id: false,
+	}
+);
+
 const singerPricingProfile = new Schema(
 	{
 		userId: {
@@ -17,67 +61,39 @@ const singerPricingProfile = new Schema(
 			type: String,
 			required: true,
 		},
-		isFlatRate: {
+		ratesAreBySong: {
 			type: Boolean,
 			default: false,
 		},
-		isLessForBackgroundVocals: {
+		ratesAreByConfidence: {
 			type: Boolean,
 			default: false,
 		},
-		isStructuredByPart: {
+		ratesAreByGenre: {
 			type: Boolean,
 			default: false,
 		},
-		hasGenreFlatRate: {
-			type: Boolean,
-			default: false,
+		bySongRates: {
+			type: rateStructure,
+			default: {},
 		},
-		hasConfidentFlatRate: {
-			type: Boolean,
-			default: false,
-		},
-		hasLessExperiencedGenreFlatRate: {
-			type: Boolean,
-			default: false,
-		},
-		flatRate: {
+		startingAt: {
 			type: Currency,
-			default: null,
 			min: 0,
 		},
-		confidentGenreFlatRate: {
-			type: Currency,
-			default: null,
-			min: 0,
+		confidenceRates: {
+			confidentRates: {
+				type: rateStructure,
+				default: {},
+			},
+			lessExperiencedRates: {
+				type: rateStructure,
+				default: {},
+			},
 		},
-		lessExperiencedGenreFlatRate: {
-			type: Currency,
-			default: null,
-			min: 0,
-		},
-		leadVocalRate: {
-			type: Currency,
-			default: null,
-			min: 0,
-		},
-		backgroundVocalRate: {
-			type: Currency,
-			default: null,
-			min: 0,
-		},
-		perPartRate: {
-			type: Currency,
-			default: null,
-			min: 0,
-		},
-		confidentGenreRates: {
+		genreRates: {
 			type: Array,
-			default: [], // populate on client side with seperate endpoint
-		},
-		lessExperiencedGenreRates: {
-			type: Array,
-			default: [], // populate on client side with seperate endpoint
+			default: [],
 		},
 	},
 	{

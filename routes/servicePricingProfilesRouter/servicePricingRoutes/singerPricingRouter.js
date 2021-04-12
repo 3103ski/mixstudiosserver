@@ -17,17 +17,24 @@ singerPricingRouter
 			})
 			.catch((err) => next(err));
 	})
-	.post((req, res, next) => {
-		SingerPricingProfile.create(req.body)
+	.post(cors.corsWithOptions, auth.verifyUser, (req, res, next) => {
+		const newProfile = {
+			userId: req.user._id,
+			...req.body,
+		};
+		SingerPricingProfile.create(newProfile)
 			.then((profile) => {
 				res.statusCode = 200;
 				res.setHeader('Content-Type', 'application/json');
 				res.json(profile);
 			})
-			.catch((err) => next(err));
+			.catch((err) => {
+				console.log(err);
+				next(err);
+			});
 	})
-	.delete((req, res, next) => {
-		SingerPricingProfile.deleteMany()
+	.delete(cors.corsWithOptions, auth.verifyUser, (req, res, next) => {
+		SingerPricingProfile.deleteMany({ userId: req.user._id })
 			.then((response) => {
 				res.statusCode = 200;
 				res.setHeader('Content-Type', 'application/json');
