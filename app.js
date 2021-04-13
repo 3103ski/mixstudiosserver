@@ -17,22 +17,22 @@ const instrumentProfilesRouter = require('./routes/instrumentsRouter/instrumentR
 const servicesPricingRouter = require('./routes/servicePricingProfilesRouter/servicePricingProfilesRouter');
 
 // Connecting Database
-const mongoose = require('mongoose');
+// const mongoose = require('mongoose');
 
-const url = config.mongoUrl;
-const connect = mongoose.connect(url, {
-	useCreateIndex: true,
-	useFindAndModify: false,
-	useNewUrlParser: true,
-	useUnifiedTopology: true,
-});
+// const url = config.mongoUrl;
+// const connect = mongoose.connect(url, {
+// 	useCreateIndex: true,
+// 	useFindAndModify: false,
+// 	useNewUrlParser: true,
+// 	useUnifiedTopology: true,
+// });
 
-connect.then(
-	() => {
-		console.log('Connected correctly to the server');
-	},
-	(err) => console.log(err)
-);
+// connect.then(
+// 	() => {
+// 		console.log('Connected correctly to the server');
+// 	},
+// 	(err) => console.log(err)
+// );
 
 // Initializing express app
 const app = express();
@@ -56,13 +56,13 @@ app.use('/home', (req, res) => {
 	res.setHeader('Content-Type', 'text/html');
 	res.sendFile(path.join(__dirname, 'views/index.html'));
 });
-app.use('/users', userProfileRouter);
-app.use('/sounds-like', soundsLikeObjectsRouter);
-app.use('/service-profiles', serviceProfilesRouter);
-app.use('/service-pricing', servicesPricingRouter);
-app.use('/instruments', instrumentProfilesRouter);
-app.use('/uploads', uploadsRouter);
-app.use('/portfolio', portfolioRouter);
+// app.use('/users', userProfileRouter);
+// app.use('/sounds-like', soundsLikeObjectsRouter);
+// app.use('/service-profiles', serviceProfilesRouter);
+// app.use('/service-pricing', servicesPricingRouter);
+// app.use('/instruments', instrumentProfilesRouter);
+// app.use('/uploads', uploadsRouter);
+// app.use('/portfolio', portfolioRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
