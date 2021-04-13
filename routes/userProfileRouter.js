@@ -13,8 +13,8 @@ userProfileRouter
 	.get(cors.cors, (req, res, next) => {
 		console.log('Applied browse filters', req.query.filters);
 
-		// const filters = req.query.filters !== undefined ? JSON.parse(req.query.filters) : {};
-		const filters = req.query.filters;
+		const filters = req.query.filters !== undefined ? JSON.parse(req.query.filters) : {};
+		// const filters = req.query.filters;
 		UserProfile.find(filters)
 			.then((profiles) => {
 				const page = req.query.page ? parseInt(req.query.page) : 1;
