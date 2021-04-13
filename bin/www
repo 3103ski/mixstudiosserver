@@ -45,10 +45,6 @@ const options = {
 
 const secureServer = https.createServer(options, app);
 
-https.request({
-	rejectUnauthorized: false,
-});
-
 /**
  * Listen on provided port, on all network interfaces.
  */
