@@ -57,12 +57,12 @@ app.get('/', (req, res) => {
 	res.sendFile(path.join(__dirname, 'views/index.html'));
 });
 app.use('/users', userProfileRouter);
-// app.use('/sounds-like', soundsLikeObjectsRouter);
-// app.use('/service-profiles', serviceProfilesRouter);
-// app.use('/service-pricing', servicesPricingRouter);
-// app.use('/instruments', instrumentProfilesRouter);
-// app.use('/uploads', uploadsRouter);
-// app.use('/portfolio', portfolioRouter);
+app.use('/sounds-like', soundsLikeObjectsRouter);
+app.use('/service-profiles', serviceProfilesRouter);
+app.use('/service-pricing', servicesPricingRouter);
+app.use('/instruments', instrumentProfilesRouter);
+app.use('/uploads', uploadsRouter);
+app.use('/portfolio', portfolioRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
