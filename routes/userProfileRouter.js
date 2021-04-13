@@ -13,11 +13,12 @@ userProfileRouter
 	.get(cors.cors, (req, res, next) => {
 		console.log('Applied browse filters', req.query.filters);
 
-		const filters = req.query.filters !== undefined ? JSON.parse(req.query.filters) : {};
+		// const filters = req.query.filters !== undefined ? JSON.parse(req.query.filters) : {};
+		const filters = req.query.filters;
 		UserProfile.find(filters)
 			.then((profiles) => {
 				const page = req.query.page ? parseInt(req.query.page) : 1;
-				const limit = parseInt(req.query.limit);
+				const limit = parseInt(req.query.limit) ? parseInt(req.query.limit) : 1;
 				const startIndex = page * limit;
 				const endIndex =
 					startIndex + limit < profiles.length - 1 ? profiles.length : startIndex + limit;
@@ -26,7 +27,7 @@ userProfileRouter
 				res.statusCode = 200;
 				res.setHeader('Content-Header', 'application/json');
 				res.json({
-					list: returnList,
+					list: profiles,
 					profileCount: profiles.length,
 				});
 			})

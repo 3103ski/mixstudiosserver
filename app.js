@@ -51,11 +51,11 @@ app.use(passport.initialize());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // ROUTES
-// app.use('/', (req, res) => {
-// 	res.statusCode = 200;
-// 	res.setHeader('Content-Type', 'text/html');
-// 	res.sendFile(path.join(__dirname, 'views/index.html'));
-// });
+app.use('/home', (req, res) => {
+	res.statusCode = 200;
+	res.setHeader('Content-Type', 'text/html');
+	res.sendFile(path.join(__dirname, 'views/index.html'));
+});
 app.use('/users', userProfileRouter);
 app.use('/sounds-like', soundsLikeObjectsRouter);
 app.use('/service-profiles', serviceProfilesRouter);

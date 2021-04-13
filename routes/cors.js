@@ -7,7 +7,8 @@ const whitelist = [
 	'https://localhost:3443',
 	'http://localhost:3443',
 	'http://13.58.190.176:3003/',
-	'https://brave-ritchie-c5bc40.netlify.app',
+	'https://13.58.190.176:3443',
+	'https://mixstudios.netlify.app',
 ];
 const corsOptionsDelegate = (req, callback) => {
 	let corsOptions;
