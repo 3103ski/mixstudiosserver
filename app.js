@@ -51,7 +51,7 @@ app.use(passport.initialize());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // ROUTES
-app.use('/home', (req, res) => {
+app.get('/', (req, res) => {
 	res.statusCode = 200;
 	res.setHeader('Content-Type', 'text/html');
 	res.sendFile(path.join(__dirname, 'views/index.html'));
