@@ -38,8 +38,8 @@ server.on('listening', onListening);
  */
 
 const options = {
-	key: fs.readFileSync(__dirname + '/server.key'),
-	cert: fs.readFileSync(__dirname + '/server.cert'),
+	key: fs.readFileSync(__dirname + '/key.pem'),
+	cert: fs.readFileSync(__dirname + '/cert.pem'),
 };
 
 const secureServer = https.createServer(options, app);
