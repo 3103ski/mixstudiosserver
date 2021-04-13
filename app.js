@@ -16,23 +16,23 @@ const serviceProfilesRouter = require('./routes/serviceProfileRouter/serviceProf
 const instrumentProfilesRouter = require('./routes/instrumentsRouter/instrumentRouter');
 const servicesPricingRouter = require('./routes/servicePricingProfilesRouter/servicePricingProfilesRouter');
 
-// Connecting Database
-// const mongoose = require('mongoose');
+Connecting Database
+const mongoose = require('mongoose');
 
-// const url = config.mongoUrl;
-// const connect = mongoose.connect(url, {
-// 	useCreateIndex: true,
-// 	useFindAndModify: false,
-// 	useNewUrlParser: true,
-// 	useUnifiedTopology: true,
-// });
+const url = config.mongoUrl;
+const connect = mongoose.connect(url, {
+	useCreateIndex: true,
+	useFindAndModify: false,
+	useNewUrlParser: true,
+	useUnifiedTopology: true,
+});
 
-// connect.then(
-// 	() => {
-// 		console.log('Connected correctly to the server');
-// 	},
-// 	(err) => console.log(err)
-// );
+connect.then(
+	() => {
+		console.log('Connected correctly to the server');
+	},
+	(err) => console.log(err)
+);
 
 // Initializing express app
 const app = express();
@@ -56,7 +56,7 @@ app.get('/', (req, res) => {
 	res.setHeader('Content-Type', 'text/html');
 	res.sendFile(path.join(__dirname, 'views/index.html'));
 });
-// app.use('/users', userProfileRouter);
+app.use('/users', userProfileRouter);
 // app.use('/sounds-like', soundsLikeObjectsRouter);
 // app.use('/service-profiles', serviceProfilesRouter);
 // app.use('/service-pricing', servicesPricingRouter);
