@@ -18,33 +18,38 @@ const audioUpload = multer({ storage: audioStorage });
 portfolioEntryRouter
 	.route('/')
 	.options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
-	.post(cors.cors, auth.verifyUser, audioUpload.array('audio/wav'), (req, res, next) => {
-		let portfolioEntry = {
-			userId: req.user._id,
-			title: req.body.title,
-			description: req.body.description,
-			genreOne: req.body.genreOne,
-			genreTwo: req.body.genreTwo,
-			category: req.body.category,
-			serviceAssignment: req.body.serviceAssignment,
-			image: req.body.image ? req.body.image : null,
-			isBeforeAfter: req.body.isBeforeAfter,
-			audioOne: req.files[0].filename,
-			audioOneOriginalName: req.files[0].originalname,
-			audioTwo: req.files[1] ? req.files[1].filename : null,
-			audioTwoOriginalName: req.files[1] ? req.files[1].originalname : null,
-		};
-		portfolioEntry.userId = req.user._id;
-		console.log(req.files);
-		console.log(portfolioEntry);
-		PortfolioEntry.create(portfolioEntry)
-			.then((newPortfolioObject) => {
-				res.status = 200;
-				res.setHeader('Content-Type', 'application/json');
-				res.json(newPortfolioObject);
-			})
-			.catch((err) => next(err));
-	})
+	.post(
+		cors.corsWithOptions,
+		auth.verifyUser,
+		audioUpload.array('audio/wav'),
+		(req, res, next) => {
+			let portfolioEntry = {
+				userId: req.user._id,
+				title: req.body.title,
+				description: req.body.description,
+				genreOne: req.body.genreOne,
+				genreTwo: req.body.genreTwo,
+				category: req.body.category,
+				serviceAssignment: req.body.serviceAssignment,
+				image: req.body.image ? req.body.image : null,
+				isBeforeAfter: req.body.isBeforeAfter,
+				audioOne: req.files[0].filename,
+				audioOneOriginalName: req.files[0].originalname,
+				audioTwo: req.files[1] ? req.files[1].filename : null,
+				audioTwoOriginalName: req.files[1] ? req.files[1].originalname : null,
+			};
+			portfolioEntry.userId = req.user._id;
+			console.log(req.files);
+			console.log(portfolioEntry);
+			PortfolioEntry.create(portfolioEntry)
+				.then((newPortfolioObject) => {
+					res.status = 200;
+					res.setHeader('Content-Type', 'application/json');
+					res.json(newPortfolioObject);
+				})
+				.catch((err) => next(err));
+		}
+	)
 	.get(cors.cors, (req, res, next) => {
 		PortfolioEntry.find()
 			.then((allPortfolioEntries) => {
