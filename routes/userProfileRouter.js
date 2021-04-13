@@ -11,8 +11,8 @@ userProfileRouter
 	.route('/')
 	.options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
 	.get(cors.cors, (req, res, next) => {
+		console.log('Applied browse filters', req.query.filters);
 		const filters = JSON.parse(req.query.filters);
-		console.log('Applied browse filters', filters);
 		UserProfile.find(filters)
 			.then((profiles) => {
 				const page = req.query.page ? parseInt(req.query.page) : 1;
