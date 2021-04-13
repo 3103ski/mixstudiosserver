@@ -16,7 +16,7 @@ const serviceProfilesRouter = require('./routes/serviceProfileRouter/serviceProf
 const instrumentProfilesRouter = require('./routes/instrumentsRouter/instrumentRouter');
 const servicesPricingRouter = require('./routes/servicePricingProfilesRouter/servicePricingProfilesRouter');
 
-Connecting Database
+// Connecting Database
 const mongoose = require('mongoose');
 
 const url = config.mongoUrl;
