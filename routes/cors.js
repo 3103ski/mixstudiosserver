@@ -9,6 +9,7 @@ const whitelist = [
 	'http://13.58.190.176:3003/',
 	'https://13.58.190.176:3443',
 	'https://mixstudios.netlify.app',
+	'https://bryanswork.com',
 ];
 const corsOptionsDelegate = (req, callback) => {
 	let corsOptions;
