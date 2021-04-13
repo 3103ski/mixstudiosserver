@@ -40,6 +40,7 @@ server.on('listening', onListening);
 const options = {
 	key: fs.readFileSync(__dirname + '/key.pem'),
 	cert: fs.readFileSync(__dirname + '/cert.pem'),
+	passphrase: 'mixstudios',
 };
 
 const secureServer = https.createServer(options, app);
