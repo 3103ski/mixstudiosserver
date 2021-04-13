@@ -93,33 +93,28 @@ uploadRouter
 		res.statusCode = 403;
 		res.end(`GET operation not supported on /audio`);
 	})
-	.post(
-		cors.corsWithOptions,
-		authenticate.verifyUser,
-		audioUpload.array('audio/wav'),
-		(req, res, next) => {
-			console.log('THE BODY!', req.body);
-			console.log('THE files!', req.files);
-			res.setHeader('Content-Type', 'application/json');
-			res.statusCode = 200;
-			res.end('recieved');
-			// console.log('THE FILE!', req.file.filename);
-			// User.findById(req.user._id)
-			// 	.then((user) => {
-			// 		return deleteWithFSFromRoot.publicAccessDelete('/audio/', user.userInfo.avatar);
-			// 	})
-			// 	.then((response) => {
-			// 		User.findById(req.user._id).then((user) => {
-			// 			user.userInfo.avatar = req.file.filename;
-			// 			user.save();
-			// 			res.statusCode = 200;
-			// 			res.setHeader('Content-Type', 'application/json');
-			// 			res.json(user);
-			// 		});
-			// 	})
-			// 	.catch((err) => next(err));
-		}
-	)
+	.post(cors.cors, authenticate.verifyUser, audioUpload.array('audio/wav'), (req, res, next) => {
+		console.log('THE BODY!', req.body);
+		console.log('THE files!', req.files);
+		res.setHeader('Content-Type', 'application/json');
+		res.statusCode = 200;
+		res.end('recieved');
+		// console.log('THE FILE!', req.file.filename);
+		// User.findById(req.user._id)
+		// 	.then((user) => {
+		// 		return deleteWithFSFromRoot.publicAccessDelete('/audio/', user.userInfo.avatar);
+		// 	})
+		// 	.then((response) => {
+		// 		User.findById(req.user._id).then((user) => {
+		// 			user.userInfo.avatar = req.file.filename;
+		// 			user.save();
+		// 			res.statusCode = 200;
+		// 			res.setHeader('Content-Type', 'application/json');
+		// 			res.json(user);
+		// 		});
+		// 	})
+		// 	.catch((err) => next(err));
+	})
 	.put(cors.corsWithOptions, authenticate.verifyUser, authenticate.verifyAdmin, (req, res) => {
 		res.statusCode = 403;
 		res.end(`PUT operation not supported on /imageUpload`);
