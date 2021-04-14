@@ -38,19 +38,20 @@ portfolioEntryRouter
 	.post(cors.cors, auth.verifyUser, (request, response, next) => {
 		const form = new multiparty.Form();
 
+		console.log('We in the post');
+
 		form.parse(request, async (error, fields, files) => {
 			if (error) {
 				response.status = 500;
 				response.setHeader('Content-Type', 'application/json');
 				response.json(error);
 			}
+			console.log('We past the first error check inside parse function');
 
 			const path = files.audioOne[0].path;
 			const buffer = fs.readFileSync(path);
 			const type = await FileType.fromBuffer(buffer);
 			const fileName = `${Date.now().toString()}${files.audioOne[0].size}`;
-
-			console.log('is this a type? ', type.mime);
 
 			let payload = await {
 				userId: request.user._id,
