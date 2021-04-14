@@ -35,7 +35,7 @@ const uploadFile = (buffer, name, type) => {
 portfolioEntryRouter
 	.route('/')
 	.options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
-	.post(cors.corsWithOptions, auth.verifyUser, (request, response, next) => {
+	.post(cors.cors, auth.verifyUser, (request, response, next) => {
 		const form = new multiparty.Form();
 
 		form.parse(request, async (error, fields, files) => {
