@@ -8,11 +8,15 @@ const whitelist = [
 	'http://localhost:3443',
 	'http://13.58.190.176:3003/',
 	'https://13.58.190.176:3443',
+	'http://75.2.60.5',
+	'https://75.2.60.5',
 	'https://mixstudios.netlify.app',
-	'https://bryanswork.com',
+	'http://mixstudios.netlify.app',
 ];
 const corsOptionsDelegate = (req, callback) => {
 	let corsOptions;
+
+	console.log('CORS is currently checking this: ', req);
 
 	// Standard requests have 'req.header', axios has 'res.headers'
 	if (
