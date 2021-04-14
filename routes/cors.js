@@ -16,7 +16,7 @@ const whitelist = [
 const corsOptionsDelegate = (req, callback) => {
 	let corsOptions;
 
-	console.log('CORS is currently checking this: ', req);
+	console.log('CORS is still seeing it: ', req.headers);
 
 	// Standard requests have 'req.header', axios has 'res.headers'
 	if (
@@ -26,7 +26,7 @@ const corsOptionsDelegate = (req, callback) => {
 		corsOptions = { origin: true };
 	} else {
 		corsOptions = {
-			origin: false,
+			origin: true,
 		};
 	}
 	callback(null, corsOptions);
