@@ -10,31 +10,31 @@ const FileType = require('file-type');
 const multiparty = require('multiparty');
 const fs = require('fs');
 
-AWS.config.update({
-	accessKeyId: 'AKIARRLEMNTVQBYT73P7',
-	secretAccessKey: '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',
-});
+// AWS.config.update({
+// 	accessKeyId: 'AKIARRLEMNTVQBYT73P7',
+// 	secretAccessKey: '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',
+// });
 
-const s3 = new AWS.S3();
+// const s3 = new AWS.S3();
 
 const portfolioEntryRouter = express.Router();
 
-const uploadFile = (buffer, name, type) => {
-	const params = {
-		ACL: 'public-read',
-		ContentType: type.mime,
-		Body: buffer,
-		Bucket: 'ms-audio-storage',
-		Key: `${name}.${type.ext}`,
-	};
-	console.log('these are the params: ', params);
-	return s3.upload(params).promise();
-};
+// const uploadFile = (buffer, name, type) => {
+// 	const params = {
+// 		ACL: 'public-read',
+// 		ContentType: type.mime,
+// 		Body: buffer,
+// 		Bucket: 'ms-audio-storage',
+// 		Key: `${name}.${type.ext}`,
+// 	};
+// 	console.log('these are the params: ', params);
+// 	return s3.upload(params).promise();
+// };
 
 portfolioEntryRouter
 	.route('/')
 	.options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
-	.post(cors.cors, (req, res, next) => {
+	.post(cors.corsWithOptions, (req, res, next) => {
 		// const form = new multiparty.Form();
 		res.status = 200;
 		res.setHeader('Content-Type', 'application/json');
