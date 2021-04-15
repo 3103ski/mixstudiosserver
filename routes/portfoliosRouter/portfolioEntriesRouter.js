@@ -3,6 +3,7 @@ const multer = require('multer');
 const deleteWithFSFromRoot = require('../../fs');
 const auth = require('../../authenticate');
 const cors = require('../cors');
+const corsTwo = require('cors');
 const PortfolioEntry = require('../../models/portfolios/portfolioEntries');
 
 const AWS = require('aws-sdk');
@@ -33,7 +34,7 @@ const uploadFile = (buffer, name, type) => {
 
 portfolioEntryRouter
 	.route('/')
-	.options(cors({ origin: true, credentials: true }), (req, res) => {
+	.options(corsTwo({ origin: true, credentials: true }), (req, res) => {
 		res.header('Access-Control-Allow-Origin', '*');
 		res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
 		res.header(
@@ -42,7 +43,7 @@ portfolioEntryRouter
 		);
 		res.sendStatus(200);
 	})
-	.post(cors.corsWithOptions, (req, res, next) => {
+	.post(corsTwo({ origin: true, credentials: true }), (req, res, next) => {
 		console.log('We in the post');
 		const form = new multiparty.Form();
 
