@@ -33,7 +33,7 @@ const uploadFile = (buffer, name, type) => {
 
 portfolioEntryRouter
 	.route('/')
-	.options(cors.cors({ origin: true, credentials: true }), (req, res) => {
+	.options(cors({ origin: true, credentials: true }), (req, res) => {
 		res.header('Access-Control-Allow-Origin', '*');
 		res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
 		res.header(
