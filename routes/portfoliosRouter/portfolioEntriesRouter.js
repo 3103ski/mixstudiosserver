@@ -33,18 +33,15 @@ const uploadFile = (buffer, name, type) => {
 
 portfolioEntryRouter
 	.route('/')
-	.options(
-		cors.cors({ origin: 'https://mixstudios.netlify.app', credentials: true }),
-		(req, res) => {
-			res.header('Access-Control-Allow-Origin', '*');
-			res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
-			res.header(
-				'Access-Control-Allow-Headers',
-				'Content-Type, Authorization, Content-Length, X-Requested-With, Access-Control-Allow-Origin'
-			);
-			res.sendStatus(200);
-		}
-	)
+	.options(cors.cors({ origin: true, credentials: true }), (req, res) => {
+		res.header('Access-Control-Allow-Origin', '*');
+		res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
+		res.header(
+			'Access-Control-Allow-Headers',
+			'Content-Type, Authorization, Content-Length, X-Requested-With, Access-Control-Allow-Origin'
+		);
+		res.sendStatus(200);
+	})
 	.post(cors.corsWithOptions, (req, res, next) => {
 		console.log('We in the post');
 		const form = new multiparty.Form();
