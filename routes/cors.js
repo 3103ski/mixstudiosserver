@@ -25,11 +25,11 @@ const corsOptionsDelegate = (req, callback) => {
 		whitelist.indexOf(req.headers.origin) !== -1
 	) {
 		console.log('cors said yes');
-		corsOptions = { origin: false };
+		corsOptions = { origin: true };
 	} else {
 		console.log('cors said no');
 		corsOptions = {
-			origin: true,
+			origin: false,
 		};
 	}
 	callback(null, corsOptions);
