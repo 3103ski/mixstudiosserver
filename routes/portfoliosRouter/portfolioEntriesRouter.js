@@ -48,9 +48,9 @@ portfolioEntryRouter
 
 		form.parse(req, async (error, fields, files) => {
 			if (error) {
-				response.status = 500;
-				response.setHeader('Content-Type', 'application/json');
-				response.json(error);
+				res.statusCode = 500;
+				res.setHeader('Content-Type', 'application/json');
+				res.json(error);
 			}
 			console.log('We past the first error check inside parse function');
 
@@ -100,12 +100,11 @@ portfolioEntryRouter
 				})
 				.then((newEntry) => {
 					console.log('SENDING THIS BACK: ', newEntry);
-					res.status = 200;
+					res.statusCode = 200;
 					res.setHeader('Content-Type', 'application/json');
 					// res.setHeader('Access-Control-Allow-Origin', '*');
 
-					// res.json({ return: 'everything kinda works?' });
-					response.json(newEntry);
+					res.json(newEntry);
 				})
 				.catch((err) => next(err));
 		});
@@ -113,7 +112,7 @@ portfolioEntryRouter
 	.get(cors.cors, (req, res, next) => {
 		PortfolioEntry.find()
 			.then((allPortfolioEntries) => {
-				res.status = 200;
+				res.statusCode = 200;
 				res.setHeader('Content-Type', 'application/json');
 				res.json(allPortfolioEntries);
 			})
