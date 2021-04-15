@@ -36,8 +36,11 @@ portfolioEntryRouter
 	.route('/')
 	.options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
 	.post(cors.corsWithOptions, auth.verifyUser, (request, response, next) => {
-		const form = new multiparty.Form();
-
+		// const form = new multiparty.Form();
+		response.status = 200;
+		response.setHeader('Content-Type', 'application/json');
+		response.setHeader('Access-Control-Allow-Origin', '*');
+		response.json({ return: 'everything kinda works?' });
 		console.log('We in the post');
 
 		// form.parse(request, async (error, fields, files) => {
