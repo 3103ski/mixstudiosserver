@@ -33,7 +33,11 @@ const uploadFile = (buffer, name, type) => {
 
 portfolioEntryRouter
 	.route('/')
-	.options(cors.cors, (req, res) => res.sendStatus(200))
+	.options(cors.cors, (req, res) => {
+		res.header('Access-Control-Allow-Origin', '*');
+		res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
+		res.sendStatus(200);
+	})
 	.post(cors.corsWithOptions, (req, res, next) => {
 		console.log('We in the post');
 		const form = new multiparty.Form();
