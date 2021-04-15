@@ -9,7 +9,6 @@ const AWS = require('aws-sdk');
 const FileType = require('file-type');
 const multiparty = require('multiparty');
 const fs = require('fs');
-const { response } = require('../../app');
 
 AWS.config.update({
 	accessKeyId: 'AKIARRLEMNTVQBYT73P7',
@@ -35,15 +34,15 @@ const uploadFile = (buffer, name, type) => {
 portfolioEntryRouter
 	.route('/')
 	.options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
-	.post(cors.cors, (request, response, next) => {
+	.post(cors.cors, (req, res, next) => {
 		// const form = new multiparty.Form();
-		response.status = 200;
-		response.setHeader('Content-Type', 'application/json');
-		response.setHeader('Access-Control-Allow-Origin', '*');
-		response.json({ return: 'everything kinda works?' });
+		res.status = 200;
+		res.setHeader('Content-Type', 'application/json');
+		res.setHeader('Access-Control-Allow-Origin', '*');
+		res.json({ return: 'everything kinda works?' });
 		console.log('We in the post');
 
-		// form.parse(request, async (error, fields, files) => {
+		// form.parse(req, async (error, fields, files) => {
 		// 	if (error) {
 		// 		response.status = 500;
 		// 		response.setHeader('Content-Type', 'application/json');
@@ -57,7 +56,7 @@ portfolioEntryRouter
 		// 	const fileName = `${Date.now().toString()}${files.audioOne[0].size}`;
 
 		// 	let payload = await {
-		// 		userId: request.user._id,
+		// 		userId: req.user._id,
 		// 		title: fields.title[0],
 		// 		description: fields.description[0],
 		// 		genreOne: fields.genreOne[0],
