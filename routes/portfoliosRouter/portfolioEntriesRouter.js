@@ -34,23 +34,17 @@ const uploadFile = (buffer, name, type) => {
 
 portfolioEntryRouter
 	.route('/')
-	.options(corsTwo({ origin: true, credentials: true }), (req, res) => {
-		res.header('Access-Control-Allow-Origin', '*');
-		res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
-		res.header(
-			'Access-Control-Allow-Headers',
-			'Content-Type, Authorization, Content-Length, X-Requested-With, Access-Control-Allow-Origin'
-		);
+	.options(cors.corsWithOptions, (req, res) => {
+		// res.header('Access-Control-Allow-Origin', '*');
+		// res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
+		// res.header(
+		// 	'Access-Control-Allow-Headers',
+		// 	'Content-Type, Authorization, Content-Length, X-Requested-With, Access-Control-Allow-Origin'
+		// );
 		res.sendStatus(200);
 	})
-	.post(corsTwo({ origin: true, credentials: true }), auth.verifyUser, (req, res, next) => {
-		console.log('We in the post');
+	.post(cors.corsWithOptions, auth.verifyUser, (req, res, next) => {
 		const form = new multiparty.Form();
-
-		// res.status = 200;
-		// res.setHeader('Content-Type', 'application/json');
-		// res.setHeader('Access-Control-Allow-Origin', '*');
-		// res.json({ return: 'everything kinda works?' });
 
 		form.parse(req, async (error, fields, files) => {
 			if (error) {
@@ -108,7 +102,7 @@ portfolioEntryRouter
 					console.log('SENDING THIS BACK: ', newEntry);
 					response.status = 200;
 					res.setHeader('Content-Type', 'application/json');
-					res.setHeader('Access-Control-Allow-Origin', '*');
+					// res.setHeader('Access-Control-Allow-Origin', '*');
 
 					// res.json({ return: 'everything kinda works?' });
 					response.json(newEntry);
