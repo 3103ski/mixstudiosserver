@@ -43,7 +43,7 @@ portfolioEntryRouter
 		);
 		res.sendStatus(200);
 	})
-	.post(corsTwo({ origin: true, credentials: true }), (req, res, next) => {
+	.post(corsTwo({ origin: true, credentials: true }), auth.verifyUser, (req, res, next) => {
 		console.log('We in the post');
 		const form = new multiparty.Form();
 
