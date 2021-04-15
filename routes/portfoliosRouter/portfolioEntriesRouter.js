@@ -100,7 +100,7 @@ portfolioEntryRouter
 				})
 				.then((newEntry) => {
 					console.log('SENDING THIS BACK: ', newEntry);
-					response.status = 200;
+					res.status = 200;
 					res.setHeader('Content-Type', 'application/json');
 					// res.setHeader('Access-Control-Allow-Origin', '*');
 
