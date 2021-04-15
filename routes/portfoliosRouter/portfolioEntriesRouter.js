@@ -16,7 +16,7 @@ AWS.config.update({
 	secretAccessKey: 'rp9w8v0wokbnN3rINvIKJ5l0OKWLdy3QqHS5PgXD',
 });
 
-// const s3 = new AWS.S3();
+const s3 = new AWS.S3();
 
 const portfolioEntryRouter = express.Router();
 
