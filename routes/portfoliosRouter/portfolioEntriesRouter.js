@@ -35,8 +35,8 @@ portfolioEntryRouter
 	.route('/')
 	.options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
 	.post(cors.corsWithOptions, (req, res, next) => {
-		const form = new multiparty.Form();
 		console.log('We in the post');
+		const form = new multiparty.Form();
 
 		// res.status = 200;
 		// res.setHeader('Content-Type', 'application/json');
