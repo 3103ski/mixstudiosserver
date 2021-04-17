@@ -28,21 +28,21 @@ const uploadFile = (buffer, name, type) => {
 		Bucket: 'ms-audio-storage',
 		Key: `${name}.${type.ext}`,
 	};
-	console.log('these are the params: ', params);
+
 	return s3.upload(params).promise();
+};
+const deleteFile = (key) => {
+	const params = {
+		Bucket: 'ms-audio-storage',
+		Key: `${key}`,
+	};
+
+	return s3.deleteObject(params).promise();
 };
 
 portfolioEntryRouter
 	.route('/')
-	.options(cors.corsWithOptions, (req, res) => {
-		// res.header('Access-Control-Allow-Origin', '*');
-		// res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
-		// res.header(
-		// 	'Access-Control-Allow-Headers',
-		// 	'Content-Type, Authorization, Content-Length, X-Requested-With, Access-Control-Allow-Origin'
-		// );
-		res.sendStatus(200);
-	})
+	.options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
 	.post(cors.corsWithOptions, auth.verifyUser, (req, res, next) => {
 		const form = new multiparty.Form();
 
@@ -52,7 +52,6 @@ portfolioEntryRouter
 				res.setHeader('Content-Type', 'application/json');
 				res.json(error);
 			}
-			console.log('We past the first error check inside parse function');
 
 			const path = files.audioOne[0].path;
 			const buffer = fs.readFileSync(path);
@@ -78,7 +77,6 @@ portfolioEntryRouter
 					payload.audioOne = fileOneResponse.Key;
 
 					if (files.audioTwo) {
-						console.log('we had a second file to upload');
 						payload.audioTwoOriginalName = files.audioTwo[0].originalFilename;
 
 						const pathTwo = files.audioTwo[0].path;
@@ -89,7 +87,6 @@ portfolioEntryRouter
 						await uploadFile(bufferTwo, fileNameTwo, typeTwo).then(
 							async (fileTwoResponse) => {
 								payload.audioTwo = fileTwoResponse.Key;
-								console.log('Sending this DOUBLE SONG payload: ', payload);
 								return PortfolioEntry.create(payload);
 							}
 						);
@@ -99,11 +96,8 @@ portfolioEntryRouter
 					}
 				})
 				.then((newEntry) => {
-					console.log('SENDING THIS BACK: ', newEntry);
 					res.statusCode = 200;
 					res.setHeader('Content-Type', 'application/json');
-					// res.setHeader('Access-Control-Allow-Origin', '*');
-
 					res.json(newEntry);
 				})
 				.catch((err) => next(err));
@@ -138,18 +132,39 @@ portfolioEntryRouter
 			.then((profile) => {
 				if (req.user._id.toString() === profile.userId) {
 					if (profile.audioOne) {
-						deleteWithFSFromRoot.publicAccessDelete('/audio/', profile.audioOne);
+						deleteFile(profile.audioOne)
+							.then((s3Res) => {
+								PortfolioEntry.findByIdAndDelete(entryId)
+									.then((deleteResponse) => {
+										console.log('SUCCEEEDED with thissss: ', deleteResponse);
+										res.status = 200;
+										res.setHeader('Content-Type', 'application/json');
+										res.json(deleteResponse);
+									})
+									.catch((err) => {
+										console.log('failed with thissss: ', err);
+										next(err);
+									});
+							})
+							.catch((err) => next(err));
 					}
 					if (profile.audioTwo) {
-						deleteWithFSFromRoot.publicAccessDelete('/audio/', profile.audioTwo);
+						deleteFile(profile.audioTwo)
+							.then((s3Res) => {
+								PortfolioEntry.findByIdAndDelete(entryId)
+									.then((deleteResponse) => {
+										console.log('SUCCEEEDED with thissss: ', deleteResponse);
+										res.status = 200;
+										res.setHeader('Content-Type', 'application/json');
+										res.json(deleteResponse);
+									})
+									.catch((err) => {
+										console.log('failed with thissss: ', err);
+										next(err);
+									});
+							})
+							.catch((err) => next(err));
 					}
-					PortfolioEntry.findByIdAndDelete(entryId)
-						.then((deleteResponse) => {
-							res.status = 200;
-							res.setHeader('Content-Type', 'application/json');
-							res.json(deleteResponse);
-						})
-						.catch((err) => next(err));
 				} else {
 					res.status = 403;
 					res.setHeader('Content-Type', 'application/json');
