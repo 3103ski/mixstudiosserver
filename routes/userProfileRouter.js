@@ -86,30 +86,37 @@ userProfileRouter
 		);
 	});
 
-userProfileRouter.route('/facebook').get(cors.cors, passport.authenticate('facebook-token'));
-
 userProfileRouter
-	.route('/facebook/callback')
-	.get(
-		cors.cors,
-		passport.authenticate('facebook', { failureRedirect: `${config.facebook.frontEnd}/login` }),
-		(req, res) => {
-			console.log('WE GOT FACEBOOK SUCCESS');
-			console.log('THE PROFILE: ', req.profile);
-			console.log('THE USER: ', req.user);
-			console.log('THE REQ: ', req);
-		}
-	);
+	.route('/facebook')
+	.get(cors.cors, passport.authenticate('facebook-token'), (req, res) => {
+		console.log(req);
+	});
+
+userProfileRouter.route('/facebook/callback').get(
+	cors.cors,
+	passport.authenticate('facebook-token', {
+		failureRedirect: `${config.facebook.frontEnd}/login`,
+	}),
+	(req, res) => {
+		console.log('WE GOT FACEBOOK SUCCESS');
+		console.log('THE PROFILE: ', req.profile);
+		console.log('THE USER: ', req.user);
+		console.log('THE REQ: ', req);
+	}
+);
 
 userProfileRouter
 	.route('/facebook/callback')
 	.options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
-	.get(passport.authenticate('facebook', { failureRedirect: '/login' }), function (req, res) {
-		console.log(req.user);
-		res.statusCode = 200;
-		res.setHeader('Content-Type', 'application/json');
-		res.json({ user: req.user, returnedRequest: req, maybeProfile: req.profile });
-	});
+	.get(
+		passport.authenticate('facebook-token', { failureRedirect: '/login' }),
+		function (req, res) {
+			console.log(req.user);
+			res.statusCode = 200;
+			res.setHeader('Content-Type', 'application/json');
+			res.json({ user: req.user, returnedRequest: req, maybeProfile: req.profile });
+		}
+	);
 
 userProfileRouter.post('/login', cors.cors, passport.authenticate('local'), (req, res) => {
 	const token = auth.getToken({ _id: req.user._id });

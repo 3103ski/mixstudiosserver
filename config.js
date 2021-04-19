@@ -5,6 +5,5 @@ module.exports = {
 	facebook: {
 		clientID: '1515252595349081',
 		clientSecret: '7630033f01a7952554a10c98cb39697b',
-		frontEnd: 'localhost:3001',
 	},
 };

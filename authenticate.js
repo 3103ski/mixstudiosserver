@@ -53,19 +53,8 @@ exports.jwtPassport = passport.use(
 exports.facebookPassport = passport.use(
 	new FacebookTokenStrategy(
 		{
-			clientID: config.facebook.clientID,
-			clientSecret: config.facebook.clientSecret,
-			callbackURL: '/facebook/callback',
-			profileFields: [
-				'id',
-				'displayName',
-				'email',
-				'name',
-				'photos',
-				'givenName',
-				'familyName',
-			],
-			passReqToCallback: true,
+			clientID: '1515252595349081',
+			clientSecret: '7630033f01a7952554a10c98cb39697b',
 		},
 		(accessToken, refreshToken, profile, done) => {
 			console.log('IN THE STRATEGY');
