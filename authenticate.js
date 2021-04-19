@@ -53,8 +53,8 @@ exports.jwtPassport = passport.use(
 exports.facebookPassport = passport.use(
 	new FacebookTokenStrategy(
 		{
-			clientID: '1515252595349081',
-			clientSecret: '7630033f01a7952554a10c98cb39697b',
+			clientID: config.facebook.clientID,
+			clientSecret: config.facebook.clientSecret,
 			fbGraphVersion: 'v3.0',
 		},
 		function (accessToken, refreshToken, profile, done) {
