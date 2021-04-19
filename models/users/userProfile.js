@@ -127,6 +127,19 @@ const userProfileSchema = new Schema(
 			type: Boolean,
 			default: false,
 		},
+		isVerified: {
+			type: Boolean,
+			default: false,
+		},
+		googleId: {
+			type: String,
+		},
+		facebookId: {
+			type: String,
+		},
+		spotifyId: {
+			type: String,
+		},
 		followers: {
 			type: Array,
 			default: [],

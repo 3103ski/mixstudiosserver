@@ -4,6 +4,7 @@ const cors = require('./cors');
 const SoundsLikeObject = require('../models/users/soundsLikeObject');
 const UserProfile = require('../models/users/userProfile');
 const passport = require('passport');
+const config = require('../config');
 
 const userProfileRouter = express.Router();
 
@@ -14,7 +15,6 @@ userProfileRouter
 		console.log('Applied browse filters', req.query.filters);
 
 		const filters = req.query.filters !== undefined ? JSON.parse(req.query.filters) : null;
-		// const filters = req.query.filters;
 		UserProfile.find(filters)
 			.then((profiles) => {
 				const page = req.query.page ? parseInt(req.query.page) : 1;
@@ -84,6 +84,28 @@ userProfileRouter
 				}
 			}
 		);
+	});
+
+userProfileRouter.route('/facebook').get(cors.cors, passport.authenticate('facebook-token'));
+
+userProfileRouter
+	.route('/facebook/callback')
+	.get(
+		cors.cors,
+		passport.authenticate('facebook', { failureRedirect: `${config.facebook.frontEnd}/login` }),
+		(req, res) => {
+			console.log('WE GOT FACEBOOK SUCCESS');
+			console.log('THE PROFILE: ', req.profile);
+			console.log('THE USER: ', req.user);
+			console.log('THE REQ: ', req);
+		}
+	);
+
+userProfileRouter
+	.route('/facebook/callback')
+	.options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
+	.get(passport.authenticate('facebook', { failureRedirect: '/login' }), function (req, res) {
+		console.log(req.user);
 	});
 
 userProfileRouter.post('/login', cors.cors, passport.authenticate('local'), (req, res) => {
