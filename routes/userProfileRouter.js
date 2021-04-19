@@ -106,6 +106,9 @@ userProfileRouter
 	.options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
 	.get(passport.authenticate('facebook', { failureRedirect: '/login' }), function (req, res) {
 		console.log(req.user);
+		res.statusCode = 200;
+		res.setHeader('Content-Type', 'application/json');
+		res.json({ user: req.user, returnedRequest: req, maybeProfile: req.profile });
 	});
 
 userProfileRouter.post('/login', cors.cors, passport.authenticate('local'), (req, res) => {
