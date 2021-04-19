@@ -131,15 +131,9 @@ const userProfileSchema = new Schema(
 			type: Boolean,
 			default: false,
 		},
-		googleId: {
-			type: String,
-		},
-		facebookId: {
-			type: String,
-		},
-		spotifyId: {
-			type: String,
-		},
+		googleId: String,
+		facebookId: String,
+		spotifyId: String,
 		followers: {
 			type: Array,
 			default: [],

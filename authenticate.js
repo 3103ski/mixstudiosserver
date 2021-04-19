@@ -12,15 +12,15 @@ const config = require('./config.js');
 
 exports.local = passport.use(new LocalStrategy(User.authenticate()));
 
-// passport.serializeUser(User.serializeUser());
-// passport.deserializeUser(User.deserializeUser());
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
 
-passport.serializeUser(function (user, cb) {
-	cb(null, user);
-});
-passport.deserializeUser(function (obj, cb) {
-	cb(null, obj);
-});
+// passport.serializeUser(function (user, cb) {
+// 	cb(null, user);
+// });
+// passport.deserializeUser(function (obj, cb) {
+// 	cb(null, obj);
+// });
 
 exports.getToken = (user) => {
 	// return jwt.sign(user, config.secretKey, { expiresIn: 10 });
@@ -55,9 +55,9 @@ exports.facebookPassport = passport.use(
 		{
 			clientID: '1515252595349081',
 			clientSecret: '7630033f01a7952554a10c98cb39697b',
+			fbGraphVersion: 'v3.0',
 		},
-		(accessToken, refreshToken, profile, done) => {
-			console.log('IN THE STRATEGY');
+		function (accessToken, refreshToken, profile, done) {
 			User.findOne({ facebookId: profile.id }, (err, user) => {
 				if (err) {
 					return done(err, false);
@@ -66,9 +66,13 @@ exports.facebookPassport = passport.use(
 					return done(null, user);
 				} else {
 					user = new User({ username: profile.displayName });
+
 					user.facebookId = profile.id;
-					user.firstName = profile.name.givenName;
-					user.lastName = profile.name.familyName;
+					user.userInfo.firstName = profile.name.givenName;
+					user.userInfo.lastName = profile.name.familyName;
+					user.userInfo.email = profile.emails[0].value;
+					user.userInfo.avatar = profile.emails[0].value;
+
 					user.save((err) => {
 						if (err) {
 							return done(err, false);
