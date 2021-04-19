@@ -71,7 +71,6 @@ exports.facebookPassport = passport.use(
 					user.userInfo.firstName = profile.name.givenName;
 					user.userInfo.lastName = profile.name.familyName;
 					user.userInfo.email = profile.emails[0].value;
-					user.userInfo.avatar = profile.emails[0].value;
 
 					user.save((err) => {
 						if (err) {
