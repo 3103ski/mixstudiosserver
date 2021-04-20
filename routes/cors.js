@@ -1,18 +1,18 @@
 const cors = require('cors');
 
 const whitelist = [
-	'http://localhost:3001',
-	'https://localhost:3001',
 	'http://localhost:3000',
+	'http://localhost:3001',
 	'http://localhost:3003',
-	'https://localhost:3443',
 	'http://localhost:3443',
 	'http://13.58.190.176:3003/',
-	'https://13.58.190.176:3443',
 	'http://75.2.60.5',
+	'http://mixstudios.netlify.app',
+	'https://localhost:3001',
+	'https://localhost:3443',
+	'https://13.58.190.176:3443',
 	'https://75.2.60.5',
 	'https://mixstudios.netlify.app',
-	'http://mixstudios.netlify.app',
 ];
 const corsOptionsDelegate = (req, callback) => {
 	let corsOptions;
