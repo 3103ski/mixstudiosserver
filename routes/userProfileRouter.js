@@ -1,4 +1,5 @@
 const express = require('express');
+const axios = require('axios');
 const auth = require('../authenticate');
 const cors = require('./cors');
 const SoundsLikeObject = require('../models/users/soundsLikeObject');
@@ -54,22 +55,17 @@ userProfileRouter
 userProfileRouter
 	.route('/signup')
 	.options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
-	.post(cors.corsWithOptions, (req, res) => {
+	.post(cors.corsWithOptions, (req, res, next) => {
 		UserProfile.register(
 			new UserProfile({ username: req.body.username, userInfo: req.body.userInfo }),
 			req.body.password,
 			(err, user) => {
 				if (err) {
-					res.statusCode = 500;
-					res.setHeader('Content-Type', 'application/json');
-					res.json({ err: err });
+					return next(err);
 				} else {
 					user.save((err) => {
 						if (err) {
-							res.statusCode = 500;
-							res.setHeader('Content-Type', 'application/json');
-							res.json({ err: err });
-							return;
+							return next(err);
 						}
 						passport.authenticate('local')(req, res, () => {
 							res.statusCode = 200;
@@ -83,7 +79,78 @@ userProfileRouter
 					});
 				}
 			}
-		);
+		).catch((err) => next(err));
+	});
+
+userProfileRouter
+	.route('/spotify/token')
+	.options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
+	.post(cors.corsWithOptions, (req, res, next) => {
+		if (req.body.token) {
+			const bearer = `Bearer ${req.body.token}`;
+			axios
+				.get('https://api.spotify.com/v1/me', {
+					headers: {
+						Authorization: bearer,
+					},
+				})
+				.then((spotifyResponse) => {
+					const profile = spotifyResponse.data;
+					UserProfile.findOne({ spotifyId: profile.id }, (err, user) => {
+						if (err) {
+							res.statusCode = 500;
+							res.setHeader('Content-Type', 'application/json');
+							res.json({
+								success: false,
+								status: 'There was an error',
+								errorMsg: err,
+							});
+						}
+						if (!err && user) {
+							const token = auth.getToken({ _id: user._id });
+							res.statusCode = 200;
+							res.setHeader('Content-Type', 'application/json');
+							res.json({
+								success: true,
+								token: token,
+								status: 'You are successfully logged in!',
+								user: user,
+							});
+						} else {
+							let user = new UserProfile({ username: profile.display_name });
+							const name = profile.display_name.split(' ');
+
+							user.spotifyId = profile.id;
+							user.userInfo.firstName = name[0] ? name[0] : `${profile.display_name}`;
+							user.userInfo.lastName = name[1] ? name[1] : '';
+							user.userInfo.email = profile.email;
+
+							user.save((err) => {
+								if (err) {
+									res.statusCode = 409;
+									res.setHeader('Content-Type', 'application/json');
+									res.json({
+										success: false,
+										status: 'There was an error or conflict saving the profile',
+										errorMsg: err,
+									});
+								} else {
+									const token = auth.getToken({ _id: user._id });
+									res.statusCode = 200;
+									res.setHeader('Content-Type', 'application/json');
+									res.json({
+										success: true,
+										token: token,
+										status: 'You are successfully logged in!',
+										user: user,
+									});
+								}
+							});
+						}
+					});
+				})
+				.catch((err) => next(err));
+		}
 	});
 
 userProfileRouter
@@ -105,8 +172,8 @@ userProfileRouter
 	.route('/google/token')
 	.options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
 	.get(cors.corsWithOptions, passport.authenticate('google-token'), (req, res) => {
-		console.log('Ready to send back this user: ', req.user);
 		const token = auth.getToken({ _id: req.user._id });
+		console.log('Ready to send back this user: ', req.user);
 		res.statusCode = 200;
 		res.setHeader('Content-Type', 'application/json');
 		res.json({

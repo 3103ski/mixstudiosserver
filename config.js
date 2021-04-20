@@ -11,4 +11,8 @@ module.exports = {
 		clientID: '555560470011-lm5fdsua6hfgtfl83vao6voj7sb9tg3b.apps.googleusercontent.com',
 		clientSecret: '_iPw4JHC6oojm5PlZxBkhAKz',
 	},
+	spotify: {
+		clientID: '58bff4c0f1a44c53a4a373652aa4d0be',
+		clientSecret: '1624e159dc854fa88ad3357d5f6b9456',
+	},
 };
