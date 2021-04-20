@@ -86,26 +86,35 @@ userProfileRouter
 		);
 	});
 
-userProfileRouter.route('/facebook').get(cors.cors, passport.authenticate('facebook-token'));
-
 userProfileRouter
-	.route('/facebook/callback')
-	.get(
-		cors.cors,
-		passport.authenticate('facebook', { failureRedirect: `${config.facebook.frontEnd}/login` }),
-		(req, res) => {
-			console.log('WE GOT FACEBOOK SUCCESS');
-			console.log('THE PROFILE: ', req.profile);
-			console.log('THE USER: ', req.user);
-			console.log('THE REQ: ', req);
-		}
-	);
-
-userProfileRouter
-	.route('/facebook/callback')
+	.route('/facebook/token')
 	.options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
-	.get(passport.authenticate('facebook', { failureRedirect: '/login' }), function (req, res) {
-		console.log(req.user);
+	.get(cors.corsWithOptions, passport.authenticate('facebook-token'), (req, res) => {
+		const token = auth.getToken({ _id: req.user._id });
+		res.statusCode = 200;
+		res.setHeader('Content-Type', 'application/json');
+		res.json({
+			success: true,
+			token: token,
+			status: 'You are successfully logged in!',
+			user: req.user,
+		});
+	});
+
+userProfileRouter
+	.route('/google/token')
+	.options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
+	.get(cors.corsWithOptions, passport.authenticate('google-token'), (req, res) => {
+		console.log('Ready to send back this user: ', req.user);
+		const token = auth.getToken({ _id: req.user._id });
+		res.statusCode = 200;
+		res.setHeader('Content-Type', 'application/json');
+		res.json({
+			success: true,
+			token: token,
+			status: 'You are successfully logged in!',
+			user: req.user,
+		});
 	});
 
 userProfileRouter.post('/login', cors.cors, passport.authenticate('local'), (req, res) => {

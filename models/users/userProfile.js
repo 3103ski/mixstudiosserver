@@ -14,7 +14,7 @@ const userProfileSchema = new Schema(
 			email: {
 				type: mongoose.SchemaTypes.Email,
 				required: true,
-				unique: true,
+				// unique: true,
 			},
 			languages: {
 				type: Array,

@@ -6,6 +6,8 @@ const LocalStrategy = require('passport-local').Strategy;
 const JwtStrategy = require('passport-jwt').Strategy;
 const ExtractJwt = require('passport-jwt').ExtractJwt;
 const FacebookTokenStrategy = require('passport-facebook-token');
+const GoogleTokenStrategy = require('passport-token-google2').Strategy;
+
 // Local
 const User = require('./models/users/userProfile');
 const config = require('./config.js');
@@ -50,25 +52,52 @@ exports.jwtPassport = passport.use(
 	})
 );
 
+exports.googleStrategy = passport.use(
+	new GoogleTokenStrategy(
+		{
+			clientID: config.google.clientID,
+			clientSecret: config.google.clientSecret,
+		},
+		function (accessToken, refreshToken, profile, done) {
+			console.log('And we did it with google too!', profile);
+			User.findOne({ googleId: profile.id }, (err, user) => {
+				if (err) {
+					console.log(`Didn't go far`, err);
+					return done(err, false);
+				}
+				if (!err && user) {
+					console.log(`We already found it: `, user);
+					return done(null, user);
+				} else {
+					console.log(`We're gonna try and make it`);
+					user = new User({ username: profile.displayName });
+					user.googleId = profile.id;
+					user.userInfo.firstName = profile.name.givenName;
+					user.userInfo.lastName = profile.name.familyName;
+					user.userInfo.email = profile.emails[0].value;
+					console.log('We were almost there');
+					user.save((err) => {
+						if (err) {
+							console.log('We were RIGHT there', err);
+							return done(err, false);
+						} else {
+							return done(null, user);
+						}
+					});
+				}
+			});
+		}
+	)
+);
+
 exports.facebookPassport = passport.use(
 	new FacebookTokenStrategy(
 		{
 			clientID: config.facebook.clientID,
 			clientSecret: config.facebook.clientSecret,
-			callbackURL: '/facebook/callback',
-			profileFields: [
-				'id',
-				'displayName',
-				'email',
-				'name',
-				'photos',
-				'givenName',
-				'familyName',
-			],
-			passReqToCallback: true,
+			fbGraphVersion: 'v3.0',
 		},
-		(accessToken, refreshToken, profile, done) => {
-			console.log('IN THE STRATEGY');
+		function (accessToken, refreshToken, profile, done) {
 			User.findOne({ facebookId: profile.id }, (err, user) => {
 				if (err) {
 					return done(err, false);
@@ -77,9 +106,12 @@ exports.facebookPassport = passport.use(
 					return done(null, user);
 				} else {
 					user = new User({ username: profile.displayName });
+
 					user.facebookId = profile.id;
-					user.firstName = profile.name.givenName;
-					user.lastName = profile.name.familyName;
+					user.userInfo.firstName = profile.name.givenName;
+					user.userInfo.lastName = profile.name.familyName;
+					user.userInfo.email = profile.emails[0].value;
+
 					user.save((err) => {
 						if (err) {
 							return done(err, false);

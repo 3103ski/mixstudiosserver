@@ -23,7 +23,7 @@ app.set('secPort', port + 443);
  * Create HTTP server.
  */
 
-const useLocal = false;
+const useLocal = true;
 
 var server = http.createServer(app);
 
