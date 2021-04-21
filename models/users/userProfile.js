@@ -14,7 +14,7 @@ const userProfileSchema = new Schema(
 			email: {
 				type: mongoose.SchemaTypes.Email,
 				required: true,
-				unique: true,
+				// unique: true,
 			},
 			languages: {
 				type: Array,
@@ -35,6 +35,18 @@ const userProfileSchema = new Schema(
 				type: String,
 			},
 			avatar: {
+				type: String,
+				default: '',
+			},
+			spotifyAvatar: {
+				type: String,
+				default: '',
+			},
+			googleAvatar: {
+				type: String,
+				default: '',
+			},
+			facebookAvatar: {
 				type: String,
 				default: '',
 			},

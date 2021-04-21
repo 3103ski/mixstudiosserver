@@ -6,6 +6,9 @@ const LocalStrategy = require('passport-local').Strategy;
 const JwtStrategy = require('passport-jwt').Strategy;
 const ExtractJwt = require('passport-jwt').ExtractJwt;
 const FacebookTokenStrategy = require('passport-facebook-token');
+const GoogleTokenStrategy = require('passport-token-google2').Strategy;
+const SpotifyTokenStrategy = require('passport-spotify').Strategy;
+
 // Local
 const User = require('./models/users/userProfile');
 const config = require('./config.js');
@@ -50,6 +53,83 @@ exports.jwtPassport = passport.use(
 	})
 );
 
+// exports.spotifyStrategy = passport.use(
+// 	new GoogleTokenStrategy(
+// 		{
+// 			clientID: config.spotify.clientID,
+// 			clientSecret: config.spotify.clientSecret,
+// 		},
+// 		function (accessToken, refreshToken, profile, done) {
+// 			console.log('And we did it with spotify too!', profile);
+// 			return done(null, profile);
+// 			User.findOne({ spotifyId: profile.id }, (err, user) => {
+// 				if (err) {
+// 					console.log(`Didn't go far`, err);
+// 					return done(err, false);
+// 				}
+// 				if (!err && user) {
+// 					console.log(`We already found it: `, user);
+// 					return done(null, user);
+// 				} else {
+// 					console.log(`We're gonna try and make it`);
+// 					user = new User({ username: profile.displayName });
+// 					user.googleId = profile.id;
+// 					user.userInfo.firstName = profile.name.givenName;
+// 					user.userInfo.lastName = profile.name.familyName;
+// 					user.userInfo.email = profile.emails[0].value;
+// 					console.log('We were almost there');
+// 					user.save((err) => {
+// 						if (err) {
+// 							console.log('We were RIGHT there', err);
+// 							return done(err, false);
+// 						} else {
+// 							return done(null, user);
+// 						}
+// 					});
+// 				}
+// 			});
+// 		}
+// 	)
+// );
+exports.googleStrategy = passport.use(
+	new GoogleTokenStrategy(
+		{
+			clientID: config.google.clientID,
+			clientSecret: config.google.clientSecret,
+		},
+		function (accessToken, refreshToken, profile, done) {
+			console.log('And we did it with google too!', profile);
+			User.findOne({ googleId: profile.id }, (err, user) => {
+				if (err) {
+					console.log(`Didn't go far`, err);
+					return done(err, false);
+				}
+				if (!err && user) {
+					console.log(`We already found it: `, user);
+					return done(null, user);
+				} else {
+					console.log(`We're gonna try and make it`, profile);
+
+					user = new User({ username: profile.displayName });
+					user.googleId = profile.id;
+					user.userInfo.firstName = profile.name.givenName;
+					user.userInfo.lastName = profile.name.familyName;
+					user.userInfo.email = profile.emails[0].value;
+					user.userInfo.googleAvatar = profile._json.picture;
+
+					user.save((err) => {
+						if (err) {
+							return done(err, false);
+						} else {
+							return done(null, user);
+						}
+					});
+				}
+			});
+		}
+	)
+);
+
 exports.facebookPassport = passport.use(
 	new FacebookTokenStrategy(
 		{
@@ -65,12 +145,14 @@ exports.facebookPassport = passport.use(
 				if (!err && user) {
 					return done(null, user);
 				} else {
+					console.log('facebooke profile', profile);
 					user = new User({ username: profile.displayName });
 
 					user.facebookId = profile.id;
 					user.userInfo.firstName = profile.name.givenName;
 					user.userInfo.lastName = profile.name.familyName;
 					user.userInfo.email = profile.emails[0].value;
+					user.userInfo.facebookAvatar = profile.photos[0].value;
 
 					user.save((err) => {
 						if (err) {
