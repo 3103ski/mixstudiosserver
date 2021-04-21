@@ -108,13 +108,15 @@ exports.googleStrategy = passport.use(
 					console.log(`We already found it: `, user);
 					return done(null, user);
 				} else {
-					console.log(`We're gonna try and make it`);
+					console.log(`We're gonna try and make it`, profile);
+
 					user = new User({ username: profile.displayName });
 					user.googleId = profile.id;
 					user.userInfo.firstName = profile.name.givenName;
 					user.userInfo.lastName = profile.name.familyName;
 					user.userInfo.email = profile.emails[0].value;
-					console.log('We were almost there');
+					user.userInfo.googleAvatar = profile._json.picture;
+
 					user.save((err) => {
 						if (err) {
 							return done(err, false);
@@ -143,12 +145,14 @@ exports.facebookPassport = passport.use(
 				if (!err && user) {
 					return done(null, user);
 				} else {
+					console.log('facebooke profile', profile);
 					user = new User({ username: profile.displayName });
 
 					user.facebookId = profile.id;
 					user.userInfo.firstName = profile.name.givenName;
 					user.userInfo.lastName = profile.name.familyName;
 					user.userInfo.email = profile.emails[0].value;
+					user.userInfo.facebookAvatar = profile.photos[0].value;
 
 					user.save((err) => {
 						if (err) {

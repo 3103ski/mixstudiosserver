@@ -38,6 +38,18 @@ const userProfileSchema = new Schema(
 				type: String,
 				default: '',
 			},
+			spotifyAvatar: {
+				type: String,
+				default: '',
+			},
+			googleAvatar: {
+				type: String,
+				default: '',
+			},
+			facebookAvatar: {
+				type: String,
+				default: '',
+			},
 		},
 		styleInfo: {
 			music: {

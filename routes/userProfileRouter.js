@@ -54,18 +54,25 @@ userProfileRouter
 
 userProfileRouter
 	.route('/signup')
-	.options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
-	.post(cors.corsWithOptions, (req, res, next) => {
+	.options(cors.cors, (req, res) => res.sendStatus(200))
+	.post(cors.cors, (req, res, next) => {
 		UserProfile.register(
 			new UserProfile({ username: req.body.username, userInfo: req.body.userInfo }),
 			req.body.password,
 			(err, user) => {
+				console.log('in there');
 				if (err) {
-					return next(err);
+					console.log('it broke early: ', err);
+					res.statusCode = 500;
+					res.setHeader('Content-Type', 'application/json');
+					res.json({ err: err });
 				} else {
 					user.save((err) => {
 						if (err) {
-							return next(err);
+							res.statusCode = 500;
+							res.setHeader('Content-Type', 'application/json');
+							res.json({ err: err });
+							return;
 						}
 						passport.authenticate('local')(req, res, () => {
 							res.statusCode = 200;
@@ -79,7 +86,7 @@ userProfileRouter
 					});
 				}
 			}
-		).catch((err) => next(err));
+		);
 	});
 
 userProfileRouter
@@ -124,6 +131,7 @@ userProfileRouter
 							user.userInfo.firstName = name[0] ? name[0] : `${profile.display_name}`;
 							user.userInfo.lastName = name[1] ? name[1] : '';
 							user.userInfo.email = profile.email;
+							user.userInfo.spotifyAvatar = profile.images[0].url;
 
 							user.save((err) => {
 								if (err) {
