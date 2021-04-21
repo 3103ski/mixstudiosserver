@@ -49,12 +49,13 @@ app.use(express.urlencoded({ extended: false }));
 app.use(passport.initialize());
 
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'views')));
 
 // ROUTES
 app.get('/', (req, res) => {
 	res.statusCode = 200;
 	res.setHeader('Content-Type', 'text/html');
-	res.sendFile(path.join(__dirname, 'views/index.html'));
+	res.sendFile(express.static(path.join(__dirname, 'views/index.html')));
 });
 app.use('/users', userProfileRouter);
 app.use('/sounds-like', soundsLikeObjectsRouter);

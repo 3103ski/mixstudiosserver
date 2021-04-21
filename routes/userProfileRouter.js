@@ -6,6 +6,7 @@ const SoundsLikeObject = require('../models/users/soundsLikeObject');
 const UserProfile = require('../models/users/userProfile');
 const passport = require('passport');
 const config = require('../config');
+const path = require('path');
 
 const userProfileRouter = express.Router();
 
@@ -131,7 +132,10 @@ userProfileRouter
 							user.userInfo.firstName = name[0] ? name[0] : `${profile.display_name}`;
 							user.userInfo.lastName = name[1] ? name[1] : '';
 							user.userInfo.email = profile.email;
-							user.userInfo.spotifyAvatar = profile.images[0].url;
+
+							if (profile.images[0] && profile.images[0].url) {
+								user.userInfo.spotifyAvatar = profile.images[0].url;
+							}
 
 							user.save((err) => {
 								if (err) {

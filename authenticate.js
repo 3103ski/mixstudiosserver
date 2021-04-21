@@ -115,7 +115,9 @@ exports.googleStrategy = passport.use(
 					user.userInfo.firstName = profile.name.givenName;
 					user.userInfo.lastName = profile.name.familyName;
 					user.userInfo.email = profile.emails[0].value;
-					user.userInfo.googleAvatar = profile._json.picture;
+					if (profile._json.picture) {
+						user.userInfo.googleAvatar = profile._json.picture;
+					}
 
 					user.save((err) => {
 						if (err) {
@@ -152,7 +154,9 @@ exports.facebookPassport = passport.use(
 					user.userInfo.firstName = profile.name.givenName;
 					user.userInfo.lastName = profile.name.familyName;
 					user.userInfo.email = profile.emails[0].value;
-					user.userInfo.facebookAvatar = profile.photos[0].value;
+					if (profile.photos[0] && profile.photos[0].value) {
+						user.userInfo.facebookAvatar = profile.photos[0].value;
+					}
 
 					user.save((err) => {
 						if (err) {
