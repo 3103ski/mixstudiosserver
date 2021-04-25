@@ -199,13 +199,19 @@ portfolioEntryRouter
 	.options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
 	.get(cors.cors, auth.verifyUser, (req, res, next) => {
 		const id = req.params.userId;
-		PortfolioEntry.find({ userId: id })
-			.then((portfolio) => {
-				res.status = 200;
-				res.setHeader('Content-Type', 'application/json');
-				res.json(portfolio);
-			})
-			.catch((err) => next(err));
+		if (id !== null && id !== undefined) {
+			PortfolioEntry.find({ userId: id })
+				.then((portfolio) => {
+					res.status = 200;
+					res.setHeader('Content-Type', 'application/json');
+					res.json(portfolio);
+				})
+				.catch((err) => next(err));
+		} else {
+			res.status = 404;
+			res.setHeader('Content-Type', 'application/json');
+			res.json({ error: 'There is no id' });
+		}
 	});
 
 module.exports = portfolioEntryRouter;
