@@ -83,6 +83,7 @@ songwriterPricingRouter
 // GET A SPECIFIC PRICING PROFILE
 songwriterPricingRouter
 	.route('/:profileId')
+	.options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
 	.get((req, res, next) => {
 		SongwriterPricingProfile.findById({ _id: req.params.profileId })
 			.then((profile) => {
@@ -102,13 +103,14 @@ songwriterPricingRouter
 			})
 			.catch((err) => next(err));
 	})
-	.put((req, res, next) => {
+	.put(cors.corsWithOptions, auth.verifyUser, (req, res, next) => {
 		SongwriterPricingProfile.findByIdAndUpdate(
 			req.params.profileId,
 			{ $set: req.body },
 			{ new: true }
 		)
 			.then((profile) => {
+				console.log('server sending this updated file back: ', profile);
 				res.statusCode = 200;
 				res.setHeader('Content-Type', 'application/json');
 				res.json(profile);
