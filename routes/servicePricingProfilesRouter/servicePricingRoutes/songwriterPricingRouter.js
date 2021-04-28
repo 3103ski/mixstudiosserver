@@ -94,7 +94,7 @@ songwriterPricingRouter
 			.catch((err) => next(err));
 	})
 
-	.delete((req, res, next) => {
+	.delete(cors.corsWithOptions, auth.verifyUser, (req, res, next) => {
 		SongwriterPricingProfile.findByIdAndDelete(req.params.profileId)
 			.then((response) => {
 				res.statusCode = 200;
