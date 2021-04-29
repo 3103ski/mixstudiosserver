@@ -83,6 +83,7 @@ producerPricingRouter
 // GET A SPECIFIC PRICING PROFILE
 producerPricingRouter
 	.route('/:profileId')
+	.options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
 	.get((req, res, next) => {
 		ProducerPricingProfile.findById({ _id: req.params.profileId })
 			.then((profile) => {
@@ -93,7 +94,7 @@ producerPricingRouter
 			.catch((err) => next(err));
 	})
 
-	.delete((req, res, next) => {
+	.delete(cors.corsWithOptions, auth.verifyUser, (req, res, next) => {
 		ProducerPricingProfile.findByIdAndDelete(req.params.profileId)
 			.then((response) => {
 				res.statusCode = 200;
@@ -102,7 +103,7 @@ producerPricingRouter
 			})
 			.catch((err) => next(err));
 	})
-	.put((req, res, next) => {
+	.put(cors.corsWithOptions, auth.verifyUser, (req, res, next) => {
 		ProducerPricingProfile.findByIdAndUpdate(
 			req.params.profileId,
 			{ $set: req.body },

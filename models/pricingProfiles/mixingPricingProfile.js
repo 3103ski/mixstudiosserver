@@ -89,7 +89,7 @@ const mixingPricingProfile = new Schema(
 				type: rateStructure,
 				default: {},
 			},
-			condfidentRates: {
+			confidentRates: {
 				type: rateStructure,
 				default: {},
 			},
@@ -110,7 +110,7 @@ const mixingPricingProfile = new Schema(
 			type: Array,
 			default: null,
 		},
-		extraServiceRates: {
+		extraServicesRates: {
 			type: Object,
 			default: {},
 		},

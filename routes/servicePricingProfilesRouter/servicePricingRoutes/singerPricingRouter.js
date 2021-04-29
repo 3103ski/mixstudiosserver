@@ -87,7 +87,8 @@ singerPricingRouter
 // GET A SPECIFIC PRICING PROFILE
 singerPricingRouter
 	.route('/:profileId')
-	.get((req, res, next) => {
+	.options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
+	.get(cors.corsWithOptions, auth.verifyUser, (req, res, next) => {
 		SingerPricingProfile.findById({ _id: req.params.profileId })
 			.then((profile) => {
 				res.statusCode = 200;
@@ -97,7 +98,7 @@ singerPricingRouter
 			.catch((err) => next(err));
 	})
 
-	.delete((req, res, next) => {
+	.delete(cors.corsWithOptions, auth.verifyUser, (req, res, next) => {
 		SingerPricingProfile.findByIdAndDelete(req.params.profileId)
 			.then((response) => {
 				res.statusCode = 200;
@@ -106,7 +107,7 @@ singerPricingRouter
 			})
 			.catch((err) => next(err));
 	})
-	.put((req, res, next) => {
+	.put(cors.corsWithOptions, auth.verifyUser, (req, res, next) => {
 		SingerPricingProfile.findByIdAndUpdate(
 			req.params.profileId,
 			{ $set: req.body },

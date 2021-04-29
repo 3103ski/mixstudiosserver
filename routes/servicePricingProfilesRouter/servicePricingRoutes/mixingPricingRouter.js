@@ -78,6 +78,7 @@ mixingPricingRouter
 	});
 mixingPricingRouter
 	.route('/:profileId')
+	.options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
 	.get((req, res, next) => {
 		MixingPricingProfile.findById({ _id: req.params.profileId })
 			.then((profile) => {
@@ -88,7 +89,7 @@ mixingPricingRouter
 			.catch((err) => next(err));
 	})
 
-	.delete((req, res, next) => {
+	.delete(cors.corsWithOptions, auth.verifyUser, (req, res, next) => {
 		MixingPricingProfile.findByIdAndDelete(req.params.profileId)
 			.then((response) => {
 				res.statusCode = 200;
@@ -97,7 +98,7 @@ mixingPricingRouter
 			})
 			.catch((err) => next(err));
 	})
-	.put((req, res, next) => {
+	.put(cors.corsWithOptions, auth.verifyUser, (req, res, next) => {
 		MixingPricingProfile.findByIdAndUpdate(
 			req.params.profileId,
 			{ $set: req.body },
