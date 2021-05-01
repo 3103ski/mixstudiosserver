@@ -16,6 +16,9 @@ const serviceProfilesRouter = require('./routes/serviceProfileRouter/serviceProf
 const instrumentProfilesRouter = require('./routes/instrumentsRouter/instrumentRouter');
 const servicesPricingRouter = require('./routes/servicePricingProfilesRouter/servicePricingProfilesRouter');
 
+const bugReportRouter = require('./routes/utilityFormsRouter/bugReportRouter');
+const updateReportRouter = require('./routes/utilityFormsRouter/updateReportRouter');
+
 // Connecting Database
 const mongoose = require('mongoose');
 
@@ -64,6 +67,8 @@ app.use('/service-pricing', servicesPricingRouter);
 app.use('/instruments', instrumentProfilesRouter);
 app.use('/uploads', uploadsRouter);
 app.use('/portfolio', portfolioRouter);
+app.use('/bug-reports', bugReportRouter);
+app.use('/update-router', updateReportRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
