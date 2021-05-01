@@ -19,7 +19,7 @@ updateReportRouter
 			.catch((err) => next(err));
 	})
 	.post(cors.corsWithOptions, auth.verifyUser, (req, res, next) => {
-		UpdateReport.create(req.body)
+		UpdateReport.create({ ...req.body, userId: req.user._id })
 			.then((report) => {
 				res.statusCode = 200;
 				res.setHeader('Content-Type', 'application/json');

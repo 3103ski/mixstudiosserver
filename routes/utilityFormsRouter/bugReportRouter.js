@@ -10,12 +10,11 @@ bugReportRouter
 	.route('/')
 	.options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
 	.get(cors.cors, auth.verifyUser, (req, res, next) => {
-		console.log('We made it in');
 		BugReport.find()
-			.then((profiles) => {
+			.then((reports) => {
 				res.statusCode = 200;
 				res.setHeader('Content-Type', 'application/json');
-				res.json(profiles);
+				res.json(reports);
 			})
 			.catch((err) => next(err));
 	})

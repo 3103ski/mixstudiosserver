@@ -40,6 +40,7 @@ const bugReportSchema = new Schema(
 		},
 		priority: {
 			type: Number,
+			required: true,
 		},
 		category: {
 			type: String,
