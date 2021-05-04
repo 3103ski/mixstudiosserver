@@ -8,6 +8,8 @@ var app = require('../app');
 var debug = require('debug')('mixstudios:server');
 var http = require('http');
 
+const socketio = require('socket.io');
+
 const https = require('https');
 const fs = require('fs');
 
@@ -24,8 +26,10 @@ app.set('secPort', port + 443);
  */
 
 const useLocal = true;
+let io;
 
 var server = http.createServer(app);
+io = socketio(server);
 
 /**
  * THIS CHECK IS ONLY GOING TO BE USED DURING PRODUCTION TO SWITCH BACK AND FORTH BETWEEN LOCAL HTTPS AND AWS HTTPS SERVER
@@ -55,10 +59,12 @@ const options = {
 	cert: fs.readFileSync(__dirname + '/server.cert'),
 };
 let secureServer;
+
 if (useLocal) {
 	secureServer = https.createServer(options, app);
 
 	if (secureServer) {
+		io = socketio(secureServer);
 		secureServer.listen(app.get('secPort'), () => {
 			console.log('Server listening on port', app.get('secPort'));
 		});
@@ -66,6 +72,24 @@ if (useLocal) {
 		secureServer.on('listening', onListening);
 	}
 }
+
+//••••••••••••••••••••
+//   SOCKET IO
+//••••••••••••••••••••
+
+io.on('connection', (socket) => {
+	console.log('a user has connected with the component with id: ', socket.id);
+
+	socket.on('open_conversation', ({ user, convoId }, callback) => {
+		console.log(`${user} is opening a conversation with id ${socket.id}`);
+		if (convoId) {
+			console.log('This is the convo id: ', convoId);
+		}
+		return socket.on('disconnect', () => {
+			console.log(`${user} is closing the conversation ${socket.id}`);
+		});
+	});
+});
 
 /**
  * Normalize a port into a number, string, or false.

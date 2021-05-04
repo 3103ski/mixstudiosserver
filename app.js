@@ -5,6 +5,7 @@ const path = require('path');
 const logger = require('morgan');
 const passport = require('passport');
 const config = require('./config');
+const cors = require('./routes/cors.js');
 
 // Router Imports
 // const indexRouter = require('./routes/index');
@@ -57,7 +58,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'views')));
 
 // ROUTES
-app.get('/', (req, res) => {
+app.get('/', cors.cors, (req, res) => {
 	res.statusCode = 200;
 	res.setHeader('Content-Type', 'text/html');
 	res.sendFile(express.static(path.join(__dirname, 'views/index.html')));
