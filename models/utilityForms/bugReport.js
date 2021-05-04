@@ -30,9 +30,9 @@ const bugReportSchema = new Schema(
 			type: String,
 			default: '',
 		},
-		comments: {
-			type: Array,
-			default: [],
+		conversationId: {
+			type: Schema.Types.ObjectId,
+			ref: 'Conversation',
 		},
 		relatedIssues: {
 			type: Array,
