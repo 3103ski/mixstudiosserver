@@ -43,6 +43,7 @@ if (useLocal) {
 	server.on('error', onError);
 	server.on('listening', onListening);
 } else {
+	io = socketio(app);
 	app.listen(port, () => {
 		console.log(`Production version running on port: ${port}`);
 	});
