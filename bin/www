@@ -147,10 +147,10 @@ function onError(error) {
 function onListening() {
 	let addr;
 	if (useLocal) {
-		addr = server.address();
+		// addr = server.address();
 		console.log('RUNNING: local https');
 	} else {
-		addr = app.address();
+		// addr = app.address();
 		console.log('RUNNING: production https');
 	}
 
