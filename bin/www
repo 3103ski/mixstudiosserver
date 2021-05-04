@@ -28,7 +28,7 @@ app.set('secPort', port + 443);
 const useLocal = false;
 let io;
 
-var server = http.createServer(app);
+var server = https.createServer(app);
 io = socketio(server);
 
 /**
@@ -43,12 +43,12 @@ if (useLocal) {
 	server.on('error', onError);
 	server.on('listening', onListening);
 } else {
-	io = socketio(app);
-	app.listen(port, () => {
+	// io = socketio(app);
+	server.listen(port, () => {
 		console.log(`Production version running on port: ${port}`);
 	});
-	app.on('error', onError);
-	app.on('listening', onListening);
+	server.on('error', onError);
+	server.on('listening', onListening);
 }
 
 /**
