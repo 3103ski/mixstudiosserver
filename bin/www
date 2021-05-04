@@ -58,8 +58,8 @@ if (secureServer) {
 	// secureServer.listen(app.get('secPort'), () => {
 	// 	console.log('secureServer listening on port', app.get('secPort'));
 	// });
-	secureServer.listen(port, () => {
-		console.log('secureServer listening on port', port);
+	secureServer.listen(app.get('secPort'), () => {
+		console.log('secureServer listening on port', app.get('secPort'));
 	});
 	secureServer.on('error', onError);
 	secureServer.on('listening', onListening);
