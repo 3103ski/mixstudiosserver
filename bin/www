@@ -28,7 +28,7 @@ app.set('secPort', port + 443);
 const useLocal = false;
 let io;
 
-var server = https.createServer(app);
+var server = http.createServer(app);
 io = socketio(server);
 
 /**
@@ -43,12 +43,12 @@ if (useLocal) {
 	server.on('error', onError);
 	server.on('listening', onListening);
 } else {
-	// io = socketio(app);
-	server.listen(port, () => {
+	io = socketio(app);
+	app.listen(port, () => {
 		console.log(`Production version running on port: ${port}`);
 	});
-	server.on('error', onError);
-	server.on('listening', onListening);
+	app.on('error', onError);
+	app.on('listening', onListening);
 }
 
 /**
@@ -145,16 +145,15 @@ function onError(error) {
  */
 
 function onListening() {
-	// let addr;
-	// if (useLocal) {
-	// 	// addr = server.address();
-	// 	console.log('RUNNING: local https');
-	// } else {
-	// 	// addr = app.address();
-	// 	console.log('RUNNING: production https');
-	// }
+	let addr;
+	if (useLocal) {
+		addr = server.address();
+		console.log('RUNNING: local https');
+	} else {
+		addr = app.address();
+		console.log('RUNNING: production https');
+	}
 
-	// var bind = typeof addr === 'string' ? 'pipe ' + addr : 'port ' + addr.port;
-	// debug('Listening on ' + bind);
-	console.log('listening on :', port);
+	var bind = typeof addr === 'string' ? 'pipe ' + addr : 'port ' + addr.port;
+	debug('Listening on ' + bind);
 }
