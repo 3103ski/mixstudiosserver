@@ -25,31 +25,22 @@ app.set('secPort', port + 443);
  * Create HTTP server.
  */
 
-const useLocal = false;
 let io;
 
 var server = http.createServer(app);
-io = socketio(server);
+// io = socketio(server);
 
 /**
  * THIS CHECK IS ONLY GOING TO BE USED DURING PRODUCTION TO SWITCH BACK AND FORTH BETWEEN LOCAL HTTPS AND AWS HTTPS SERVER
  *
  * SHOULD BE DELETED AFTER ALL AUTH TESTING REQUIRING HTTPS FOR SETUP ARE COMPLETED
  */
-if (useLocal) {
-	server.listen(port, () => {
-		console.log(`Fake https version running on port: ${port}`);
-	});
-	server.on('error', onError);
-	server.on('listening', onListening);
-} else {
-	io = socketio(app);
-	app.listen(port, () => {
-		console.log(`Production version running on port: ${port}`);
-	});
-	app.on('error', onError);
-	app.on('listening', onListening);
-}
+
+app.listen(port, () => {
+	console.log(`Production version running on port: ${port}`);
+});
+app.on('error', onError);
+app.on('listening', onListening);
 
 /**
  * THIS SECTION IS FOR DEVELOPMENT ONLY. SUPPORTING LOCAL SELF SIGNED CERT FOR HTTPS TESTING ON LOCAL SERVER
@@ -59,19 +50,16 @@ const options = {
 	key: fs.readFileSync(__dirname + '/server.key'),
 	cert: fs.readFileSync(__dirname + '/server.cert'),
 };
-let secureServer;
 
-if (useLocal) {
-	secureServer = https.createServer(options, app);
+const secureServer = https.createServer(options, app);
+io = socketio(secureServer);
 
-	if (secureServer) {
-		io = socketio(secureServer);
-		secureServer.listen(app.get('secPort'), () => {
-			console.log('Server listening on port', app.get('secPort'));
-		});
-		secureServer.on('error', onError);
-		secureServer.on('listening', onListening);
-	}
+if (secureServer) {
+	secureServer.listen(app.get('secPort'), () => {
+		console.log('secureServer listening on port', app.get('secPort'));
+	});
+	secureServer.on('error', onError);
+	secureServer.on('listening', onListening);
 }
 
 //••••••••••••••••••••
@@ -146,14 +134,9 @@ function onError(error) {
 
 function onListening() {
 	let addr;
-	if (useLocal) {
-		addr = server.address();
-		console.log('RUNNING: local https');
-	} else {
-		addr = app.address();
-		console.log('RUNNING: production https');
-	}
+	addr = app.address;
+	console.log('RUNNING: production https');
 
-	var bind = typeof addr === 'string' ? 'pipe ' + addr : 'port ' + addr.port;
+	var bind = typeof addr === 'string' ? 'pipe ' + addr : 'port ' + port;
 	debug('Listening on ' + bind);
 }
