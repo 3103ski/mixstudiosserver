@@ -67,14 +67,14 @@ if (secureServer) {
 //••••••••••••••••••••
 
 io.on('connection', (socket) => {
-	console.log('a user has connected with the component with id: ', socket.id);
-
 	socket.on('open_conversation', ({ user, convoId }, callback) => {
 		console.log(`${user} is opening a conversation with id ${socket.id}`);
 		callback('server sees you enter');
+
 		if (convoId) {
 			console.log('This is the convo id: ', convoId);
 		}
+
 		return socket.on('disconnect', () => {
 			callback('server sees you leave');
 			console.log(`${user} is closing the conversation ${socket.id}`);
