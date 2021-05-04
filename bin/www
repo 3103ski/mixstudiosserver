@@ -145,15 +145,16 @@ function onError(error) {
  */
 
 function onListening() {
-	let addr;
-	if (useLocal) {
-		// addr = server.address();
-		console.log('RUNNING: local https');
-	} else {
-		// addr = app.address();
-		console.log('RUNNING: production https');
-	}
+	// let addr;
+	// if (useLocal) {
+	// 	// addr = server.address();
+	// 	console.log('RUNNING: local https');
+	// } else {
+	// 	// addr = app.address();
+	// 	console.log('RUNNING: production https');
+	// }
 
-	var bind = typeof addr === 'string' ? 'pipe ' + addr : 'port ' + addr.port;
-	debug('Listening on ' + bind);
+	// var bind = typeof addr === 'string' ? 'pipe ' + addr : 'port ' + addr.port;
+	// debug('Listening on ' + bind);
+	console.log('listening on :', port);
 }
