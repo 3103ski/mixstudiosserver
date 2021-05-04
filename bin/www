@@ -55,8 +55,11 @@ const secureServer = https.createServer(options, app);
 io = socketio(secureServer);
 
 if (secureServer) {
-	secureServer.listen(app.get('secPort'), () => {
-		console.log('secureServer listening on port', app.get('secPort'));
+	// secureServer.listen(app.get('secPort'), () => {
+	// 	console.log('secureServer listening on port', app.get('secPort'));
+	// });
+	secureServer.listen(port, () => {
+		console.log('secureServer listening on port', port);
 	});
 	secureServer.on('error', onError);
 	secureServer.on('listening', onListening);
