@@ -35,7 +35,7 @@ const connect = mongoose.connect(url, {
 
 connect.then(
 	() => {
-		console.log('Connected correctly to the server');
+		console.log('MongoDB Connected');
 	},
 	(err) => console.log(err)
 );
@@ -63,6 +63,7 @@ app.get('/', cors.cors, (req, res) => {
 	res.setHeader('Content-Type', 'text/html');
 	res.sendFile(express.static(path.join(__dirname, 'views/index.html')));
 });
+// app.get('/socket.io')
 app.use('/users', userProfileRouter);
 app.use('/sounds-like', soundsLikeObjectsRouter);
 app.use('/service-profiles', serviceProfilesRouter);
