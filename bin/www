@@ -6,9 +6,6 @@
 
 var app = require('../app');
 var debug = require('debug')('mixstudios:server');
-var http = require('http');
-
-const socketio = require('socket.io');
 
 const https = require('https');
 const fs = require('fs');
@@ -25,45 +22,23 @@ app.set('secPort', port + 443);
  * Create HTTP server.
  */
 
-let io;
-
-var server = http.createServer(app);
-// io = socketio(server);
-
-/**
- * THIS CHECK IS ONLY GOING TO BE USED DURING PRODUCTION TO SWITCH BACK AND FORTH BETWEEN LOCAL HTTPS AND AWS HTTPS SERVER
- *
- * SHOULD BE DELETED AFTER ALL AUTH TESTING REQUIRING HTTPS FOR SETUP ARE COMPLETED
- */
-
-app.listen(port, () => {
-	console.log(`Production version running on port: ${port}`);
-});
-app.on('error', onError);
-app.on('listening', onListening);
-
-/**
- * THIS SECTION IS FOR DEVELOPMENT ONLY. SUPPORTING LOCAL SELF SIGNED CERT FOR HTTPS TESTING ON LOCAL SERVER
- */
-
 const options = {
 	key: fs.readFileSync(__dirname + '/server.key'),
 	cert: fs.readFileSync(__dirname + '/server.cert'),
 };
 
 const secureServer = https.createServer(options, app);
-io = socketio(secureServer);
 
-if (secureServer) {
-	// secureServer.listen(app.get('secPort'), () => {
-	// 	console.log('secureServer listening on port', app.get('secPort'));
-	// });
-	secureServer.listen(app.get('secPort'), () => {
-		console.log('secureServer listening on port', app.get('secPort'));
-	});
-	secureServer.on('error', onError);
-	secureServer.on('listening', onListening);
-}
+var io = require('socket.io')(secureServer, {
+	path: '/test',
+});
+
+secureServer.listen(app.get('secPort'), () => {
+	console.log('secureServer listening on port', app.get('secPort'));
+});
+
+secureServer.on('error', onError);
+secureServer.on('listening', onListening);
 
 //••••••••••••••••••••
 //   SOCKET IO
