@@ -6,7 +6,7 @@
 
 var app = require('../app');
 var debug = require('debug')('mixstudios:server');
-
+const server = require('http').createServer();
 const https = require('https');
 const fs = require('fs');
 
@@ -29,16 +29,21 @@ const options = {
 
 const secureServer = https.createServer(options, app);
 
-var io = require('socket.io')(secureServer, {
-	path: '/test',
-});
+var io = require('socket.io')(server);
 
-secureServer.listen(app.get('secPort'), () => {
+app.listen(app.get('secPort'), () => {
 	console.log('secureServer listening on port', app.get('secPort'));
 });
 
-secureServer.on('error', onError);
-secureServer.on('listening', onListening);
+app.on('error', onError);
+app.on('listening', onListening);
+
+// secureServer.listen(app.get('secPort'), () => {
+// 	console.log('secureServer listening on port', app.get('secPort'));
+// });
+
+// secureServer.on('error', onError);
+// secureServer.on('listening', onListening);
 
 //••••••••••••••••••••
 //   SOCKET IO
