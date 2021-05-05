@@ -45,7 +45,7 @@ const httpsOptions = {
 
 const secureServer = https.createServer(httpsOptions, app);
 
-io = socketio(server, { transports: ['websocket'], path: '/' });
+io = socketio(server, { transports: ['websocket'] });
 
 secureServer.listen(app.get('secPort'), () => {
 	console.log('HTTPS listening on port', app.get('secPort'));
