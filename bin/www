@@ -8,7 +8,7 @@ var app = require('../app');
 var debug = require('debug')('mixstudios:server');
 var http = require('http');
 
-const socketio = require('socket.io');
+const socketio = require('socket.io', { path: '/' });
 
 const https = require('https');
 const fs = require('fs');
