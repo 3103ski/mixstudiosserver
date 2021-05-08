@@ -29,7 +29,10 @@ const userIsSubscribed = (thread, userId) => {
 	return thread.subscribers.filter((id) => id === userId).length === 1;
 };
 
-const postComment = ({ threadTitle, commentPayload: { comment, userId, avatar } }, callback) => {
+const postComment = (
+	{ threadTitle, commentPayload: { comment, userId, avatar, author } },
+	callback
+) => {
 	return Thread.findOne({ threadTitle: threadTitle })
 		.then((thread) => {
 			if (thread) {
@@ -41,6 +44,7 @@ const postComment = ({ threadTitle, commentPayload: { comment, userId, avatar } 
 					comment,
 					userId,
 					avatar,
+					author,
 				})
 					.then((comment) => {
 						thread.comments.push(comment._id);
@@ -62,6 +66,7 @@ const postComment = ({ threadTitle, commentPayload: { comment, userId, avatar } 
 							comment,
 							userId,
 							avatar,
+							author,
 						})
 							.then((comment) => {
 								thread.comments.push(comment._id);
@@ -77,7 +82,10 @@ const postComment = ({ threadTitle, commentPayload: { comment, userId, avatar } 
 		.catch((error) => callback({ error }));
 };
 
-const replyToComment = ({ commentId, commentPayload: { comment, userId, avatar } }, callback) => {
+const replyToComment = (
+	{ commentId, commentPayload: { comment, userId, avatar, author } },
+	callback
+) => {
 	return Comment.findOne({ _id: commentId }).then((rootComment) => {
 		if (rootComment) {
 			if (!userIsSubscribed(rootComment, userId)) {
@@ -88,6 +96,7 @@ const replyToComment = ({ commentId, commentPayload: { comment, userId, avatar }
 				comment,
 				userId,
 				avatar,
+				author,
 			})
 				.then((comment) => {
 					rootComment.comments.push(comment._id);
