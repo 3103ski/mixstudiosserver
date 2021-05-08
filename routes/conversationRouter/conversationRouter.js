@@ -1,6 +1,5 @@
 const express = require('express');
-const BugReport = require('../../models/utilityForms/bugReport');
-const Conversation = require('../../models/social/conversation');
+const Conversation = require('../../models/social/thread');
 const Comment = require('../../models/social/comment');
 
 const cors = require('../cors');

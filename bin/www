@@ -16,6 +16,18 @@ const socketio = require('socket.io', { path: '/' });
 const fs = require('fs');
 
 /**
+ * Socket Functions
+ */
+const {
+	openThread,
+	closeThread,
+	postComment,
+	likeComment,
+	unlikeComment,
+	replyToComment,
+} = require('../socketEvents/commentThread.js');
+
+/**
  * Get port from environment and store in Express.
  */
 
@@ -58,18 +70,79 @@ secureServer.on('listening', onListening);
 //••••••••••••••••••••
 
 io.on('connection', (socket) => {
-	console.log('IO User Connection: ', socket.id);
+	console.log('Socket.IO Connection ID: ', socket.id);
 
-	socket.on('open_conversation', ({ user, convoId }, callback) => {
-		console.log(`${user} is opening a conversation with id ${socket.id}`);
-		callback('Socket.Io sees you entering');
-		if (convoId) {
-			console.log('This is the convo id: ', convoId);
-		}
-		return socket.on('disconnect', () => {
-			callback('Socket.io sees you leaving');
-			console.log(`${user} is closing the conversation ${socket.id}`);
+	//-------------------------------------
+	// Socket.IO events for COMMENT THREADS
+	//-------------------------------------
+	socket.on('open_comment_thread', ({ threadTitle }, callback) => {
+		openThread({ threadTitle }, callback);
+
+		socket.join(threadTitle);
+
+		// Posting comments
+
+		socket.on('post_comment', ({ threadTitle, commentPayload }, callback) => {
+			postComment({ threadTitle, commentPayload }, callback)
+				.then((newComment) => {
+					callback({ newComment });
+					io.to(threadTitle).emit('new_comment', { comment: newComment });
+				})
+				.catch((error) => {
+					callback({ error });
+				});
 		});
+
+		socket.on('reply_to_comment', ({ commentId, commentPayload }, callback) => {
+			replyToComment({ commentId, commentPayload }, callback)
+				.then((newComment) => {
+					callback({ newComment });
+					io.to(threadTitle).emit('comment_reply', { newComment, commentId });
+				})
+				.catch((error) => {
+					callback({ error });
+				});
+		});
+
+		// Comment Likes
+
+		socket.on('like_comment', ({ commentId, userId }, callback) => {
+			likeComment({ commentId, userId }, callback)
+				.then(({ comment }) => {
+					if (comment) {
+						callback({ comment });
+						io.to(threadTitle).emit('likes_update', { comment });
+					}
+				})
+				.catch((error) => {
+					console.log('THIS IS A PROBLEM', error);
+					return callback({ error });
+				});
+		});
+
+		socket.on('unlike_comment', ({ commentId, userId }, callback) => {
+			unlikeComment({ commentId, userId }, callback)
+				.then(({ comment }) => {
+					callback({ comment });
+					io.to(threadTitle).emit('likes_update', { comment });
+				})
+				.catch((error) => callback({ error }));
+		});
+
+		// Leaving Comment Thread
+
+		return socket.on('close_comment_thread', ({ user, threadTitle }, callback) => {
+			closeThread({ user, threadTitle }, callback);
+			return socket.disconnect();
+		});
+	});
+
+	//------------------
+	// SOCKET CLOSURE
+	//------------------
+
+	socket.on('disconnect', () => {
+		return console.log(`Closed Socket.IO connection: ${socket.id}`);
 	});
 });
 

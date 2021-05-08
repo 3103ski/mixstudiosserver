@@ -6,6 +6,7 @@ const likeSchema = new Schema(
 		userId: {
 			type: Schema.Types.ObjectId,
 			ref: 'UserProfile',
+			required: true,
 		},
 	},
 	{
@@ -13,6 +14,6 @@ const likeSchema = new Schema(
 	}
 );
 
-const Like = mongoose.model('Like', likeSchema);
+const Like = mongoose.model('Like', likeSchema, 'likes');
 
 module.exports = Like;
