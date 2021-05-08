@@ -1,54 +1,37 @@
 #!/usr/bin/env node
 
-/**
- * Module dependencies.
- */
-
+// Module Imports
 var app = require('../app');
-
 var debug = require('debug')('mixstudios:server');
-
 var http = require('http');
 const https = require('https');
-
-const socketio = require('socket.io', { path: '/' });
-
 const fs = require('fs');
 
-/**
- * Socket Functions
- */
-const {
-	openThread,
-	closeThread,
-	postComment,
-	likeComment,
-	unlikeComment,
-	replyToComment,
-} = require('../socketEvents/commentThread.js');
+// Socket.io
+const socketio = require('socket.io', { path: '/' });
+const threadSocketEvents = require('../webSockets/commentThreads/thread');
 
-/**
- * Get port from environment and store in Express.
- */
+//•••••••••••••••••••••••••••
+//•••••••••••••••••••••••••••
 
+// Get port from environment and store in Express.
 var port = normalizePort(process.env.PORT || '8080');
 
 app.set('port', port);
 app.set('secPort', port + 443);
 
-/**
- * Create HTTP server.
- */
+// Create Server
 
 let io;
-
-var server = http.createServer(app);
+const server = http.createServer(app);
 
 server.listen(port, () => {
 	console.log(`HTTP server running on: ${port}`);
 });
 server.on('error', onError);
 server.on('listening', onListening);
+
+io = socketio(server);
 
 const httpsOptions = {
 	key: fs.readFileSync(__dirname + '/server.key'),
@@ -57,127 +40,54 @@ const httpsOptions = {
 
 const secureServer = https.createServer(httpsOptions, app);
 
-io = socketio(server);
-
 secureServer.listen(app.get('secPort'), () => {
 	console.log('HTTPS listening on port', app.get('secPort'));
 });
 secureServer.on('error', onError);
 secureServer.on('listening', onListening);
 
-//••••••••••••••••••••
-//   SOCKET IO
-//••••••••••••••••••••
+//•••••••••••••••••••••••••
+//  Socket.io Connections
+//•••••••••••••••••••••••••
 
 io.on('connection', (socket) => {
 	console.log('Socket.IO Connection ID: ', socket.id);
 
-	//-------------------------------------
-	// Socket.IO events for COMMENT THREADS
-	//-------------------------------------
-	socket.on('open_comment_thread', ({ threadTitle }, callback) => {
-		openThread({ threadTitle }, callback);
+	//-----------------
+	// COMMENT THREADS
+	//-----------------
+	socket.on('open_comment_thread', ({ threadTitle }, callback) =>
+		threadSocketEvents(threadTitle, socket, io, callback)
+	);
 
-		socket.join(threadTitle);
-
-		// Posting comments
-
-		socket.on('post_comment', ({ threadTitle, commentPayload }, callback) => {
-			postComment({ threadTitle, commentPayload }, callback)
-				.then((newComment) => {
-					callback({ newComment });
-					io.to(threadTitle).emit('new_comment', { comment: newComment });
-				})
-				.catch((error) => {
-					callback({ error });
-				});
-		});
-
-		socket.on('reply_to_comment', ({ commentId, commentPayload }, callback) => {
-			replyToComment({ commentId, commentPayload }, callback)
-				.then((newComment) => {
-					callback({ newComment });
-					io.to(threadTitle).emit('comment_reply', { newComment, commentId });
-				})
-				.catch((error) => {
-					callback({ error });
-				});
-		});
-
-		// Comment Likes
-
-		socket.on('like_comment', ({ commentId, userId }, callback) => {
-			likeComment({ commentId, userId }, callback)
-				.then(({ comment }) => {
-					if (comment) {
-						callback({ comment });
-						io.to(threadTitle).emit('likes_update', { comment });
-					}
-				})
-				.catch((error) => {
-					console.log('THIS IS A PROBLEM', error);
-					return callback({ error });
-				});
-		});
-
-		socket.on('unlike_comment', ({ commentId, userId }, callback) => {
-			unlikeComment({ commentId, userId }, callback)
-				.then(({ comment }) => {
-					callback({ comment });
-					io.to(threadTitle).emit('likes_update', { comment });
-				})
-				.catch((error) => callback({ error }));
-		});
-
-		// Leaving Comment Thread
-
-		return socket.on('close_comment_thread', ({ user, threadTitle }, callback) => {
-			closeThread({ user, threadTitle }, callback);
-			return socket.disconnect();
-		});
-	});
-
-	//------------------
 	// SOCKET CLOSURE
-	//------------------
-
 	socket.on('disconnect', () => {
 		return console.log(`Closed Socket.IO connection: ${socket.id}`);
 	});
 });
 
-/**
- * Normalize a port into a number, string, or false.
- */
+//•••••••••••••••••••••••••
+//  File Util
+//•••••••••••••••••••••••••
 
+// Normalize a port into a number, string, or false.
 function normalizePort(val) {
 	var port = parseInt(val, 10);
-
 	if (isNaN(port)) {
-		// named pipe
 		return val;
 	}
-
 	if (port >= 0) {
-		// port number
 		return port;
 	}
-
 	return false;
 }
 
-/**
- * Event listener for HTTP server "error" event.
- */
-
+// Event listener for HTTP server "error" event.
 function onError(error) {
 	if (error.syscall !== 'listen') {
 		throw error;
 	}
-
 	var bind = typeof port === 'string' ? 'Pipe ' + port : 'Port ' + port;
-
-	// handle specific listen errors with friendly messages
 	switch (error.code) {
 		case 'EACCES':
 			console.error(bind + ' requires elevated privileges');
@@ -192,15 +102,10 @@ function onError(error) {
 	}
 }
 
-/**
- * Event listener for HTTP server "listening" event.
- */
-
+// Event listener for HTTP server "listening" event.
 function onListening() {
 	let addr;
 	addr = app.address;
-	// console.log('RUNNING: production https');
-
 	var bind = typeof addr === 'string' ? 'pipe ' + addr : 'port ' + port;
 	debug('Listening on ' + bind);
 }

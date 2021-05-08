@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const Populate = require('../../util/autoPopulate');
+const Populate = require('../../../util/autoPopulate');
 
 const commentSchema = new Schema(
 	{

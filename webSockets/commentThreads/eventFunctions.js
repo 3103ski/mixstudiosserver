@@ -1,6 +1,6 @@
-const Thread = require('../models/social/thread');
-const Comment = require('../models/social/comment');
-const Like = require('../models/social/like');
+const Thread = require('../../models/social/threads/thread');
+const Comment = require('../../models/social/threads/comment');
+const Like = require('../../models/social/like');
 const mongoose = require('mongoose');
 const ObjectId = mongoose.Types.ObjectId;
 

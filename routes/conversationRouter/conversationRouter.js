@@ -1,6 +1,6 @@
 const express = require('express');
-const Conversation = require('../../models/social/thread');
-const Comment = require('../../models/social/comment');
+const Conversation = require('../../models/social/threads/thread');
+const Comment = require('../../models/social/threads/comment');
 
 const cors = require('../cors');
 const auth = require('../../authenticate');
