@@ -10,6 +10,7 @@ const fs = require('fs');
 // Socket.io
 const socketio = require('socket.io', { path: '/' });
 const threadSocketEvents = require('../webSockets/commentThreads/thread');
+const messengerSocketEvents = require('../webSockets/messenger/messenger');
 
 //•••••••••••••••••••••••••••
 //•••••••••••••••••••••••••••
@@ -58,6 +59,13 @@ io.on('connection', (socket) => {
 	//-----------------
 	socket.on('open_comment_thread', ({ threadTitle }, callback) =>
 		threadSocketEvents(threadTitle, socket, io, callback)
+	);
+
+	//-----------------
+	//  MESSENGER
+	//-----------------
+	socket.on('open_messenger', ({ userId }, callback) =>
+		messengerSocketEvents(userId, socket, io, callback)
 	);
 
 	// SOCKET CLOSURE

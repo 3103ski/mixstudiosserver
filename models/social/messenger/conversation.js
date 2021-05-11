@@ -8,23 +8,14 @@ const conversationSchema = new Schema(
 			type: String,
 			required: true,
 		},
-		subscribers: [
-			{
-				type: Schema.Types.ObjectId,
-				ref: 'UserProfile',
-			},
-		],
-		recipients: [
-			{
-				type: Schema.Types.ObjectId,
-				ref: 'UserProfile',
-			},
-		],
-		messages: [{ type: Schema.Types.ObjectId, ref: 'Message' }],
-		latestMessage: {
-			type: Schema.Types.ObjectId,
-			ref: 'Message',
+		subscribers: {
+			type: Array,
+			default: [],
 		},
+		recipients: {},
+		recipientIds: { type: Array, default: [], required: true },
+		messages: [{ type: Schema.Types.ObjectId, ref: 'Message' }],
+		latestMessage: {},
 	},
 	{
 		timestamps: true,
@@ -34,8 +25,6 @@ const conversationSchema = new Schema(
 conversationSchema
 	.pre('findOne', Populate('messages'))
 	.pre('find', Populate('messages'))
-	.pre('findOne', Populate('latestMessage'))
-	.pre('find', Populate('latestMessage'))
 	.pre('findOne', Populate('unreadBy'))
 	.pre('find', Populate('unreadBy'));
 

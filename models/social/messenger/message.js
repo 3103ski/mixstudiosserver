@@ -8,10 +8,7 @@ const messageScehma = new Schema(
 			type: String,
 			required: true,
 		},
-		sender: {
-			type: Schema.Types.ObjectId,
-			ref: 'UserProfile',
-		},
+		sender: {},
 		todoListId: {
 			type: String,
 		},
@@ -19,18 +16,22 @@ const messageScehma = new Schema(
 		conversationId: {
 			type: String,
 		},
+		socketRoomId: { type: String },
 		likes: [
 			{
 				type: Schema.Types.ObjectId,
 				ref: 'Like',
 			},
 		],
-		subscribers: [
+		recipientIds: [
 			{
-				type: Schema.Types.ObjectId,
-				ref: 'UserProfile',
+				type: String,
 			},
 		],
+		subscribers: {
+			type: Array,
+			default: [],
+		},
 		messages: [{ type: Schema.Types.ObjectId, ref: 'Message' }],
 	},
 	{
@@ -42,9 +43,7 @@ messageScehma
 	.pre('findOne', Populate('messages'))
 	.pre('find', Populate('messages'))
 	.pre('findOne', Populate('likes'))
-	.pre('find', Populate('likes'))
-	.pre('findOne', Populate('unreadBy'))
-	.pre('find', Populate('unreadBy'));
+	.pre('find', Populate('likes'));
 
 const Message = mongoose.model('Message', messageScehma, 'messages');
 
