@@ -10,7 +10,11 @@ const fs = require('fs');
 // Socket.io
 const socketio = require('socket.io', { path: '/' });
 const threadSocketEvents = require('../webSockets/commentThreads/thread');
-const messengerSocketEvents = require('../webSockets/messenger/messenger');
+const {
+	conversationListSocketEvents,
+	messengerSocketEvents,
+	conversationSocketEvents,
+} = require('../webSockets/messenger/messenger');
 
 //•••••••••••••••••••••••••••
 //•••••••••••••••••••••••••••
@@ -52,7 +56,12 @@ secureServer.on('listening', onListening);
 //•••••••••••••••••••••••••
 
 io.on('connection', (socket) => {
-	console.log('Socket.IO Connection ID: ', socket.id);
+	// socket.setMaxListeners(1);
+	// socket.address =
+	// 	socket.handshake.address !== null
+	// 		? socket.handshake.address.address + ':' + socket.handshake.address.port
+	// 		: process.env.DOMAIN;
+	// console.log('Socket.IO Connection ID: ', socket.id);
 
 	//-----------------
 	// COMMENT THREADS

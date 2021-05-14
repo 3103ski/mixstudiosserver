@@ -4,17 +4,13 @@ const Populate = require('../../../util/autoPopulate');
 
 const conversationSchema = new Schema(
 	{
-		socketRoomId: {
-			type: String,
-			required: true,
-		},
 		subscribers: {
 			type: Array,
 			default: [],
 		},
 		recipients: {},
 		recipientIds: { type: Array, default: [], required: true },
-		messages: [{ type: Schema.Types.ObjectId, ref: 'Message' }],
+		// messages: [{ type: Schema.Types.ObjectId, ref: 'Message' }],
 		latestMessage: {},
 	},
 	{

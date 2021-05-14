@@ -1,67 +1,76 @@
 const {
-	fetchUserConversations,
+	fetchConversationList,
 	searchUsers,
 	sendNewMessage,
-	fetchConversation,
+	loadMessages,
 } = require('./eventFunctions');
 
-const messageSocketEvents = (userId, socket, io, callback) => {
-	fetchUserConversations({ userId, socket }, callback).then(({ rooms, userConversations }) => {
-		if (userConversations) {
-			callback({ userConversations });
+//•••••••••••••••••••
+//  Messenger
+//•••••••••••••••••••
+const messengerSocketEvents = (userId, socket, io, callback) => {
+	console.log(`${socket.id} CONNECTED`);
+	socket.join(userId.toString());
+	console.log('im the ROOMS: ', socket.rooms);
+	callback({
+		serverMessage: `The messenger has been connected to socket: ${socket.id}`,
+		status: 'connected',
+	});
+
+	socket.on('load_conversation_list', ({ userId }, callback) => {
+		return fetchConversationList({ userId }, callback);
+	});
+
+	socket.on('load_messages', ({ conversationId }, callback) => {
+		loadMessages({ conversationId }, callback);
+	});
+
+	socket.on('join_conversation', ({ conversationId }, callback) => {
+		if (![...socket.rooms].includes(conversationId)) {
+			socket.join(conversationId);
+			callback({ confirmation: `Joined: ${conversationId}` });
 		}
-		socket.join(rooms);
+	});
+
+	socket.on('conversation_select', ({ conversationId }) => {
+		io.to(socket.id).emit('conversation_selection', { selectConversation: conversationId });
 	});
 
 	socket.on('find_recipient', ({ recipient, senderId }, callback) => {
 		searchUsers({ recipient, senderId }, callback);
 	});
 
-	socket.on('fetch_populated_conversation', ({ convoId }, callback) => {
-		fetchConversation({ convoId }, callback);
-	});
-
-	socket.on('new_message', ({ incomingMessage }, callback) => {
-		// console.log(incomingMessage);
-		const socketRoomId =
-			incomingMessage.socketRoomId && incomingMessage.socketRoomId !== undefined
-				? incomingMessage.socketRoomId
-				: `${socket.id}_${incomingMessage.recipientIds[0]}_${incomingMessage.recipientIds[1]}`;
-
-		let message = {
-			...incomingMessage,
-			socketRoomId,
-		};
-
-		sendNewMessage(
-			{
-				message,
-				socketRoomId,
-			},
-			callback
-		).then(({ updatedConversation, newConversation }) => {
-			if (updatedConversation) {
-				callback({ activeConversation: updatedConversation });
-
-				console.log('Im in these rooms: ', socket.rooms);
-				console.log('Should include: ', socketRoomId);
-				io.to(socketRoomId).emit('updated_conversation', { updatedConversation });
+	socket.on('send_new_message', ({ message }, callback) => {
+		sendNewMessage({ message }, callback).then(
+			({ newMessage, updatedConversation, firstMessage, newConversation }) => {
+				if (newMessage && updatedConversation) {
+					console.log('EMITING UPDATE');
+					return io.to(message.conversationId).emit('message_update', {
+						updatedConversation,
+						newMessage,
+					});
+				} else if (firstMessage && newConversation) {
+					socket.join(newConversation._id.toString());
+					return newConversation.subscribers.forEach(function (room) {
+						console.log('IO emmitting to :: ', room);
+						io.sockets.in(room.userId).emit('message_update', {
+							firstMessage,
+							newConversation,
+						});
+					});
+				}
 			}
-			if (newConversation) {
-				socket.join(socketRoomId);
-				console.log('Im in these rooms: ', socket.rooms);
-				console.log('Should include: ', socketRoomId);
-				callback({ activeConversation: newConversation });
-				io.to(socketRoomId).emit('updated_conversation', { newConversation });
-			}
-		});
+		);
 	});
 
 	// User leaves messenger page
-	return socket.on('close_messenger', ({ user }, callback) => {
-		console.log('close messenger function');
+	return socket.on('close_messenger', (callback) => {
+		callback({
+			serverMessage: `The messenger has been DISCONNECTED from socket: ${socket.id}`,
+			status: 'not connected',
+		});
 		return socket.disconnect();
 	});
 };
 
-module.exports = messageSocketEvents;
+module.exports = { messengerSocketEvents };

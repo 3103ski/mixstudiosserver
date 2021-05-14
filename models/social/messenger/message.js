@@ -16,7 +16,6 @@ const messageScehma = new Schema(
 		conversationId: {
 			type: String,
 		},
-		socketRoomId: { type: String },
 		likes: [
 			{
 				type: Schema.Types.ObjectId,

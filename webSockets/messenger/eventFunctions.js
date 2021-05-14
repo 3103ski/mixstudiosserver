@@ -3,14 +3,12 @@ const Message = require('../../models/social/messenger/message');
 const UserProfile = require('../../models/users/userProfile');
 const ObjectId = require('mongoose').Types.ObjectId;
 
-const fetchUserConversations = ({ userId }, callback) => {
+const fetchConversationList = ({ userId }, callback) => {
+	console.log('In the events');
 	return Conversation.find({ recipientIds: { $in: [userId] } })
-		.then((userConversations) => {
-			const rooms =
-				userConversations.length > 0
-					? userConversations.map((convo) => convo.socketRoomId)
-					: [];
-			return { rooms, userConversations };
+		.then((conversationList) => {
+			// console.log('about to send back a convo list', conversationList);
+			return callback({ conversationList });
 		})
 		.catch((error) => callback({ error }));
 };
@@ -20,8 +18,6 @@ const fetchConversation = ({ convoId }, callback) => {
 		.then((conversations) => {
 			if (conversations[0]) {
 				const conversation = conversations[0];
-				console.log('server sending back this UPDATED conversation', conversation);
-				console.log('using: ', callback);
 				return callback({ conversation });
 			} else {
 				console.log(`I looked but didn't find the conversation to populate`, conversations);
@@ -70,62 +66,76 @@ const searchUsers = ({ recipient }, callback) => {
 	}
 };
 
-const sendNewMessage = ({ message, socketRoomId, socket }, callback) => {
-	if (message.conversationId !== '') {
+const sendNewMessage = ({ message }, callback) => {
+	if (message.conversationId) {
 		return Conversation.find({ _id: ObjectId(message.conversationId) })
-			.then((results) => {
-				if (results[0]) {
-					console.log('found EXISTING conversation');
-					return Message.create(message).then((newMsg) => {
-						results[0].latestMessage = newMsg;
-						results[0].messages.push(newMsg._id);
-						results[0].save();
-
-						newMsg.conversationId = results[0]._id.toString();
-						newMsg.save();
-						return { updatedConversation: results[0] };
+			.then((conversations) => {
+				if (conversations[0]) {
+					return Message.create(message).then((newMessage) => {
+						newMessage.conversationId = conversations[0]._id.toString();
+						conversations[0].latestMessage = newMessage;
+						conversations[0].updatedAt = newMessage.updatedAt;
+						newMessage.save();
+						conversations[0].save();
+						return { newMessage, updatedConversation: conversations[0] };
 					});
 				}
 			})
 			.catch((error) => callback({ error }));
 	} else {
 		return Conversation.find({ recipientIds: { $all: [message.recipientIds] } })
-			.then((results) => {
-				if (results[0]) {
-					console.log('found EXISTING conversation');
-					return Message.create(message).then((newMsg) => {
-						results[0].latestMessage = newMsg;
-						results[0].messages.push(newMsg._id);
-						results[0].save();
-						newMsg.conversationId = results[0]._id.toString();
-						newMsg.save();
-
-						return { updatedConversation: results[0] };
-					});
+			.then((conversations) => {
+				if (conversations[0]) {
+					return Message.create(message)
+						.then((newMessage) => {
+							newMessage.conversationId = conversations[0]._id.toString();
+							conversations[0].latestMessage = newMessage;
+							newMessage.save();
+							conversations[0].save();
+							return { newMessage, updatedConversation: conversations[0] };
+						})
+						.catch((error) => callback({ error }));
 				} else {
 					return Conversation.create({
-						socketRoomId,
 						recipientIds: message.recipientIds,
 						subscribers: message.subscribers,
 						recipients: message.subscribers,
 					})
-						.then((newConvo) => {
-							return Message.create(message).then((newMsg) => {
-								newConvo.latestMessage = newMsg;
-								newConvo.messages.push(newMsg._id);
-								newConvo.save();
-								newMsg.conversationId = newConvo._id.toString();
-								newMsg.save();
-
-								return { newConversation: newConvo };
-							});
+						.then((newConversation) => {
+							console.log('made a new convo');
+							return Message.create(message)
+								.then((newMessage) => {
+									newMessage.conversationId = newConversation._id.toString();
+									newConversation.latestMessage = newMessage;
+									newMessage.save();
+									newConversation.save();
+									return { firstMessage: newMessage, newConversation };
+								})
+								.catch((error) => callback({ error }));
 						})
-						.catch((error) => console.log('We had an error: ', error));
+						.catch((error) => callback({ error }));
 				}
 			})
-			.catch((error) => console.log('the find had an error: ', error));
+			.catch((error) => callback({ error }));
 	}
-	// callback({ message });
 };
 
-module.exports = { fetchUserConversations, searchUsers, sendNewMessage, fetchConversation };
+const loadMessages = ({ conversationId }, callback) => {
+	console.log('EVENET_FUNCTION :: loadMessages :: conversationId ', conversationId);
+	return Message.find({ conversationId: conversationId })
+		.then((messages) => {
+			console.log(`Message count for convo ${messages[0].conversationId}: `, messages.length);
+			if (messages) {
+				return callback({ loadedMessages: messages });
+			}
+		})
+		.catch((error) => callback({ error }));
+};
+
+module.exports = {
+	fetchConversationList,
+	searchUsers,
+	sendNewMessage,
+	fetchConversation,
+	loadMessages,
+};
