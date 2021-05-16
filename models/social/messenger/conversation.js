@@ -9,6 +9,7 @@ const conversationSchema = new Schema(
 			default: [],
 		},
 		recipients: {},
+		subscribers: { type: Array, default: [] },
 		recipientIds: { type: Array, default: [], required: true },
 		// messages: [{ type: Schema.Types.ObjectId, ref: 'Message' }],
 		latestMessage: {},

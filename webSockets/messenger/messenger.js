@@ -10,10 +10,13 @@ const {
 //•••••••••••••••••••
 const messengerSocketEvents = (userId, socket, io, callback) => {
 	console.log(`${socket.id} CONNECTED`);
+	// console.log('im the ROOMS: ', socket.rooms);
+
 	socket.join(userId.toString());
-	console.log('im the ROOMS: ', socket.rooms);
+
 	callback({
 		serverMessage: `The messenger has been connected to socket: ${socket.id}`,
+		socketId: socket.id,
 		status: 'connected',
 	});
 
@@ -21,19 +24,15 @@ const messengerSocketEvents = (userId, socket, io, callback) => {
 		return fetchConversationList({ userId }, callback);
 	});
 
-	socket.on('load_messages', ({ conversationId }, callback) => {
+	socket.on('load_conversation', ({ conversationId }, callback) => {
 		loadMessages({ conversationId }, callback);
 	});
 
 	socket.on('join_conversation', ({ conversationId }, callback) => {
 		if (![...socket.rooms].includes(conversationId)) {
 			socket.join(conversationId);
-			callback({ confirmation: `Joined: ${conversationId}` });
 		}
-	});
-
-	socket.on('conversation_select', ({ conversationId }) => {
-		io.to(socket.id).emit('conversation_selection', { selectConversation: conversationId });
+		callback({ joinedRoom: conversationId });
 	});
 
 	socket.on('find_recipient', ({ recipient, senderId }, callback) => {
@@ -44,19 +43,27 @@ const messengerSocketEvents = (userId, socket, io, callback) => {
 		sendNewMessage({ message }, callback).then(
 			({ newMessage, updatedConversation, firstMessage, newConversation }) => {
 				if (newMessage && updatedConversation) {
-					console.log('EMITING UPDATE');
-					return io.to(message.conversationId).emit('message_update', {
+					io.to(message.conversationId).emit('message_update', {
+						conversation: updatedConversation,
+						message: newMessage,
+						emitOrigin: socket.id,
+					});
+					return callback({
 						updatedConversation,
 						newMessage,
 					});
 				} else if (firstMessage && newConversation) {
 					socket.join(newConversation._id.toString());
-					return newConversation.subscribers.forEach(function (room) {
-						console.log('IO emmitting to :: ', room);
+					newConversation.subscribers.forEach(function (room) {
 						io.sockets.in(room.userId).emit('message_update', {
-							firstMessage,
-							newConversation,
+							message: firstMessage,
+							conversation: newConversation,
+							emitOrigin: socket.id,
 						});
+					});
+					return callback({
+						newMessage: firstMessage,
+						newConversation,
 					});
 				}
 			}

@@ -56,13 +56,6 @@ secureServer.on('listening', onListening);
 //•••••••••••••••••••••••••
 
 io.on('connection', (socket) => {
-	// socket.setMaxListeners(1);
-	// socket.address =
-	// 	socket.handshake.address !== null
-	// 		? socket.handshake.address.address + ':' + socket.handshake.address.port
-	// 		: process.env.DOMAIN;
-	// console.log('Socket.IO Connection ID: ', socket.id);
-
 	//-----------------
 	// COMMENT THREADS
 	//-----------------
@@ -76,6 +69,8 @@ io.on('connection', (socket) => {
 	socket.on('open_messenger', ({ userId }, callback) =>
 		messengerSocketEvents(userId, socket, io, callback)
 	);
+
+	// socket.on('')
 
 	// SOCKET CLOSURE
 	socket.on('disconnect', () => {

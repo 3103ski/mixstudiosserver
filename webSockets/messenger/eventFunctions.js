@@ -6,9 +6,9 @@ const ObjectId = require('mongoose').Types.ObjectId;
 const fetchConversationList = ({ userId }, callback) => {
 	console.log('In the events');
 	return Conversation.find({ recipientIds: { $in: [userId] } })
-		.then((conversationList) => {
+		.then((conversations) => {
 			// console.log('about to send back a convo list', conversationList);
-			return callback({ conversationList });
+			return callback({ conversations });
 		})
 		.catch((error) => callback({ error }));
 };
@@ -126,7 +126,7 @@ const loadMessages = ({ conversationId }, callback) => {
 		.then((messages) => {
 			console.log(`Message count for convo ${messages[0].conversationId}: `, messages.length);
 			if (messages) {
-				return callback({ loadedMessages: messages });
+				return callback({ messages });
 			}
 		})
 		.catch((error) => callback({ error }));
