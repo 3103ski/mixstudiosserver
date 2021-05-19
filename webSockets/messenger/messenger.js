@@ -10,8 +10,6 @@ const {
 //•••••••••••••••••••
 const messengerSocketEvents = (userId, socket, io, callback) => {
 	console.log(`${socket.id} CONNECTED`);
-	// console.log('im the ROOMS: ', socket.rooms);
-
 	socket.join(userId.toString());
 
 	callback({
@@ -41,7 +39,7 @@ const messengerSocketEvents = (userId, socket, io, callback) => {
 
 	socket.on('send_new_message', ({ message }, callback) => {
 		sendNewMessage({ message }, callback).then(
-			({ newMessage, updatedConversation, firstMessage, newConversation }) => {
+			({ newMessage, updatedConversation, firstMessage, newConversation, reply }) => {
 				if (newMessage && updatedConversation) {
 					io.to(message.conversationId).emit('message_update', {
 						conversation: updatedConversation,
@@ -64,6 +62,11 @@ const messengerSocketEvents = (userId, socket, io, callback) => {
 					return callback({
 						newMessage: firstMessage,
 						newConversation,
+					});
+				} else if (reply) {
+					console.log('Sending this reply: ', reply);
+					return callback({
+						reply,
 					});
 				}
 			}

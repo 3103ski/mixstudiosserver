@@ -16,6 +16,14 @@ const messageScehma = new Schema(
 		conversationId: {
 			type: String,
 		},
+		isReply: {
+			type: Boolean,
+			default: false,
+		},
+		repliedTo: {
+			type: String,
+			default: null,
+		},
 		likes: [
 			{
 				type: Schema.Types.ObjectId,

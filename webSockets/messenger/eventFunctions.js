@@ -67,21 +67,33 @@ const searchUsers = ({ recipient }, callback) => {
 };
 
 const sendNewMessage = ({ message }, callback) => {
-	if (message.conversationId) {
-		return Conversation.find({ _id: ObjectId(message.conversationId) })
-			.then((conversations) => {
-				if (conversations[0]) {
-					return Message.create(message).then((newMessage) => {
-						newMessage.conversationId = conversations[0]._id.toString();
-						conversations[0].latestMessage = newMessage;
-						conversations[0].updatedAt = newMessage.updatedAt;
-						newMessage.save();
-						conversations[0].save();
-						return { newMessage, updatedConversation: conversations[0] };
-					});
-				}
-			})
-			.catch((error) => callback({ error }));
+	if (message.isReply && message.repliedTo) {
+		return Message.findOne({ _id: ObjectId(message.repliedTo) }).then((parentMessage) => {
+			if (parentMessage) {
+				return Message.create(message).then((reply) => {
+					parentMessage.messages.push(reply._id);
+					parentMessage.save();
+					return { reply };
+				});
+			}
+		});
+	} else if (message.conversationId) {
+		{
+			return Conversation.find({ _id: ObjectId(message.conversationId) })
+				.then((conversations) => {
+					if (conversations[0]) {
+						return Message.create(message).then((newMessage) => {
+							newMessage.conversationId = conversations[0]._id.toString();
+							conversations[0].latestMessage = newMessage;
+							conversations[0].updatedAt = newMessage.updatedAt;
+							newMessage.save();
+							conversations[0].save();
+							return { newMessage, updatedConversation: conversations[0] };
+						});
+					}
+				})
+				.catch((error) => callback({ error }));
+		}
 	} else {
 		return Conversation.find({ recipientIds: { $all: [message.recipientIds] } })
 			.then((conversations) => {
