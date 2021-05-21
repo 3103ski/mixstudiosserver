@@ -1,5 +1,8 @@
 const Conversation = require('../../models/social/messenger/conversation');
 const Message = require('../../models/social/messenger/message');
+const PinCollection = require('../../models/social/messenger/pinCollection');
+const Pin = require('../../models/social/messenger/pin');
+
 const UserProfile = require('../../models/users/userProfile');
 const ObjectId = require('mongoose').Types.ObjectId;
 
@@ -24,6 +27,48 @@ const fetchConversation = ({ convoId }, callback) => {
 			}
 		})
 		.catch((error) => callback({ error }));
+};
+
+const fetchPinCollections = ({ userId }, callback) => {
+	return PinCollection.find({ userId: userId })
+		.then((collections) => {
+			return callback({ pinCollections: collections });
+		})
+		.catch((err) => callback({ error: err }));
+};
+
+const pinMessage = ({ payload }, callback) => {
+	const { pin, message } = payload;
+
+	return PinCollection.find({ recipientIds: { $all: [message.recipientIds] } })
+		.then((collection) => {
+			console.log('the collection', collection);
+			if (collection[0]) {
+				return Pin.create(pin)
+					.then((newPin) => {
+						console.log('new pin was created, ', collection[0]);
+						collection[0].pins.push(newPin._id);
+						collection[0].save();
+						return { collection: collection[0], newPin };
+					})
+					.catch((err) => callback({ error: err }));
+			} else {
+				return PinCollection.create({
+					userId: message.sender.userId,
+					subscribers: message.subscribers,
+					recipientIds: message.recipientIds,
+				})
+					.then((newPinCollection) => {
+						return Pin.create(pin).then((newPin) => {
+							newPinCollection.pins.push(newPin._id);
+							newPinCollection.save();
+							return { newPinCollection, newPin };
+						});
+					})
+					.catch((err) => callback({ error: err }));
+			}
+		})
+		.catch((err) => callback({ error: err }));
 };
 
 const searchUsers = ({ recipient }, callback) => {
@@ -150,4 +195,6 @@ module.exports = {
 	sendNewMessage,
 	fetchConversation,
 	loadMessages,
+	pinMessage,
+	fetchPinCollections,
 };

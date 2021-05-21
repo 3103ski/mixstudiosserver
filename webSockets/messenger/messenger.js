@@ -3,6 +3,8 @@ const {
 	searchUsers,
 	sendNewMessage,
 	loadMessages,
+	fetchPinCollections,
+	pinMessage,
 } = require('./eventFunctions');
 
 //•••••••••••••••••••
@@ -31,6 +33,21 @@ const messengerSocketEvents = (userId, socket, io, callback) => {
 			socket.join(conversationId);
 		}
 		callback({ joinedRoom: conversationId });
+	});
+
+	socket.on('pin_message', ({ payload }, callback) => {
+		pinMessage({ payload }, callback).then(({ collection, newPinCollection, newPin }) => {
+			if (collection) {
+				return callback({ collection, newPin });
+			}
+			if (newPinCollection) {
+				return callback({ newPinCollection, newPin });
+			}
+		});
+	});
+
+	socket.on('fetch_pin_collections', ({ userId }, callback) => {
+		fetchPinCollections({ userId }, callback);
 	});
 
 	socket.on('find_recipient', ({ recipient, senderId }, callback) => {
