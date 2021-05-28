@@ -1,5 +1,7 @@
 const jwt = require('jsonwebtoken');
-
+const fetch = require('node-fetch');
+const AWS = require('aws-sdk');
+const FileType = require('file-type');
 // Passport
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
@@ -7,9 +9,29 @@ const JwtStrategy = require('passport-jwt').Strategy;
 const ExtractJwt = require('passport-jwt').ExtractJwt;
 const FacebookTokenStrategy = require('passport-facebook-token');
 const GoogleTokenStrategy = require('passport-token-google2').Strategy;
-const SpotifyTokenStrategy = require('passport-spotify').Strategy;
 
-// Local
+// Amazon s3 for avatar bucket
+
+AWS.config.update({
+	accessKeyId: 'AKIARRLEMNTVQBYT73P7',
+	secretAccessKey: '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',
+});
+
+const s3 = new AWS.S3();
+
+const uploadAvatar = (buffer, name, type) => {
+	const params = {
+		ACL: 'public-read',
+		ContentType: type.mime,
+		Body: buffer,
+		Bucket: 'ms-avatars',
+		Key: `${name}`,
+	};
+
+	return s3.upload(params).promise();
+};
+
+// Local Strategies
 const User = require('./models/users/userProfile');
 const config = require('./config.js');
 
@@ -18,15 +40,7 @@ exports.local = passport.use(new LocalStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
-// passport.serializeUser(function (user, cb) {
-// 	cb(null, user);
-// });
-// passport.deserializeUser(function (obj, cb) {
-// 	cb(null, obj);
-// });
-
 exports.getToken = (user) => {
-	// return jwt.sign(user, config.secretKey, { expiresIn: 10 });
 	return jwt.sign(user, config.secretKey, { expiresIn: 10800 });
 };
 
@@ -53,79 +67,54 @@ exports.jwtPassport = passport.use(
 	})
 );
 
-// exports.spotifyStrategy = passport.use(
-// 	new GoogleTokenStrategy(
-// 		{
-// 			clientID: config.spotify.clientID,
-// 			clientSecret: config.spotify.clientSecret,
-// 		},
-// 		function (accessToken, refreshToken, profile, done) {
-// 			console.log('And we did it with spotify too!', profile);
-// 			return done(null, profile);
-// 			User.findOne({ spotifyId: profile.id }, (err, user) => {
-// 				if (err) {
-// 					console.log(`Didn't go far`, err);
-// 					return done(err, false);
-// 				}
-// 				if (!err && user) {
-// 					console.log(`We already found it: `, user);
-// 					return done(null, user);
-// 				} else {
-// 					console.log(`We're gonna try and make it`);
-// 					user = new User({ username: profile.displayName });
-// 					user.googleId = profile.id;
-// 					user.userInfo.firstName = profile.name.givenName;
-// 					user.userInfo.lastName = profile.name.familyName;
-// 					user.userInfo.email = profile.emails[0].value;
-// 					console.log('We were almost there');
-// 					user.save((err) => {
-// 						if (err) {
-// 							console.log('We were RIGHT there', err);
-// 							return done(err, false);
-// 						} else {
-// 							return done(null, user);
-// 						}
-// 					});
-// 				}
-// 			});
-// 		}
-// 	)
-// );
 exports.googleStrategy = passport.use(
 	new GoogleTokenStrategy(
 		{
 			clientID: config.google.clientID,
 			clientSecret: config.google.clientSecret,
 		},
-		function (accessToken, refreshToken, profile, done) {
-			console.log('And we did it with google too!', profile);
-			User.findOne({ googleId: profile.id }, (err, user) => {
+		async function (accessToken, refreshToken, profile, done) {
+			User.findOne({ googleId: profile.id }, async (err, user) => {
 				if (err) {
-					console.log(`Didn't go far`, err);
 					return done(err, false);
 				}
 				if (!err && user) {
-					console.log(`We already found it: `, user);
 					return done(null, user);
 				} else {
-					console.log(`We're gonna try and make it`, profile);
-
 					user = new User({ username: profile.displayName });
 					user.googleId = profile.id;
 					user.userInfo.firstName = profile.name.givenName;
 					user.userInfo.lastName = profile.name.familyName;
 					user.userInfo.email = profile.emails[0].value;
-					if (profile._json.picture) {
-						user.userInfo.googleAvatar = profile._json.picture;
-					}
 
-					user.save((err) => {
-						if (err) {
-							return done(err, false);
-						} else {
-							return done(null, user);
-						}
-					});
+					if (profile._json.picture) {
+						const avatarUrl = profile._json.picture;
+						const avatarResponse = await fetch(avatarUrl);
+						const avatarBuffer = await avatarResponse.buffer();
+						const type = await FileType.fromBuffer(avatarBuffer);
+
+						uploadAvatar(avatarBuffer, user._id.toString(), type)
+							.then((s3Res) => {
+								user.userInfo.avatar = s3Res.Location;
+
+								user.save((err) => {
+									if (err) {
+										return done(err, false);
+									} else {
+										return done(null, user);
+									}
+								});
+							})
+							.catch((err) => done(err, false));
+					} else {
+						user.save((err) => {
+							if (err) {
+								return done(err, false);
+							} else {
+								return done(null, user);
+							}
+						});
+					}
 				}
 			});
 		}
@@ -140,31 +129,46 @@ exports.facebookPassport = passport.use(
 			fbGraphVersion: 'v3.0',
 		},
 		function (accessToken, refreshToken, profile, done) {
-			User.findOne({ facebookId: profile.id }, (err, user) => {
+			User.findOne({ facebookId: profile.id }, async (err, user) => {
 				if (err) {
 					return done(err, false);
 				}
 				if (!err && user) {
 					return done(null, user);
 				} else {
-					console.log('facebooke profile', profile);
 					user = new User({ username: profile.displayName });
 
 					user.facebookId = profile.id;
 					user.userInfo.firstName = profile.name.givenName;
 					user.userInfo.lastName = profile.name.familyName;
 					user.userInfo.email = profile.emails[0].value;
-					if (profile.photos[0] && profile.photos[0].value) {
-						user.userInfo.facebookAvatar = profile.photos[0].value;
-					}
 
-					user.save((err) => {
-						if (err) {
-							return done(err, false);
-						} else {
-							return done(null, user);
-						}
-					});
+					if (profile.photos[0] && profile.photos[0].value) {
+						const avatarUrl = profile.photos[0].value;
+						const avatarResponse = await fetch(avatarUrl);
+						const avatarBuffer = await avatarResponse.buffer();
+						const type = await FileType.fromBuffer(avatarBuffer);
+						uploadAvatar(avatarBuffer, user._id.toString(), type)
+							.then((s3Res) => {
+								user.userInfo.avatar = s3Res.Location;
+								user.save((err) => {
+									if (err) {
+										return done(err, false);
+									} else {
+										return done(null, user);
+									}
+								});
+							})
+							.catch((err) => done(err, false));
+					} else {
+						user.save((err) => {
+							if (err) {
+								return done(err, false);
+							} else {
+								return done(null, user);
+							}
+						});
+					}
 				}
 			});
 		}

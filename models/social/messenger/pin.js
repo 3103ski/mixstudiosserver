@@ -7,6 +7,7 @@ const pinSchema = new Schema(
 		title: { type: String, required: true },
 		notes: { type: String },
 		message: { type: Schema.Types.ObjectId, ref: 'Message' },
+		userId: { type: String },
 	},
 	{
 		timestamps: true,

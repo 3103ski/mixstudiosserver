@@ -2,13 +2,37 @@ const express = require('express');
 const axios = require('axios');
 const auth = require('../authenticate');
 const cors = require('./cors');
+const passport = require('passport');
+
+const fetch = require('node-fetch');
+const AWS = require('aws-sdk');
+const FileType = require('file-type');
+
 const SoundsLikeObject = require('../models/users/soundsLikeObject');
 const UserProfile = require('../models/users/userProfile');
-const passport = require('passport');
-const config = require('../config');
-const path = require('path');
 
 const userProfileRouter = express.Router();
+
+// Amazon s3 for avatar bucket
+
+AWS.config.update({
+	accessKeyId: 'AKIARRLEMNTVQBYT73P7',
+	secretAccessKey: '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',
+});
+
+const s3 = new AWS.S3();
+
+const uploadAvatar = (buffer, name, type) => {
+	const params = {
+		ACL: 'public-read',
+		ContentType: type.mime,
+		Body: buffer,
+		Bucket: 'ms-avatars',
+		Key: `${name}`,
+	};
+
+	return s3.upload(params).promise();
+};
 
 userProfileRouter
 	.route('/')
@@ -104,7 +128,7 @@ userProfileRouter
 				})
 				.then((spotifyResponse) => {
 					const profile = spotifyResponse.data;
-					UserProfile.findOne({ spotifyId: profile.id }, (err, user) => {
+					UserProfile.findOne({ spotifyId: profile.id }, async (err, user) => {
 						if (err) {
 							res.statusCode = 500;
 							res.setHeader('Content-Type', 'application/json');
@@ -134,30 +158,70 @@ userProfileRouter
 							user.userInfo.email = profile.email;
 
 							if (profile.images[0] && profile.images[0].url) {
-								user.userInfo.spotifyAvatar = profile.images[0].url;
+								const avatarUrl = profile.images[0].url;
+								const avatarResponse = await fetch(avatarUrl);
+								const avatarBuffer = await avatarResponse.buffer();
+								const type = await FileType.fromBuffer(avatarBuffer);
+								uploadAvatar(avatarBuffer, user._id.toString(), type)
+									.then((s3Res) => {
+										user.userInfo.avatar = s3Res.Location;
+										user.save((err) => {
+											if (err) {
+												res.statusCode = 409;
+												res.setHeader('Content-Type', 'application/json');
+												res.json({
+													success: false,
+													status:
+														'There was an error or conflict saving the profile',
+													errorMsg: err,
+												});
+											} else {
+												const token = auth.getToken({ _id: user._id });
+												res.statusCode = 200;
+												res.setHeader('Content-Type', 'application/json');
+												res.json({
+													success: true,
+													token: token,
+													status: 'You are successfully logged in!',
+													user: user,
+												});
+											}
+										});
+									})
+									.catch((err) => {
+										res.statusCode = 409;
+										res.setHeader('Content-Type', 'application/json');
+										res.json({
+											success: false,
+											status:
+												'There was an error or conflict saving the profile',
+											errorMsg: err,
+										});
+									});
+							} else {
+								user.save((err) => {
+									if (err) {
+										res.statusCode = 409;
+										res.setHeader('Content-Type', 'application/json');
+										res.json({
+											success: false,
+											status:
+												'There was an error or conflict saving the profile',
+											errorMsg: err,
+										});
+									} else {
+										const token = auth.getToken({ _id: user._id });
+										res.statusCode = 200;
+										res.setHeader('Content-Type', 'application/json');
+										res.json({
+											success: true,
+											token: token,
+											status: 'You are successfully logged in!',
+											user: user,
+										});
+									}
+								});
 							}
-
-							user.save((err) => {
-								if (err) {
-									res.statusCode = 409;
-									res.setHeader('Content-Type', 'application/json');
-									res.json({
-										success: false,
-										status: 'There was an error or conflict saving the profile',
-										errorMsg: err,
-									});
-								} else {
-									const token = auth.getToken({ _id: user._id });
-									res.statusCode = 200;
-									res.setHeader('Content-Type', 'application/json');
-									res.json({
-										success: true,
-										token: token,
-										status: 'You are successfully logged in!',
-										user: user,
-									});
-								}
-							});
 						}
 					});
 				})

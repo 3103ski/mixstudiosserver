@@ -10,6 +10,7 @@ const cors = require('./routes/cors.js');
 // Router Imports
 // const indexRouter = require('./routes/index');
 const portfolioRouter = require('./routes/portfoliosRouter/portfolioEntriesRouter');
+const avatarUploadRouter = require('./routes/avatarUpload/avatarUpload');
 const uploadsRouter = require('./routes/uploadRouter');
 const userProfileRouter = require('./routes/userProfileRouter');
 const soundsLikeObjectsRouter = require('./routes/soundsLikeObjectsRouter');
@@ -74,6 +75,7 @@ app.use('/portfolio', portfolioRouter);
 app.use('/bug-reports', bugReportRouter);
 app.use('/update-report', updateReportRouter);
 app.use('/convo', conversationRouter);
+app.use('/avatars', avatarUploadRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

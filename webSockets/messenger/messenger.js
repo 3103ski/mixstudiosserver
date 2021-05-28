@@ -5,6 +5,7 @@ const {
 	loadMessages,
 	fetchPinCollections,
 	pinMessage,
+	unpinMessage,
 } = require('./eventFunctions');
 
 //•••••••••••••••••••
@@ -32,18 +33,25 @@ const messengerSocketEvents = (userId, socket, io, callback) => {
 		if (![...socket.rooms].includes(conversationId)) {
 			socket.join(conversationId);
 		}
+
 		callback({ joinedRoom: conversationId });
 	});
 
 	socket.on('pin_message', ({ payload }, callback) => {
-		pinMessage({ payload }, callback).then(({ collection, newPinCollection, newPin }) => {
-			if (collection) {
-				return callback({ collection, newPin });
-			}
-			if (newPinCollection) {
-				return callback({ newPinCollection, newPin });
-			}
-		});
+		pinMessage({ payload }, callback)
+			.then(({ collection, newPinCollection, newPin }) => {
+				if (collection) {
+					return callback({ collection, newPin });
+				}
+				if (newPinCollection) {
+					return callback({ newPinCollection, newPin });
+				}
+			})
+			.catch((err) => console.log('This ERROR :: ', err));
+	});
+
+	socket.on('unpin_message', ({ messageId, userId }, callback) => {
+		unpinMessage({ messageId, userId }, callback);
 	});
 
 	socket.on('fetch_pin_collections', ({ userId }, callback) => {
@@ -55,6 +63,7 @@ const messengerSocketEvents = (userId, socket, io, callback) => {
 	});
 
 	socket.on('send_new_message', ({ message }, callback) => {
+		console.log('the new message: ', message);
 		sendNewMessage({ message }, callback).then(
 			({ newMessage, updatedConversation, firstMessage, newConversation, reply }) => {
 				if (newMessage && updatedConversation) {
@@ -81,7 +90,6 @@ const messengerSocketEvents = (userId, socket, io, callback) => {
 						newConversation,
 					});
 				} else if (reply) {
-					console.log('Sending this reply: ', reply);
 					return callback({
 						reply,
 					});
