@@ -30,7 +30,6 @@ const messageScehma = new Schema(
 				ref: 'Like',
 			},
 		],
-
 		recipientIds: [
 			{
 				type: String,

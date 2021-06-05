@@ -2,12 +2,16 @@ const Conversation = require('../../models/social/messenger/conversation');
 const Message = require('../../models/social/messenger/message');
 const PinCollection = require('../../models/social/messenger/pinCollection');
 const Pin = require('../../models/social/messenger/pin');
+const Notification = require('../../models/notifications/messageNotification');
 
 const UserProfile = require('../../models/users/userProfile');
 const ObjectId = require('mongoose').Types.ObjectId;
 
-const fetchConversationList = ({ userId }, callback) => {
-	return Conversation.find({ recipientIds: { $in: [userId] } })
+const fetchConversationList = async ({ userId }, callback) => {
+	Conversation.find({ recipientIds: { $in: [userId] } })
+		.then(async (conversations) => {
+			return conversations;
+		})
 		.then((conversations) => {
 			return callback({ conversations });
 		})
@@ -21,7 +25,6 @@ const fetchConversation = ({ convoId }, callback) => {
 				const conversation = conversations[0];
 				return callback({ conversation });
 			} else {
-				console.log(`I looked but didn't find the conversation to populate`, conversations);
 				callback({
 					error: 'The conversation you are looking for was not found in the database',
 				});
@@ -49,15 +52,11 @@ const unpinMessage = ({ messageId, userId }, callback) => {
 							const updatedPins = await collectionResults[0].pins.filter(
 								(pin) => pin._id.toString() !== pinToRemove._id.toString()
 							);
-
-							console.log('Are these pins correct? ', updatedPins);
 							if (updatedPins.length === 0) {
 								PinCollection.deleteOne({ _id: collectionResults[0]._id })
 									.then((res) => {
-										console.log('Deleted collection res: ', res);
 										Pin.deleteOne({ _id: pinToRemove._id })
 											.then((res) => {
-												console.log('This was the res: ', res);
 												collectionResults[0].pins = updatedPins;
 												callback({
 													updatedCollection: collectionResults[0],
@@ -70,7 +69,6 @@ const unpinMessage = ({ messageId, userId }, callback) => {
 							} else {
 								Pin.deleteOne({ _id: pinToRemove._id })
 									.then((res) => {
-										console.log('This was the res: ', res);
 										collectionResults[0].pins = updatedPins;
 										collectionResults[0].save();
 										callback({
@@ -186,34 +184,101 @@ const sendNewMessage = ({ message }, callback) => {
 			return Conversation.find({ _id: ObjectId(message.conversationId) })
 				.then((conversations) => {
 					if (conversations[0]) {
-						return Message.create(message).then((newMessage) => {
+						return Message.create(message).then(async (newMessage) => {
 							newMessage.conversationId = conversations[0]._id.toString();
 							conversations[0].latestMessage = newMessage;
 							conversations[0].updatedAt = newMessage.updatedAt;
-							newMessage.save();
-							conversations[0].save();
-							return { newMessage, updatedConversation: conversations[0] };
+
+							const users = newMessage.subscribers.map((user) => user.userId);
+
+							const statusArray = users
+								.map((user) => {
+									if (user !== newMessage.sender.userId) {
+										return createNotificationStatus(user);
+									} else {
+										return null;
+									}
+								})
+								.filter((status) => status !== null);
+
+							return Notification.create({
+								users,
+								statusArray,
+								conversationId: conversations[0]._id.toString(),
+								messageId: newMessage._id.toString(),
+							})
+								.then(async (notification) => {
+									await conversations[0].notifications.push(notification._id);
+
+									await newMessage.save();
+									await conversations[0].save();
+
+									return Conversation.findById(conversations[0]._id)
+										.then((populatedConvo) => {
+											console.log('populated? ', populatedConvo);
+											if (populatedConvo) {
+												return {
+													newMessage,
+													updatedConversation: populatedConvo,
+												};
+											}
+										})
+										.catch((error) => console.log(error));
+								})
+								.catch((error) => callback({ error }));
 						});
 					}
 				})
 				.catch((error) => callback({ error }));
 		}
 	} else {
-		return Conversation.find({ recipientIds: { $all: message.recipientIds } })
+		return Conversation.find({ recipientIds: { $all: [...message.recipientIds] } })
 			.then((conversations) => {
 				if (
 					conversations[0] &&
 					conversations[0].recipientIds.length === message.recipientIds.length
 				) {
-					console.log('This list: ', conversations);
-					console.log('These IDs: ', message.recipientIds);
 					return Message.create(message)
-						.then((newMessage) => {
+						.then(async (newMessage) => {
 							newMessage.conversationId = conversations[0]._id.toString();
 							conversations[0].latestMessage = newMessage;
-							newMessage.save();
-							conversations[0].save();
-							return { newMessage, updatedConversation: conversations[0] };
+							const users = newMessage.subscribers.map((user) => user.userId);
+
+							const statusArray = users
+								.map((user) => {
+									if (user !== newMessage.sender.userId) {
+										return createNotificationStatus(user);
+									} else {
+										return null;
+									}
+								})
+								.filter((status) => status !== null);
+
+							return Notification.create({
+								users,
+								statusArray,
+								conversationId: conversations[0]._id.toString(),
+								messageId: newMessage._id.toString(),
+							})
+								.then(async (notification) => {
+									await conversations[0].notifications.push(notification._id);
+
+									await newMessage.save();
+									await conversations[0].save();
+
+									return Conversation.findById(conversations[0]._id)
+										.then((populatedConvo) => {
+											console.log('populated? ', populatedConvo);
+											if (populatedConvo) {
+												return {
+													newMessage,
+													updatedConversation: populatedConvo,
+												};
+											}
+										})
+										.catch((error) => console.log(error));
+								})
+								.catch((error) => callback({ error }));
 						})
 						.catch((error) => callback({ error }));
 				} else {
@@ -223,14 +288,48 @@ const sendNewMessage = ({ message }, callback) => {
 						recipients: message.subscribers,
 					})
 						.then((newConversation) => {
-							console.log('made a new convo');
 							return Message.create(message)
 								.then((newMessage) => {
+									const users = newMessage.subscribers.map((user) => user.userId);
+
+									const statusArray = users
+										.map((user) => {
+											if (user !== newMessage.sender.userId) {
+												return createNotificationStatus(user);
+											} else {
+												return null;
+											}
+										})
+										.filter((status) => status !== null);
+
 									newMessage.conversationId = newConversation._id.toString();
 									newConversation.latestMessage = newMessage;
-									newMessage.save();
-									newConversation.save();
-									return { firstMessage: newMessage, newConversation };
+
+									return Notification.create({
+										users,
+										statusArray,
+										conversationId: newConversation._id.toString(),
+										messageId: newMessage._id.toString(),
+									})
+										.then(async (notification) => {
+											await newConversation.notifications.push(
+												notification._id
+											);
+											await newMessage.save();
+											await newConversation.save();
+
+											return Conversation.findById(newConversation._id)
+												.then((populatedConvo) => {
+													if (populatedConvo) {
+														return {
+															firstMessage: newMessage,
+															newConversation: populatedConvo,
+														};
+													}
+												})
+												.catch((error) => console.log(error));
+										})
+										.catch((error) => callback({ error }));
 								})
 								.catch((error) => callback({ error }));
 						})
@@ -241,14 +340,98 @@ const sendNewMessage = ({ message }, callback) => {
 	}
 };
 
-const loadMessages = ({ conversationId }, callback) => {
-	console.log('EVENET_FUNCTION :: loadMessages :: conversationId ', conversationId);
-	return Message.find({ conversationId: conversationId })
-		.then((messages) => {
-			console.log(`Message count for convo ${messages[0].conversationId}: `, messages.length);
-			if (messages) {
-				return callback({ messages });
-			}
+const fetchNewMessageCount = ({ userId }, callback) => {
+	return Notification.find({ users: { $in: [userId] } })
+		.then((notifications) => {
+			let newMessageCount = 0;
+			notifications.map((notification) => {
+				notification.statusArray.map((status) => {
+					console.log('checked a notification');
+					if (status.userId === userId && status.seen === false) {
+						newMessageCount++;
+					}
+				});
+			});
+			return newMessageCount;
+		})
+		.then((newMessageCount) => {
+			console.log('fired callback');
+			callback({ newMessageCount });
+		})
+		.catch((error) => callback({ error }));
+};
+
+const dismissConversationNotifications = ({ conversationId, userId }, callback) => {
+	Notification.find({ conversationId: conversationId }, function (err, notifications) {
+		if (err) {
+			console.log('We have an error trying to loop notifications');
+		}
+		if (notifications) {
+			notifications.forEach(function (notification) {
+				let updatedStatusArray = notification.statusArray.map((status) => {
+					if (status.userId === userId) {
+						status.seen = true;
+						return status;
+					} else {
+						return status;
+					}
+				});
+				console.log('Going to update', notification);
+				Notification.updateOne(
+					{ _id: notification._id },
+					{ $set: { statusArray: updatedStatusArray } }
+				).then((updatedNotification) => {
+					console.log('Am I updated?', updatedNotification);
+				});
+			});
+		}
+	})
+		.then(() => {
+			callback({ success: true });
+		})
+		.catch((error) => callback({ error }));
+};
+
+function createNotificationStatus(userId) {
+	return {
+		userId,
+		seen: false,
+	};
+}
+
+const loadMessages = ({ conversationId, userId }, callback) => {
+	Notification.find({ conversationId: conversationId }, function (err, notifications) {
+		if (err) {
+			console.log('We have an error trying to loop notifications');
+		}
+		if (notifications) {
+			notifications.forEach(function (notification) {
+				let updatedStatusArray = notification.statusArray.map((status) => {
+					if (status.userId === userId) {
+						status.seen = true;
+						return status;
+					} else {
+						return status;
+					}
+				});
+				console.log('Going to update', notification);
+				Notification.updateOne(
+					{ _id: notification._id },
+					{ $set: { statusArray: updatedStatusArray } }
+				).then((updatedNotification) => {
+					console.log('Am I updated?', updatedNotification);
+				});
+			});
+		}
+	})
+		.then(() => {
+			Conversation.findOne({ _id: conversationId }).then((conversation) => {
+				Message.find({ conversationId: conversationId }).then((messages) => {
+					if (messages) {
+						callback({ messages, updatedConversation: conversation });
+					}
+				});
+			});
 		})
 		.catch((error) => callback({ error }));
 };
@@ -262,4 +445,6 @@ module.exports = {
 	pinMessage,
 	fetchPinCollections,
 	unpinMessage,
+	dismissConversationNotifications,
+	fetchNewMessageCount,
 };

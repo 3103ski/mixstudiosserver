@@ -12,6 +12,13 @@ const conversationSchema = new Schema(
 		subscribers: { type: Array, default: [] },
 		recipientIds: { type: Array, default: [], required: true },
 		latestMessage: {},
+
+		notifications: [
+			{
+				type: Schema.Types.ObjectId,
+				ref: 'MessageNotification',
+			},
+		],
 	},
 	{
 		timestamps: true,
@@ -19,8 +26,9 @@ const conversationSchema = new Schema(
 );
 
 conversationSchema
-	.pre('findOne', Populate('messages'))
-	.pre('find', Populate('messages'))
+	.pre('findById', Populate('notifications'))
+	.pre('findOne', Populate('notifications'))
+	.pre('find', Populate('notifications'))
 	.pre('findOne', Populate('unreadBy'))
 	.pre('find', Populate('unreadBy'));
 

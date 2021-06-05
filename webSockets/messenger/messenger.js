@@ -4,7 +4,9 @@ const {
 	sendNewMessage,
 	loadMessages,
 	fetchPinCollections,
+	fetchNewMessageCount,
 	pinMessage,
+	dismissConversationNotifications,
 	unpinMessage,
 } = require('./eventFunctions');
 
@@ -14,6 +16,7 @@ const {
 const messengerSocketEvents = (userId, socket, io, callback) => {
 	console.log(`${socket.id} CONNECTED`);
 	socket.join(userId.toString());
+	console.log(socket.rooms);
 
 	callback({
 		serverMessage: `The messenger has been connected to socket: ${socket.id}`,
@@ -25,8 +28,8 @@ const messengerSocketEvents = (userId, socket, io, callback) => {
 		return fetchConversationList({ userId }, callback);
 	});
 
-	socket.on('load_conversation', ({ conversationId }, callback) => {
-		loadMessages({ conversationId }, callback);
+	socket.on('load_conversation', ({ conversationId, userId }, callback) => {
+		loadMessages({ conversationId, userId }, callback);
 	});
 
 	socket.on('join_conversation', ({ conversationId }, callback) => {
@@ -62,8 +65,15 @@ const messengerSocketEvents = (userId, socket, io, callback) => {
 		searchUsers({ recipient, senderId }, callback);
 	});
 
+	socket.on('fetch_new_message_count', ({ userId }, callback) => {
+		fetchNewMessageCount({ userId }, callback);
+	});
+
+	socket.on('dismiss_conversation_notifications', ({ conversationId, userId }, callback) => {
+		dismissConversationNotifications({ conversationId, userId }, callback);
+	});
+
 	socket.on('send_new_message', ({ message }, callback) => {
-		console.log('the new message: ', message);
 		sendNewMessage({ message }, callback).then(
 			({ newMessage, updatedConversation, firstMessage, newConversation, reply }) => {
 				if (newMessage && updatedConversation) {
@@ -81,7 +91,7 @@ const messengerSocketEvents = (userId, socket, io, callback) => {
 					newConversation.subscribers.forEach(function (room) {
 						io.sockets.in(room.userId).emit('message_update', {
 							message: firstMessage,
-							conversation: newConversation,
+							newConversation,
 							emitOrigin: socket.id,
 						});
 					});
