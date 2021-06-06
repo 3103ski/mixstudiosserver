@@ -8,10 +8,8 @@ const config = require('./config');
 const cors = require('./routes/cors.js');
 
 // Router Imports
-// const indexRouter = require('./routes/index');
-const portfolioRouter = require('./routes/portfoliosRouter/portfolioEntriesRouter');
-const avatarUploadRouter = require('./routes/avatarUpload/avatarUpload');
-const uploadsRouter = require('./routes/uploadRouter');
+const portfolioRouter = require('./routes/s3Storage/portfolioEntries');
+const avatarUploadRouter = require('./routes/s3Storage/userAvatars');
 const userProfileRouter = require('./routes/userProfileRouter');
 const soundsLikeObjectsRouter = require('./routes/soundsLikeObjectsRouter');
 const serviceProfilesRouter = require('./routes/serviceProfileRouter/serviceProfilesRouter');
@@ -20,8 +18,6 @@ const servicesPricingRouter = require('./routes/servicePricingProfilesRouter/ser
 
 const bugReportRouter = require('./routes/utilityFormsRouter/bugReportRouter');
 const updateReportRouter = require('./routes/utilityFormsRouter/updateReportRouter');
-
-const conversationRouter = require('./routes/conversationRouter/conversationRouter');
 
 // Connecting Database
 const mongoose = require('mongoose');
@@ -64,17 +60,17 @@ app.get('/', cors.cors, (req, res) => {
 	res.setHeader('Content-Type', 'text/html');
 	res.sendFile(express.static(path.join(__dirname, 'views/index.html')));
 });
-// app.get('/socket.io')
+
 app.use('/users', userProfileRouter);
 app.use('/sounds-like', soundsLikeObjectsRouter);
 app.use('/service-profiles', serviceProfilesRouter);
 app.use('/service-pricing', servicesPricingRouter);
 app.use('/instruments', instrumentProfilesRouter);
-app.use('/uploads', uploadsRouter);
+
 app.use('/portfolio', portfolioRouter);
 app.use('/bug-reports', bugReportRouter);
 app.use('/update-report', updateReportRouter);
-app.use('/convo', conversationRouter);
+
 app.use('/avatars', avatarUploadRouter);
 
 // catch 404 and forward to error handler

@@ -66,8 +66,6 @@ avatarUploadRouter
 
 			checkForAvatar(req.user._id.toString())
 				.then((avatar) => {
-					console.log('we found the avatar');
-					console.log(avatar);
 					if (avatar) {
 						deleteFile(req.user._id.toString()).then(() => {
 							uploadAvatar(buffer, req.user._id.toString(), type)
@@ -76,7 +74,6 @@ avatarUploadRouter
 										.then((user) => {
 											user.userInfo.avatar = s3Res.Location;
 											user.save();
-
 											res.statusCode = 200;
 											res.setHeader('Content-Type', 'application/json');
 											res.json(user.userInfo);

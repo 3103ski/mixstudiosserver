@@ -1,35 +1,39 @@
+// Event Functions
 const {
-	fetchConversationList,
-	searchUsers,
 	sendNewMessage,
 	loadMessages,
-	fetchPinCollections,
-	fetchNewMessageCount,
-	pinMessage,
+	fetchConversationList,
+} = require('./messengerEventFunctions/messageEventFunctions');
+
+const {
 	dismissConversationNotifications,
+	fetchNewMessageCount,
+} = require('./messengerEventFunctions/notificationsEventFunctions');
+
+const {
+	pinMessage,
 	unpinMessage,
-} = require('./eventFunctions');
+	fetchPinCollections,
+} = require('./messengerEventFunctions/pinEventFunctions');
+
+const { searchUsers } = require('./messengerEventFunctions/utilityEventFunctions');
 
 //•••••••••••••••••••
 //  Messenger
 //•••••••••••••••••••
 const messengerSocketEvents = (userId, socket, io, callback) => {
+	//================
+	// User Connects to Messenger
+	//================
 	console.log(`${socket.id} CONNECTED`);
+
+	// Create room for userId for location to direct new conversations
 	socket.join(userId.toString());
-	console.log(socket.rooms);
 
 	callback({
 		serverMessage: `The messenger has been connected to socket: ${socket.id}`,
 		socketId: socket.id,
 		status: 'connected',
-	});
-
-	socket.on('load_conversation_list', ({ userId }, callback) => {
-		return fetchConversationList({ userId }, callback);
-	});
-
-	socket.on('load_conversation', ({ conversationId, userId }, callback) => {
-		loadMessages({ conversationId, userId }, callback);
 	});
 
 	socket.on('join_conversation', ({ conversationId }, callback) => {
@@ -40,37 +44,16 @@ const messengerSocketEvents = (userId, socket, io, callback) => {
 		callback({ joinedRoom: conversationId });
 	});
 
-	socket.on('pin_message', ({ payload }, callback) => {
-		pinMessage({ payload }, callback)
-			.then(({ collection, newPinCollection, newPin }) => {
-				if (collection) {
-					return callback({ collection, newPin });
-				}
-				if (newPinCollection) {
-					return callback({ newPinCollection, newPin });
-				}
-			})
-			.catch((err) => console.log('This ERROR :: ', err));
+	//•••••••••••••••••••••
+	// Message Events
+	//•••••••••••••••••••••
+
+	socket.on('load_conversation_list', ({ userId }, callback) => {
+		return fetchConversationList({ userId }, callback);
 	});
 
-	socket.on('unpin_message', ({ messageId, userId }, callback) => {
-		unpinMessage({ messageId, userId }, callback);
-	});
-
-	socket.on('fetch_pin_collections', ({ userId }, callback) => {
-		fetchPinCollections({ userId }, callback);
-	});
-
-	socket.on('find_recipient', ({ recipient, senderId }, callback) => {
-		searchUsers({ recipient, senderId }, callback);
-	});
-
-	socket.on('fetch_new_message_count', ({ userId }, callback) => {
-		fetchNewMessageCount({ userId }, callback);
-	});
-
-	socket.on('dismiss_conversation_notifications', ({ conversationId, userId }, callback) => {
-		dismissConversationNotifications({ conversationId, userId }, callback);
+	socket.on('load_conversation', ({ conversationId, userId }, callback) => {
+		loadMessages({ conversationId, userId }, callback);
 	});
 
 	socket.on('send_new_message', ({ message }, callback) => {
@@ -108,7 +91,54 @@ const messengerSocketEvents = (userId, socket, io, callback) => {
 		);
 	});
 
+	//•••••••••••••••••••••
+	// Pin Events
+	//•••••••••••••••••••••
+
+	socket.on('pin_message', ({ payload }, callback) => {
+		pinMessage({ payload }, callback)
+			.then(({ collection, newPinCollection, newPin }) => {
+				if (collection) {
+					return callback({ collection, newPin });
+				}
+				if (newPinCollection) {
+					return callback({ newPinCollection, newPin });
+				}
+			})
+			.catch((error) => callback({ error }));
+	});
+
+	socket.on('unpin_message', ({ messageId, userId }, callback) => {
+		unpinMessage({ messageId, userId }, callback);
+	});
+
+	socket.on('fetch_pin_collections', ({ userId }, callback) => {
+		fetchPinCollections({ userId }, callback);
+	});
+
+	//•••••••••••••••••••••
+	// Notification Events
+	//•••••••••••••••••••••
+
+	socket.on('fetch_new_message_count', ({ userId }, callback) => {
+		fetchNewMessageCount({ userId }, callback);
+	});
+
+	socket.on('dismiss_conversation_notifications', ({ conversationId, userId }, callback) => {
+		dismissConversationNotifications({ conversationId, userId }, callback);
+	});
+
+	//•••••••••••••••••••••
+	// Utility Events
+	//•••••••••••••••••••••
+
+	socket.on('find_recipient', ({ recipient, senderId }, callback) => {
+		searchUsers({ recipient, senderId }, callback);
+	});
+
+	//=================
 	// User leaves messenger page
+	//=================
 	return socket.on('close_messenger', (callback) => {
 		callback({
 			serverMessage: `The messenger has been DISCONNECTED from socket: ${socket.id}`,

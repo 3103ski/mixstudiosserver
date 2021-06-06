@@ -1,9 +1,6 @@
 const express = require('express');
-// const multer = require('multer');
-// const deleteWithFSFromRoot = require('../../fs');
 const auth = require('../../authenticate');
 const cors = require('../cors');
-// const corsTwo = require('cors');
 const PortfolioEntry = require('../../models/portfolios/portfolioEntries');
 
 const AWS = require('aws-sdk');
@@ -91,7 +88,6 @@ portfolioEntryRouter
 							}
 						);
 					} else {
-						console.log('Sending this SINGLE SONG payload: ', payload);
 						return PortfolioEntry.create(payload);
 					}
 				})
@@ -136,13 +132,11 @@ portfolioEntryRouter
 							.then((s3Res) => {
 								PortfolioEntry.findByIdAndDelete(entryId)
 									.then((deleteResponse) => {
-										console.log('SUCCEEEDED with thissss: ', deleteResponse);
 										res.status = 200;
 										res.setHeader('Content-Type', 'application/json');
 										res.json(deleteResponse);
 									})
 									.catch((err) => {
-										console.log('failed with thissss: ', err);
 										next(err);
 									});
 							})
@@ -153,13 +147,11 @@ portfolioEntryRouter
 							.then((s3Res) => {
 								PortfolioEntry.findByIdAndDelete(entryId)
 									.then((deleteResponse) => {
-										console.log('SUCCEEEDED with thissss: ', deleteResponse);
 										res.status = 200;
 										res.setHeader('Content-Type', 'application/json');
 										res.json(deleteResponse);
 									})
 									.catch((err) => {
-										console.log('failed with thissss: ', err);
 										next(err);
 									});
 							})
