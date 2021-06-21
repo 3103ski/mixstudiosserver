@@ -30,7 +30,6 @@ studioMusicianProfileRouter
 				} else {
 					const newprofile = req.body.profile;
 					newprofile.userId = req.user._id;
-					console.log('+++++HERE', newprofile);
 					const instruments = req.body.instruments;
 					for (let i = 0; i < instruments.length; i++) {
 						InstrumentProfile.create(instruments[i])

@@ -19,6 +19,9 @@ const servicesPricingRouter = require('./routes/servicePricingProfilesRouter/ser
 const bugReportRouter = require('./routes/utilityFormsRouter/bugReportRouter');
 const updateReportRouter = require('./routes/utilityFormsRouter/updateReportRouter');
 
+const activityRouter = require('./routes/feedsRoutes/activityFeedRouter');
+const studioFeedRouter = require('./routes/feedsRoutes/studioFeedRouter');
+
 // Connecting Database
 const mongoose = require('mongoose');
 
@@ -60,6 +63,9 @@ app.get('/', cors.cors, (req, res) => {
 	res.setHeader('Content-Type', 'text/html');
 	res.sendFile(express.static(path.join(__dirname, 'views/index.html')));
 });
+
+app.use('/activity', activityRouter);
+app.use('/studio-feed', studioFeedRouter);
 
 app.use('/users', userProfileRouter);
 app.use('/sounds-like', soundsLikeObjectsRouter);

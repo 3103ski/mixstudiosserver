@@ -39,6 +39,10 @@ const userProfileSchema = new Schema(
 			},
 		},
 		styleInfo: {
+			soundsLike: {
+				type: Array,
+				default: [],
+			},
 			music: {
 				confidentGenres: {
 					type: Array,

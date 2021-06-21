@@ -147,7 +147,6 @@ serviceProfilesRouter
 			})
 			.then((profiles) => {
 				if (profiles[0]) {
-					console.log('yes it is in');
 					let foundSongwriterProfile = profiles[0];
 					SongwriterPricingProfile.find({
 						songwriterServiceProfileId: foundSongwriterProfile._id,

@@ -110,7 +110,6 @@ songwriterPricingRouter
 			{ new: true }
 		)
 			.then((profile) => {
-				console.log('server sending this updated file back: ', profile);
 				res.statusCode = 200;
 				res.setHeader('Content-Type', 'application/json');
 				res.json(profile);

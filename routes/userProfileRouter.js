@@ -38,8 +38,6 @@ userProfileRouter
 	.route('/')
 	.options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
 	.get(cors.cors, (req, res, next) => {
-		console.log('Applied browse filters', req.query.filters);
-
 		const filters = req.query.filters !== undefined ? JSON.parse(req.query.filters) : null;
 		UserProfile.find(filters)
 			.then((profiles) => {
@@ -49,7 +47,6 @@ userProfileRouter
 				const endIndex =
 					startIndex + limit < profiles.length - 1 ? profiles.length : startIndex + limit;
 				const returnList = profiles.slice(startIndex, startIndex + limit);
-				console.log('I return', returnList);
 				res.statusCode = 200;
 				res.setHeader('Content-Header', 'application/json');
 				res.json({
@@ -85,9 +82,7 @@ userProfileRouter
 			new UserProfile({ username: req.body.username, userInfo: req.body.userInfo }),
 			req.body.password,
 			(err, user) => {
-				console.log('in there');
 				if (err) {
-					console.log('it broke early: ', err);
 					res.statusCode = 500;
 					res.setHeader('Content-Type', 'application/json');
 					res.json({ err: err });
@@ -246,7 +241,6 @@ userProfileRouter
 	.options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
 	.get(cors.corsWithOptions, passport.authenticate('google-token'), (req, res) => {
 		const token = auth.getToken({ _id: req.user._id });
-		console.log('Ready to send back this user: ', req.user);
 		res.statusCode = 200;
 		res.setHeader('Content-Type', 'application/json');
 		res.json({
@@ -315,7 +309,7 @@ userProfileRouter
 							soundsLike: soundsLikeNames,
 						};
 						// userProfile.save();
-						console.log(returnProfile);
+						// console.log(returnProfile);
 						res.statusCode = 200;
 						res.setHeader('Content-Type', 'application/json');
 						res.json(returnProfile);

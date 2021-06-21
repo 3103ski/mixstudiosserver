@@ -54,7 +54,6 @@ singerPricingRouter
 	.get(cors.cors, (req, res, next) => {
 		SingerPricingProfile.find({ userId: req.params.userId })
 			.then((profiles) => {
-				console.log('The server is printing these: ', profiles);
 				res.statusCode = 200;
 				res.setHeader('Content-Type', 'application/json');
 				res.json(profiles);

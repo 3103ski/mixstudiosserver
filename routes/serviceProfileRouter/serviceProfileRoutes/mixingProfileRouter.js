@@ -52,14 +52,12 @@ mixingProfileRouter
 		MixingProfile.find({ userId: req.user._id })
 			.then((profiles) => {
 				if (profiles[0]) {
-					console.log('wants to add this', req.body);
 					MixingProfile.findByIdAndUpdate(
 						profiles[0]._id,
 						{ $set: req.body },
 						{ new: true }
 					)
 						.then((response) => {
-							console.log('we updated and I got this', response);
 							res.statusCode = 200;
 							res.setHeader('Content-Type', 'application/json');
 							res.json(response);
