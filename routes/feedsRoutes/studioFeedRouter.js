@@ -42,10 +42,26 @@ studioFeedPostRouter
 	});
 
 studioFeedPostRouter
+	.route('/dashboard-feed')
+	.options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
+	.get(cors.corsWithOptions, auth.verifyUser, (req, res, next) => {
+		StudioFeedPost.find({ userId: { $in: [...req.user.following, req.user._id] } })
+			.then((posts) => {
+				if (posts) {
+					console.log('Found these: ', posts);
+
+					res.statusCode = 200;
+					res.setHeader('Content-Type', 'application/json');
+					res.json(posts);
+				}
+			})
+			.catch((error) => next(error));
+	});
+
+studioFeedPostRouter
 	.route('/:userId')
 	.options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
 	.get(cors.cors, (req, res, next) => {
-		console.log('got this id', req.params.userId);
 		StudioFeedPost.find({ userId: req.params.userId })
 			.then((posts) => {
 				res.statusCode = 200;

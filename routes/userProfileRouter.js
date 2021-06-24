@@ -291,6 +291,73 @@ userProfileRouter
 	});
 
 userProfileRouter
+	.route('/follow-user')
+	.options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
+	.post(cors.corsWithOptions, auth.verifyUser, (req, res, next) => {
+		console.log(req.user._id.toString(), ' will START following: ', req.body.idToFollow);
+
+		UserProfile.findOne({ _id: req.user._id.toString() })
+			.then((user) => {
+				console.log('we found the user: ', user);
+				if (req.body.idToFollow) {
+					user.following.push(req.body.idToFollow);
+					user.save();
+
+					console.log('We should be sending this back: ', user.following);
+
+					res.statusCode = 200;
+					res.setHeader('Content-Type', 'application/json');
+					res.json(user.following);
+				} else {
+					res.statusCode = 500;
+					res.setHeader('Content-Type', 'application/json');
+					res.json({ errorMsg: 'Server not given any id to follow.' });
+				}
+			})
+			.catch((error) => {
+				console.log('Our INTERNAL server error: ', error);
+				next(error);
+			});
+	});
+
+userProfileRouter
+	.route('/unfollow-user')
+	.options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
+	.post(cors.corsWithOptions, auth.verifyUser, (req, res, next) => {
+		console.log('SERVER HEARD TO FOLLOW FOR ', req.user._id);
+		UserProfile.findOne({ _id: req.user._id })
+			.then((user) => {
+				if (user && req.body.idToFollow) {
+					let updatedFollowing = user.following
+						.map((id) => {
+							console.log('comparing ', id, ' to ', req.body.idToFollow);
+							if (id === req.body.idToFollow) {
+								console.log('MATCH');
+								return null;
+							} else {
+								console.log('KEEP IT');
+								return id;
+							}
+						})
+						.filter((id) => id !== null);
+					user.following = updatedFollowing;
+					user.save();
+
+					console.log('this should be the updated user following: ', user.following);
+
+					res.statusCode = 200;
+					res.setHeader('Content-Type', 'application/json');
+					res.json(user.following);
+				} else {
+					res.statusCode = 500;
+					res.setHeader('Content-Type', 'application/json');
+					res.json({ errorMsg: 'Server not given any id to stop following.' });
+				}
+			})
+			.catch((error) => next(error));
+	});
+
+userProfileRouter
 	.route('/:userId')
 	.options(cors.corsWithOptions, (req, res, next) => res.sendStatus(200))
 	.get(cors.cors, (req, res, next) => {

@@ -6,6 +6,7 @@ const studioFeedPostSchema = new Schema(
 	{
 		postType: { type: String, required: true },
 		threadId: { type: String },
+		displayName: {},
 		likes: [{ type: Schema.Types.ObjectId, ref: 'Like' }],
 		images: { type: Array },
 		portfolioItem: { type: Schema.Types.ObjectId, ref: 'PortfolioEntryObject' },
