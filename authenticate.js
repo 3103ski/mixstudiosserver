@@ -7,6 +7,7 @@ const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const JwtStrategy = require('passport-jwt').Strategy;
 const ExtractJwt = require('passport-jwt').ExtractJwt;
+
 const FacebookTokenStrategy = require('passport-facebook-token');
 const GoogleTokenStrategy = require('passport-token-google2').Strategy;
 
@@ -35,16 +36,18 @@ const uploadAvatar = (buffer, name, type) => {
 const User = require('./models/users/userProfile');
 const config = require('./config.js');
 
-exports.local = passport.use(new LocalStrategy(User.authenticate()));
+exports.local = passport.use(new LocalStrategy({ usernameField: 'email' }, User.authenticate()));
 
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
 exports.getToken = (user) => {
+	console.log('Get TOKEN: ', user);
 	return jwt.sign(user, config.secretKey, { expiresIn: 10800 });
 };
 
 const opts = {};
+
 opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
 opts.secretOrKey = config.secretKey;
 
@@ -53,6 +56,7 @@ exports.jwtPassport = passport.use(
 	new JwtStrategy(opts, (jwt_payload, done) => {
 		User.findOne({ _id: jwt_payload._id }, (err, user) => {
 			if (err) {
+				console.log('Some error in the jwtPassport');
 				return done(err, false);
 			} else if (user) {
 				let newLastLogin = Date.now();
@@ -80,11 +84,15 @@ exports.googleStrategy = passport.use(
 				if (!err && user) {
 					return done(null, user);
 				} else {
-					user = new User({ username: profile.displayName });
+					user = new User({
+						email: profile.emails[0].value,
+						userInfo: { displayName: profile.displayName },
+					});
+
 					user.googleId = profile.id;
+
 					user.userInfo.firstName = profile.name.givenName;
 					user.userInfo.lastName = profile.name.familyName;
-					user.userInfo.email = profile.emails[0].value;
 
 					if (profile._json.picture) {
 						const avatarUrl = profile._json.picture;
@@ -98,8 +106,13 @@ exports.googleStrategy = passport.use(
 
 								user.save((err) => {
 									if (err) {
+										console.log(
+											'We are getting an error on saving this user: ',
+											err
+										);
 										return done(err, false);
 									} else {
+										console.log('We are sending back a saved user: ', user);
 										return done(null, user);
 									}
 								});
@@ -135,12 +148,17 @@ exports.facebookPassport = passport.use(
 				if (!err && user) {
 					return done(null, user);
 				} else {
-					user = new User({ username: profile.displayName });
+					user = new User({
+						email: profile.emails[0].value,
+						userInfo: { displayName: profile.displayName },
+					});
 
 					user.facebookId = profile.id;
+					// user.displayName = profile.displayName;
+
 					user.userInfo.firstName = profile.name.givenName;
 					user.userInfo.lastName = profile.name.familyName;
-					user.userInfo.email = profile.emails[0].value;
+					// user.userInfo.email = profile.emails[0].value;
 
 					if (profile.photos[0] && profile.photos[0].value) {
 						const avatarUrl = profile.photos[0].value;

@@ -1,7 +1,8 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-require('mongoose-type-email');
 const passportLocalMongoose = require('passport-local-mongoose');
+
+require('mongoose-type-email');
 
 const falseDefaultBoolean = {
 	type: Boolean,
@@ -11,10 +12,6 @@ const falseDefaultBoolean = {
 const userProfileSchema = new Schema(
 	{
 		userInfo: {
-			email: {
-				type: mongoose.SchemaTypes.Email,
-				required: true,
-			},
 			languages: {
 				type: Array,
 				default: ['English'],
@@ -30,6 +27,7 @@ const userProfileSchema = new Schema(
 				type: String,
 				required: true,
 			},
+			displayName: { type: String, required: true },
 			location: {
 				type: String,
 			},
@@ -126,6 +124,7 @@ const userProfileSchema = new Schema(
 			songwriter: falseDefaultBoolean,
 			studioMusician: falseDefaultBoolean,
 		},
+
 		isAdmin: {
 			type: Boolean,
 			default: false,
@@ -159,6 +158,6 @@ const userProfileSchema = new Schema(
 	}
 );
 
-userProfileSchema.plugin(passportLocalMongoose);
+userProfileSchema.plugin(passportLocalMongoose, { usernameField: 'email' });
 
 module.exports = mongoose.model('UserProfile', userProfileSchema);

@@ -79,22 +79,31 @@ userProfileRouter
 	.options(cors.cors, (req, res) => res.sendStatus(200))
 	.post(cors.cors, (req, res, next) => {
 		UserProfile.register(
-			new UserProfile({ username: req.body.username, userInfo: req.body.userInfo }),
+			new UserProfile({
+				email: req.body.email,
+				userInfo: req.body.userInfo,
+				displayName: req.body.displayName,
+			}),
 			req.body.password,
 			(err, user) => {
+				console.log('we got this user: ', user);
 				if (err) {
+					console.log('What is the error:: ', err);
 					res.statusCode = 500;
 					res.setHeader('Content-Type', 'application/json');
 					res.json({ err: err });
 				} else {
 					user.save((err) => {
+						console.log('Some kind of error: ', err);
 						if (err) {
 							res.statusCode = 500;
 							res.setHeader('Content-Type', 'application/json');
 							res.json({ err: err });
 							return;
 						}
+						console.log('About to hit passport');
 						passport.authenticate('local')(req, res, () => {
+							console.log('Registrations!!');
 							res.statusCode = 200;
 							res.setHeader('Content-Type', 'application/json');
 							res.json({
@@ -144,13 +153,18 @@ userProfileRouter
 								user: user,
 							});
 						} else {
-							let user = new UserProfile({ username: profile.display_name });
+							let user = new UserProfile({
+								email: profile.email,
+								userInfo: { displayName: profile.display_name },
+							});
+
 							const name = profile.display_name.split(' ');
 
 							user.spotifyId = profile.id;
+							// user.displayName = profile.display_name;
+
 							user.userInfo.firstName = name[0] ? name[0] : `${profile.display_name}`;
 							user.userInfo.lastName = name[1] ? name[1] : '';
-							user.userInfo.email = profile.email;
 
 							if (profile.images[0] && profile.images[0].url) {
 								const avatarUrl = profile.images[0].url;
