@@ -12,6 +12,7 @@ const threadSocketEvents = (threadTitle, socket, io, callback) => {
 
 	// Join Soicket IO Room for comment thread
 	socket.join(threadTitle);
+	console.log(socket.rooms);
 
 	// Handle new comments
 	socket.on('post_comment', ({ threadTitle, commentPayload }, callback) => {

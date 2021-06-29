@@ -76,14 +76,13 @@ avatarUploadRouter
 											user.save();
 											res.statusCode = 200;
 											res.setHeader('Content-Type', 'application/json');
-											res.json(user.userInfo);
+											res.json(user.info);
 										})
 										.catch((err) => {
 											next(err);
 										});
 								})
 								.catch((err) => {
-									console.log('ERROR WHERE WE GUESSED::: ', err);
 									res.statusCode = 500;
 									res.setHeader('Content-Type', 'application/json');
 									res.json(err);
@@ -92,7 +91,6 @@ avatarUploadRouter
 					}
 				})
 				.catch((err) => {
-					console.log('ERROR WHERE WE GUESSED 2::: ', err);
 					if (err && err.statusCode === 404) {
 						uploadAvatar(buffer, req.user._id.toString(), type)
 							.then((s3Res) => {

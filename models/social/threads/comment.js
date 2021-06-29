@@ -11,6 +11,9 @@ const commentSchema = new Schema(
 		avatar: {
 			type: String,
 		},
+		threadTitle: {
+			type: String,
+		},
 		userId: {
 			type: Schema.Types.ObjectId,
 			ref: 'UserProfile',

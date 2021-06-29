@@ -7,6 +7,7 @@ const ObjectId = mongoose.Types.ObjectId;
 const openThread = ({ threadTitle }, callback) => {
 	Thread.findOne({ threadTitle: threadTitle })
 		.then((thread) => {
+			// console.log(`I looked for ${threadTitle} and found::`, thread);
 			if (thread) {
 				callback({ thread });
 			} else {
@@ -32,6 +33,8 @@ const postComment = (
 	{ threadTitle, commentPayload: { comment, userId, avatar, author } },
 	callback
 ) => {
+	console.log('This comment:::', comment);
+	console.log('This thread title:::', threadTitle);
 	return Thread.findOne({ threadTitle: threadTitle })
 		.then((thread) => {
 			if (thread) {
@@ -44,6 +47,7 @@ const postComment = (
 					userId,
 					avatar,
 					author,
+					threadTitle,
 				})
 					.then((comment) => {
 						thread.comments.push(comment._id);
@@ -66,6 +70,7 @@ const postComment = (
 							userId,
 							avatar,
 							author,
+							threadTitle,
 						})
 							.then((comment) => {
 								thread.comments.push(comment._id);
@@ -95,6 +100,7 @@ const replyToComment = (
 				comment,
 				userId,
 				avatar,
+				threadTitle,
 				author,
 			})
 				.then((comment) => {
