@@ -29,7 +29,6 @@ singerPricingRouter
 				res.json(profile);
 			})
 			.catch((err) => {
-				console.log(err);
 				next(err);
 			});
 	})

@@ -12,7 +12,6 @@ activityFeedPostRouter
 	.route('/')
 	.options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
 	.post(cors.corsWithOptions, auth.verifyUser, (req, res, next) => {
-		console.log('Server got the activityPost: ', req.body);
 		ActivityPost.create(req.body)
 			.then((newPost) => {
 				ActivityPost.findOne({ _id: newPost._id })

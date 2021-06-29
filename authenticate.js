@@ -42,7 +42,6 @@ passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
 exports.getToken = (user) => {
-	console.log('Get TOKEN: ', user);
 	return jwt.sign(user, config.secretKey, { expiresIn: 10800 });
 };
 
@@ -56,7 +55,6 @@ exports.jwtPassport = passport.use(
 	new JwtStrategy(opts, (jwt_payload, done) => {
 		User.findOne({ _id: jwt_payload._id }, (err, user) => {
 			if (err) {
-				console.log('Some error in the jwtPassport');
 				return done(err, false);
 			} else if (user) {
 				let newLastLogin = Date.now();
@@ -86,13 +84,13 @@ exports.googleStrategy = passport.use(
 				} else {
 					user = new User({
 						email: profile.emails[0].value,
-						userInfo: { displayName: profile.displayName },
+						info: { displayName: profile.displayName },
 					});
 
 					user.googleId = profile.id;
 
-					user.userInfo.firstName = profile.name.givenName;
-					user.userInfo.lastName = profile.name.familyName;
+					user.info.firstName = profile.name.givenName;
+					user.info.lastName = profile.name.familyName;
 
 					if (profile._json.picture) {
 						const avatarUrl = profile._json.picture;
@@ -102,7 +100,7 @@ exports.googleStrategy = passport.use(
 
 						uploadAvatar(avatarBuffer, user._id.toString(), type)
 							.then((s3Res) => {
-								user.userInfo.avatar = s3Res.Location;
+								user.info.avatar = s3Res.Location;
 
 								user.save((err) => {
 									if (err) {
@@ -112,7 +110,6 @@ exports.googleStrategy = passport.use(
 										);
 										return done(err, false);
 									} else {
-										console.log('We are sending back a saved user: ', user);
 										return done(null, user);
 									}
 								});
@@ -150,15 +147,15 @@ exports.facebookPassport = passport.use(
 				} else {
 					user = new User({
 						email: profile.emails[0].value,
-						userInfo: { displayName: profile.displayName },
+						info: { displayName: profile.displayName },
 					});
 
 					user.facebookId = profile.id;
 					// user.displayName = profile.displayName;
 
-					user.userInfo.firstName = profile.name.givenName;
-					user.userInfo.lastName = profile.name.familyName;
-					// user.userInfo.email = profile.emails[0].value;
+					user.info.firstName = profile.name.givenName;
+					user.info.lastName = profile.name.familyName;
+					// user.info.email = profile.emails[0].value;
 
 					if (profile.photos[0] && profile.photos[0].value) {
 						const avatarUrl = profile.photos[0].value;
@@ -167,7 +164,7 @@ exports.facebookPassport = passport.use(
 						const type = await FileType.fromBuffer(avatarBuffer);
 						uploadAvatar(avatarBuffer, user._id.toString(), type)
 							.then((s3Res) => {
-								user.userInfo.avatar = s3Res.Location;
+								user.info.avatar = s3Res.Location;
 								user.save((err) => {
 									if (err) {
 										return done(err, false);

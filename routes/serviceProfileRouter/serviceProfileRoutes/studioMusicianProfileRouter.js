@@ -1,6 +1,5 @@
 const express = require('express');
 const StudioMusicianProfile = require('../../../models/serviceProfiles/studioMusicianServiceProfile');
-const InstrumentProfile = require('../../../models/serviceProfiles/instrumentProfile');
 const cors = require('../../cors');
 const auth = require('../../../authenticate');
 
@@ -28,18 +27,7 @@ studioMusicianProfileRouter
 						`User ${req.body.userId} already has a studio musician service profile`
 					);
 				} else {
-					const newprofile = req.body.profile;
-					newprofile.userId = req.user._id;
-					const instruments = req.body.instruments;
-					for (let i = 0; i < instruments.length; i++) {
-						InstrumentProfile.create(instruments[i])
-							.then((instrument) => {
-								instrument.userId = req.user._id;
-								instrument.save();
-							})
-							.catch((err) => next(err));
-					}
-					return StudioMusicianProfile.create(newprofile);
+					return StudioMusicianProfile.create(req.body.profile);
 				}
 			})
 			.then((studioMusicianProfile) => {
@@ -68,12 +56,9 @@ studioMusicianProfileRouter
 						{ new: true }
 					)
 						.then((updatedProfile) => {
-							InstrumentProfile.find({ userId: req.user._id }).then((instruments) => {
-								updatedProfile.instruments = instruments;
-								res.statusCode = 200;
-								res.setHeader('Content-Type', 'application/json');
-								res.json(updatedProfile);
-							});
+							res.statusCode = 200;
+							res.setHeader('Content-Type', 'application/json');
+							res.json(updatedProfile);
 						})
 						.catch((err) => next(err));
 				} else {

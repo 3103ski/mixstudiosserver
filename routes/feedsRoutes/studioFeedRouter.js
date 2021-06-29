@@ -14,7 +14,6 @@ studioFeedPostRouter
 	.route('/')
 	.options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
 	.post(cors.corsWithOptions, auth.verifyUser, (req, res, next) => {
-		console.log('We got this feed post: ', req.body);
 		StudioFeedPost.create(req.body)
 			.then((newPost) => {
 				StudioFeedPost.findOne({ _id: newPost._id })
@@ -48,8 +47,6 @@ studioFeedPostRouter
 		StudioFeedPost.find({ userId: { $in: [...req.user.following, req.user._id] } })
 			.then((posts) => {
 				if (posts) {
-					console.log('Found these: ', posts);
-
 					res.statusCode = 200;
 					res.setHeader('Content-Type', 'application/json');
 					res.json(posts);
@@ -77,7 +74,6 @@ studioFeedPostRouter
 	.post(cors.corsWithOptions, auth.verifyUser, (req, res, next) => {
 		StudioFeedPost.findOne({ _id: req.params.postId })
 			.then((post) => {
-				console.log('Heard the like on the server');
 				Like.create({ userId: req.user._id })
 					.then((newLike) => {
 						post.likes.push(newLike._id);
@@ -112,7 +108,6 @@ studioFeedPostRouter
 				post.save();
 				return Like.deleteOne({ _id: likeId })
 					.then((res) => {
-						console.log(res);
 						res.statusCode = 200;
 						res.setHeader('Content-Type', 'application/json');
 						res.json({ updatedPost: post });

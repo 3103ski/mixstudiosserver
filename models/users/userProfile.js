@@ -11,7 +11,7 @@ const falseDefaultBoolean = {
 
 const userProfileSchema = new Schema(
 	{
-		userInfo: {
+		info: {
 			languages: {
 				type: Array,
 				default: ['English'],
@@ -41,6 +41,8 @@ const userProfileSchema = new Schema(
 				type: Array,
 				default: [],
 			},
+			gear: { type: Array, default: [] },
+			instruments: { type: Array, default: [] },
 			music: {
 				confidentGenres: {
 					type: Array,
@@ -53,62 +55,6 @@ const userProfileSchema = new Schema(
 				unwillingGenres: {
 					type: Array,
 					default: [],
-				},
-			},
-			tv: {
-				doesOffer: {
-					type: Boolean,
-					default: false,
-				},
-				tvType: {
-					tvAndFilm: {
-						type: Boolean,
-						default: false,
-					},
-					commercials: {
-						type: Boolean,
-						default: false,
-					},
-					theater: {
-						type: Boolean,
-						default: false,
-					},
-				},
-				tvGenres: {
-					confidentGenres: {
-						type: Array,
-						default: [],
-					},
-					lessExperiencedGenres: {
-						type: Array,
-						default: [],
-					},
-				},
-				tvMusic: {
-					doesOffer: {
-						type: Boolean,
-						default: false,
-					},
-					confidentGenres: {
-						type: Array,
-						default: [],
-					},
-					lessConfidentGenres: {
-						type: Array,
-						default: [],
-					},
-					unwillingGenres: {
-						type: Array,
-						default: [],
-					},
-					moods: {
-						type: Array,
-						default: [],
-					},
-					scenes: {
-						type: Array,
-						default: [],
-					},
 				},
 			},
 		},

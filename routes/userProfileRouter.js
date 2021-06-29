@@ -8,7 +8,7 @@ const fetch = require('node-fetch');
 const AWS = require('aws-sdk');
 const FileType = require('file-type');
 
-const SoundsLikeObject = require('../models/users/soundsLikeObject');
+// const SoundsLikeObject = require('../models/users/soundsLikeObject');
 const UserProfile = require('../models/users/userProfile');
 
 const userProfileRouter = express.Router();
@@ -81,29 +81,25 @@ userProfileRouter
 		UserProfile.register(
 			new UserProfile({
 				email: req.body.email,
-				userInfo: req.body.userInfo,
+				info: req.body.info,
 				displayName: req.body.displayName,
 			}),
 			req.body.password,
 			(err, user) => {
-				console.log('we got this user: ', user);
 				if (err) {
-					console.log('What is the error:: ', err);
 					res.statusCode = 500;
 					res.setHeader('Content-Type', 'application/json');
 					res.json({ err: err });
 				} else {
 					user.save((err) => {
-						console.log('Some kind of error: ', err);
 						if (err) {
 							res.statusCode = 500;
 							res.setHeader('Content-Type', 'application/json');
 							res.json({ err: err });
 							return;
 						}
-						console.log('About to hit passport');
+
 						passport.authenticate('local')(req, res, () => {
-							console.log('Registrations!!');
 							res.statusCode = 200;
 							res.setHeader('Content-Type', 'application/json');
 							res.json({
@@ -155,16 +151,15 @@ userProfileRouter
 						} else {
 							let user = new UserProfile({
 								email: profile.email,
-								userInfo: { displayName: profile.display_name },
+								info: { displayName: profile.display_name },
 							});
 
 							const name = profile.display_name.split(' ');
 
 							user.spotifyId = profile.id;
-							// user.displayName = profile.display_name;
 
-							user.userInfo.firstName = name[0] ? name[0] : `${profile.display_name}`;
-							user.userInfo.lastName = name[1] ? name[1] : '';
+							user.info.firstName = name[0] ? name[0] : `${profile.display_name}`;
+							user.info.lastName = name[1] ? name[1] : '';
 
 							if (profile.images[0] && profile.images[0].url) {
 								const avatarUrl = profile.images[0].url;
@@ -173,7 +168,7 @@ userProfileRouter
 								const type = await FileType.fromBuffer(avatarBuffer);
 								uploadAvatar(avatarBuffer, user._id.toString(), type)
 									.then((s3Res) => {
-										user.userInfo.avatar = s3Res.Location;
+										user.info.avatar = s3Res.Location;
 										user.save((err) => {
 											if (err) {
 												res.statusCode = 409;
@@ -277,8 +272,6 @@ userProfileRouter.post('/login', cors.cors, passport.authenticate('local'), (req
 	});
 });
 
-// 'fetch-user' endpoint used by front-end to easily grab data of the currently authenticated user. '/:userId' endpoint is for any
-// account or instance of the app to get info on any user; given they have the permissions
 userProfileRouter
 	.route('/fetch-user')
 	.options(cors.corsWithOptions, (req, res, next) => res.sendStatus(200))
@@ -308,16 +301,11 @@ userProfileRouter
 	.route('/follow-user')
 	.options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
 	.post(cors.corsWithOptions, auth.verifyUser, (req, res, next) => {
-		console.log(req.user._id.toString(), ' will START following: ', req.body.idToFollow);
-
 		UserProfile.findOne({ _id: req.user._id.toString() })
 			.then((user) => {
-				console.log('we found the user: ', user);
 				if (req.body.idToFollow) {
 					user.following.push(req.body.idToFollow);
 					user.save();
-
-					console.log('We should be sending this back: ', user.following);
 
 					res.statusCode = 200;
 					res.setHeader('Content-Type', 'application/json');
@@ -329,7 +317,6 @@ userProfileRouter
 				}
 			})
 			.catch((error) => {
-				console.log('Our INTERNAL server error: ', error);
 				next(error);
 			});
 	});
@@ -338,26 +325,20 @@ userProfileRouter
 	.route('/unfollow-user')
 	.options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
 	.post(cors.corsWithOptions, auth.verifyUser, (req, res, next) => {
-		console.log('SERVER HEARD TO FOLLOW FOR ', req.user._id);
 		UserProfile.findOne({ _id: req.user._id })
 			.then((user) => {
 				if (user && req.body.idToFollow) {
 					let updatedFollowing = user.following
 						.map((id) => {
-							console.log('comparing ', id, ' to ', req.body.idToFollow);
 							if (id === req.body.idToFollow) {
-								console.log('MATCH');
 								return null;
 							} else {
-								console.log('KEEP IT');
 								return id;
 							}
 						})
 						.filter((id) => id !== null);
 					user.following = updatedFollowing;
 					user.save();
-
-					console.log('this should be the updated user following: ', user.following);
 
 					res.statusCode = 200;
 					res.setHeader('Content-Type', 'application/json');
@@ -377,27 +358,12 @@ userProfileRouter
 	.get(cors.cors, (req, res, next) => {
 		const userId = req.params.userId;
 		UserProfile.findById(userId)
-			.then((userProfile) => {
-				// SLOs here is just listing names as strings in an array for UI usage.
-				// For details on one or a group of SLOs, you shoulds make a seperate call to the db and not
-				// depend on '[profile].styleInfo.soundsLike' for other SLO info.
-				SoundsLikeObject.find({ userId: userId })
-					.then((SLOs) => {
-						const soundsLikeNames = SLOs.map((slo) => slo.title);
-						userProfile.soundsLike = soundsLikeNames;
-						const returnProfile = {
-							...userProfile._doc,
-							soundsLike: soundsLikeNames,
-						};
-						// userProfile.save();
-						// console.log(returnProfile);
-						res.statusCode = 200;
-						res.setHeader('Content-Type', 'application/json');
-						res.json(returnProfile);
-					})
-					.catch((err) => next(err));
+			.then((profile) => {
+				res.statusCode = 200;
+				res.setHeader('Content-Type', 'application/json');
+				res.json(profile);
 			})
-			.catch((err) => next(err));
+			.catch((error) => next(error));
 	})
 	.put(cors.corsWithOptions, auth.verifyUser, (req, res, next) => {
 		if (req.user._id.toString() === req.params.userId) {

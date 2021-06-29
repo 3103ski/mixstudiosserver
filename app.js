@@ -11,9 +11,9 @@ const cors = require('./routes/cors.js');
 const portfolioRouter = require('./routes/s3Storage/portfolioEntries');
 const avatarUploadRouter = require('./routes/s3Storage/userAvatars');
 const userProfileRouter = require('./routes/userProfileRouter');
-const soundsLikeObjectsRouter = require('./routes/soundsLikeObjectsRouter');
+
 const serviceProfilesRouter = require('./routes/serviceProfileRouter/serviceProfilesRouter');
-const instrumentProfilesRouter = require('./routes/instrumentsRouter/instrumentRouter');
+
 const servicesPricingRouter = require('./routes/servicePricingProfilesRouter/servicePricingProfilesRouter');
 
 const bugReportRouter = require('./routes/utilityFormsRouter/bugReportRouter');
@@ -68,10 +68,8 @@ app.use('/activity', activityRouter);
 app.use('/studio-feed', studioFeedRouter);
 
 app.use('/users', userProfileRouter);
-app.use('/sounds-like', soundsLikeObjectsRouter);
 app.use('/service-profiles', serviceProfilesRouter);
 app.use('/service-pricing', servicesPricingRouter);
-app.use('/instruments', instrumentProfilesRouter);
 
 app.use('/portfolio', portfolioRouter);
 app.use('/bug-reports', bugReportRouter);
@@ -83,7 +81,6 @@ app.use('/avatars', avatarUploadRouter);
 app.use(function (req, res, next) {
 	next(createError(404));
 });
-
 // error handler
 app.use(function (err, req, res, next) {
 	// set locals, only providing error in development

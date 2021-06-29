@@ -16,7 +16,6 @@ const openThread = ({ threadTitle }, callback) => {
 			}
 		})
 		.catch((err) => {
-			console.log('This is the area with the like populate on: ', err);
 			callback({ error: err });
 		});
 };

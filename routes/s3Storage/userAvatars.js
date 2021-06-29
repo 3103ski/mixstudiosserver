@@ -72,15 +72,18 @@ avatarUploadRouter
 								.then((s3Res) => {
 									User.findById(req.user._id)
 										.then((user) => {
-											user.userInfo.avatar = s3Res.Location;
+											user.info.avatar = s3Res.Location;
 											user.save();
 											res.statusCode = 200;
 											res.setHeader('Content-Type', 'application/json');
 											res.json(user.userInfo);
 										})
-										.catch((err) => next(err));
+										.catch((err) => {
+											next(err);
+										});
 								})
 								.catch((err) => {
+									console.log('ERROR WHERE WE GUESSED::: ', err);
 									res.statusCode = 500;
 									res.setHeader('Content-Type', 'application/json');
 									res.json(err);
@@ -89,6 +92,7 @@ avatarUploadRouter
 					}
 				})
 				.catch((err) => {
+					console.log('ERROR WHERE WE GUESSED 2::: ', err);
 					if (err && err.statusCode === 404) {
 						uploadAvatar(buffer, req.user._id.toString(), type)
 							.then((s3Res) => {
@@ -108,8 +112,6 @@ avatarUploadRouter
 								res.setHeader('Content-Type', 'application/json');
 								res.json(err);
 							});
-					} else {
-						console.log('we got an error searching for the avatar: ', err);
 					}
 				});
 		});

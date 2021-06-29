@@ -6,7 +6,6 @@
 // 			fs.unlinkSync('./public' + path + fileName);
 // 			return true;
 // 		} catch (err) {
-// 			console.log('DIDNOTWORK!!', err);
 // 			return false;
 // 		}
 // 	}

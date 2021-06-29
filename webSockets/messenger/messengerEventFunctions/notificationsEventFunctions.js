@@ -38,7 +38,7 @@ const dismissConversationNotifications = ({ conversationId, userId }, callback) 
 					{ _id: notification._id },
 					{ $set: { statusArray: updatedStatusArray } }
 				).then(() => {
-					console.log('Update Successfull');
+					return null;
 				});
 			});
 		}

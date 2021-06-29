@@ -46,7 +46,6 @@ const threadSocketEvents = (threadTitle, socket, io, callback) => {
 				}
 			})
 			.catch((error) => {
-				console.log('THIS IS A PROBLEM', error);
 				return callback({ error });
 			});
 	});
