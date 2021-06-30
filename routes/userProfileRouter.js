@@ -38,15 +38,21 @@ userProfileRouter
 	.route('/')
 	.options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
 	.get(cors.cors, (req, res, next) => {
-		const filters = req.query.filters !== undefined ? JSON.parse(req.query.filters) : null;
+		let filters = req.query.filters !== undefined ? JSON.parse(req.query.filters) : null;
+
 		UserProfile.find(filters)
+			.collation({ locale: 'en', strength: 2 })
 			.then((profiles) => {
 				const page = req.query.page ? parseInt(req.query.page) : 1;
 				const limit = parseInt(req.query.limit) ? parseInt(req.query.limit) : 1;
 				const startIndex = page * limit;
+
+				console.log('THESE::: ', profiles);
+
 				const endIndex =
 					startIndex + limit < profiles.length - 1 ? profiles.length : startIndex + limit;
 				const returnList = profiles.slice(startIndex, startIndex + limit);
+
 				res.statusCode = 200;
 				res.setHeader('Content-Header', 'application/json');
 				res.json({
@@ -54,7 +60,10 @@ userProfileRouter
 					profileCount: profiles.length,
 				});
 			})
-			.catch((err) => next(err));
+			.catch((err) => {
+				console.log('What is the error: ', err);
+				next(err);
+			});
 	})
 	.delete(cors.corsWithOptions, auth.verifyUser, auth.verifyAdmin, (req, res, next) => {
 		UserProfile.deleteMany()

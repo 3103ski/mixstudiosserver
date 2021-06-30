@@ -14,7 +14,7 @@ const userProfileSchema = new Schema(
 		info: {
 			languages: {
 				type: Array,
-				default: ['English'],
+				default: ['english'],
 			},
 			bio: {
 				type: String,
