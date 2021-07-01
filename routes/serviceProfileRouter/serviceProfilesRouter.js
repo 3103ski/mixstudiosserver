@@ -73,6 +73,7 @@ serviceProfilesRouter
 	.route('/fetch-user-profiles')
 	.options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
 	.get(cors.cors, auth.verifyUser, (req, res, next) => {
+		console.log('Made it inside the fetch');
 		let allProfiles = {
 			singer: null,
 			mixing: null,
