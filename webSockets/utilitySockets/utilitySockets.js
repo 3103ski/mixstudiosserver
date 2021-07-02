@@ -1,4 +1,5 @@
 const Users = require('../../models/users/userProfile');
+const cities = require('all-the-cities');
 
 const utilitySocketEvents = (socket) => {
 	socket.on('search_sounds_like', ({ artist }, callback) => {
@@ -53,6 +54,44 @@ const utilitySocketEvents = (socket) => {
 
 			callback({ results: matches });
 		});
+	});
+	socket.on('search_locations', ({ location }, callback) => {
+		function makeReg(text) {
+			return new RegExp(`${text}`, 'i');
+		}
+		console.log('seraching: ', location);
+
+		Users.find({
+			$or: [{ 'info.locations': makeReg(location) }],
+		}).then((results) => {
+			const matches = [];
+			results.map((result) => {
+				result.info.locations.map(async (langRes) => {
+					if (
+						langRes.toLowerCase().includes(location.toLowerCase()) &&
+						!matches.includes(langRes.toLowerCase())
+					) {
+						await matches.push(langRes.toLowerCase());
+					}
+					return null;
+				});
+				return null;
+			});
+
+			callback({ results: matches });
+		});
+	});
+
+	socket.on('search_all_cities', ({ city }, callback) => {
+		function makeReg(text) {
+			return new RegExp(`${text}`, 'i');
+		}
+
+		let results = cities
+			.filter((resCity) => resCity.name.toLowerCase().match(city.toLowerCase()))
+			.map((el) => el.name);
+
+		callback({ results: [...new Set(results)] });
 	});
 
 	socket.on('search_genres', ({ genre }, callback) => {

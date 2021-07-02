@@ -28,8 +28,9 @@ const userProfileSchema = new Schema(
 				required: true,
 			},
 			displayName: { type: String, required: true },
-			location: {
-				type: String,
+			locations: {
+				type: Array,
+				default: [],
 			},
 			avatar: {
 				type: String,

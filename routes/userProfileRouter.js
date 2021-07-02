@@ -47,16 +47,12 @@ userProfileRouter
 				const limit = parseInt(req.query.limit) ? parseInt(req.query.limit) : 1;
 				const startIndex = page * limit;
 
-				console.log('THESE::: ', profiles);
-
-				const endIndex =
-					startIndex + limit < profiles.length - 1 ? profiles.length : startIndex + limit;
 				const returnList = profiles.slice(startIndex, startIndex + limit);
 
 				res.statusCode = 200;
 				res.setHeader('Content-Header', 'application/json');
 				res.json({
-					list: profiles,
+					list: returnList,
 					profileCount: profiles.length,
 				});
 			})
