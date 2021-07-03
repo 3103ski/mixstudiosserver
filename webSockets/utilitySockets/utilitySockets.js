@@ -14,7 +14,6 @@ const utilitySocketEvents = (socket) => {
 			results.map((result) => {
 				if (results.length > 0) {
 					result.styleInfo.soundsLike.map(async (sl) => {
-						console.log(sl);
 						if (
 							sl.toLowerCase().includes(artist.toLowerCase()) &&
 							!matches.includes(sl.toLowerCase())
@@ -40,6 +39,7 @@ const utilitySocketEvents = (socket) => {
 			$or: [{ 'info.languages': makeReg(language) }],
 		}).then((results) => {
 			const matches = [];
+
 			results.map((result) => {
 				result.info.languages.map(async (langRes) => {
 					console.log(langRes);
@@ -127,9 +127,6 @@ const utilitySocketEvents = (socket) => {
 						genreRes.toLowerCase().includes(genre.toLowerCase()) &&
 						!matches.includes(genreRes.toLowerCase())
 					) {
-						console.log('pushing: ', genreRes.toLowerCase());
-						console.log('to: ', matches);
-
 						await matches.push(genreRes.toLowerCase());
 					}
 					return null;
