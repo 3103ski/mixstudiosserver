@@ -91,6 +91,10 @@ const userProfileSchema = new Schema(
 			type: Array,
 			default: [],
 		},
+		reviews: {
+			type: Array,
+			default: [],
+		},
 		isLoggedIn: {
 			type: Boolean,
 			default: false,

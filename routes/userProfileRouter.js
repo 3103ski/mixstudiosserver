@@ -312,9 +312,16 @@ userProfileRouter
 					user.following.push(req.body.idToFollow);
 					user.save();
 
-					res.statusCode = 200;
-					res.setHeader('Content-Type', 'application/json');
-					res.json(user.following);
+					return UserProfile.findOne({ _id: req.body.idToFollow }).then((profile) => {
+						if (profile) {
+							profile.followers.push(req.user._id);
+							profile.save();
+
+							res.statusCode = 200;
+							res.setHeader('Content-Type', 'application/json');
+							res.json(user.following);
+						}
+					});
 				} else {
 					res.statusCode = 500;
 					res.setHeader('Content-Type', 'application/json');
@@ -345,9 +352,25 @@ userProfileRouter
 					user.following = updatedFollowing;
 					user.save();
 
-					res.statusCode = 200;
-					res.setHeader('Content-Type', 'application/json');
-					res.json(user.following);
+					return UserProfile.findOne({ _id: req.body.idToFollow }).then((profile) => {
+						if (profile) {
+							let updatedFollowers = profile.followers
+								.map((id) => {
+									if (id.toString() === req.user._id.toString()) {
+										return null;
+									} else {
+										return id;
+									}
+								})
+								.filter((id) => id !== null);
+							profile.followers = updatedFollowers;
+							profile.save();
+
+							res.statusCode = 200;
+							res.setHeader('Content-Type', 'application/json');
+							res.json(user.following);
+						}
+					});
 				} else {
 					res.statusCode = 500;
 					res.setHeader('Content-Type', 'application/json');
