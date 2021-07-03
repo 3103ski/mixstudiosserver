@@ -15,10 +15,10 @@ const utilitySocketEvents = (socket) => {
 				if (results.length > 0) {
 					result.styleInfo.soundsLike.map(async (sl) => {
 						console.log(sl);
-						if (sl) {
+						if (
 							sl.toLowerCase().includes(artist.toLowerCase()) &&
-								!matches.includes(sl.toLowerCase());
-						} else {
+							!matches.includes(sl.toLowerCase())
+						) {
 							await matches.push(sl.toLowerCase());
 						}
 						return null;
