@@ -189,7 +189,7 @@ portfolioEntryRouter
 portfolioEntryRouter
 	.route('/fetch-full-portfolio/:userId')
 	.options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
-	.get(cors.cors, auth.verifyUser, (req, res, next) => {
+	.get(cors.cors, (req, res, next) => {
 		const id = req.params.userId;
 		if (id !== null && id !== undefined) {
 			PortfolioEntry.find({ userId: id })
