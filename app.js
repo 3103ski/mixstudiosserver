@@ -22,6 +22,8 @@ const updateReportRouter = require('./routes/utilityFormsRouter/updateReportRout
 const activityRouter = require('./routes/feedsRoutes/activityFeedRouter');
 const studioFeedRouter = require('./routes/feedsRoutes/studioFeedRouter');
 
+const userPicUploadRouter = require('./routes/s3Storage/userPics');
+
 // Connecting Database
 const mongoose = require('mongoose');
 
@@ -76,6 +78,8 @@ app.use('/bug-reports', bugReportRouter);
 app.use('/update-report', updateReportRouter);
 
 app.use('/avatars', avatarUploadRouter);
+
+app.use('/user-pics', userPicUploadRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

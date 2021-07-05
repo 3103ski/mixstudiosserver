@@ -403,6 +403,7 @@ userProfileRouter
 				{ new: true }
 			)
 				.then((userProfile) => {
+					console.log('will send back this :: ', userProfile);
 					res.statusCode = 200;
 					res.setHeader('Content-Type', 'application/json');
 					res.json(userProfile);

@@ -19,6 +19,14 @@ const userProfileSchema = new Schema(
 			bio: {
 				type: String,
 			},
+			extendedBio: {
+				type: String,
+				default: '',
+			},
+			userPics: {
+				type: Array,
+				default: [],
+			},
 			firstName: {
 				type: String,
 				required: true,
