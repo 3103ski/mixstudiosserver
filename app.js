@@ -23,7 +23,7 @@ const activityRouter = require('./routes/feedsRoutes/activityFeedRouter');
 const studioFeedRouter = require('./routes/feedsRoutes/studioFeedRouter');
 
 const userPicUploadRouter = require('./routes/s3Storage/userPics');
-const { AWS_SECRET_ACCESS_KEY } = require('./config');
+const { AWS_SECRET } = require('./config');
 
 // Connecting Database
 const mongoose = require('mongoose');
@@ -45,7 +45,7 @@ connect.then(
 
 // Initializing express app
 const app = express();
-console.log('in app.js :: config ::', AWS_SECRET_ACCESS_KEY);
+console.log('in app.js :: config ::', AWS_SECRET);
 console.log('in app.js :: env ::', process.env.AWS_SECRET_KEY);
 console.log('in app.js :: env :: ', process.env.FACEBOOK_CLIENT_ID);
 console.log('in app.js :: env :: ', process.env.NUM_TEST);
