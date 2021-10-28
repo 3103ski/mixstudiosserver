@@ -7,10 +7,11 @@ const AWS = require('aws-sdk');
 const FileType = require('file-type');
 const multiparty = require('multiparty');
 const fs = require('fs');
+const { AWS_KEY, AWS_SECRET } = require('../../config.js');
 
 AWS.config.update({
-	accessKeyId: 'AKIARRLEMNTVUSD22Y45',
-	secretAccessKey: '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',
+	accessKeyId: AWS_KEY,
+	secretAccessKey: AWS_SECRET,
 });
 
 const s3 = new AWS.S3();

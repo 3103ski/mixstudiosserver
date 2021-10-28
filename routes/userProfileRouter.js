@@ -10,14 +10,15 @@ const FileType = require('file-type');
 
 // const SoundsLikeObject = require('../models/users/soundsLikeObject');
 const UserProfile = require('../models/users/userProfile');
+const { AWS_KEY, AWS_SECRET } = require('../config.js');
 
 const userProfileRouter = express.Router();
 
 // Amazon s3 for avatar bucket
 
 AWS.config.update({
-	accessKeyId: 'AKIARRLEMNTVUSD22Y45',
-	secretAccessKey: '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',
+	accessKeyId: AWS_KEY,
+	secretAccessKey: AWS_SECRET,
 });
 
 const s3 = new AWS.S3();

@@ -8,14 +8,16 @@ const LocalStrategy = require('passport-local').Strategy;
 const JwtStrategy = require('passport-jwt').Strategy;
 const ExtractJwt = require('passport-jwt').ExtractJwt;
 
+const { AWS_KEY, AWS_SECRET } = require('./config.js');
+
 const FacebookTokenStrategy = require('passport-facebook-token');
 const GoogleTokenStrategy = require('passport-token-google2').Strategy;
 
 // Amazon s3 for avatar bucket
 
 AWS.config.update({
-	accessKeyId: 'AKIARRLEMNTVUSD22Y45',
-	secretAccessKey: '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',
+	accessKeyId: AWS_KEY,
+	secretAccessKey: AWS_SECRET,
 });
 
 const s3 = new AWS.S3();
