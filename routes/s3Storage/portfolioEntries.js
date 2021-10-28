@@ -9,8 +9,8 @@ const multiparty = require('multiparty');
 const fs = require('fs');
 
 AWS.config.update({
-	accessKeyId: 'AKIARRLEMNTVQBYT73P7',
-	secretAccessKey: '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',
+	accessKeyId: 'AKIARRLEMNTVUSD22Y45',
+	secretAccessKey: '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',
 });
 
 const s3 = new AWS.S3();

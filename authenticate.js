@@ -14,8 +14,8 @@ const GoogleTokenStrategy = require('passport-token-google2').Strategy;
 // Amazon s3 for avatar bucket
 
 AWS.config.update({
-	accessKeyId: 'AKIARRLEMNTVQBYT73P7',
-	secretAccessKey: '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',
+	accessKeyId: 'AKIARRLEMNTVUSD22Y45',
+	secretAccessKey: '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',
 });
 
 const s3 = new AWS.S3();
@@ -53,6 +53,7 @@ opts.secretOrKey = config.secretKey;
 // STRATEGIES
 exports.jwtPassport = passport.use(
 	new JwtStrategy(opts, (jwt_payload, done) => {
+		console.log('it happened here');
 		User.findOne({ _id: jwt_payload._id }, (err, user) => {
 			if (err) {
 				return done(err, false);
