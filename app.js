@@ -96,5 +96,5 @@ app.use(function (err, req, res, next) {
 	res.render('error');
 });
 
-console.log('how app sees env:: ', process.env.AWS_SECRET_ACCESS_KEY);
+console.log('how app sees env:: ', process.env.TEST_VAR);
 module.exports = app;

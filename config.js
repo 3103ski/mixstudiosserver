@@ -17,3 +17,5 @@ module.exports = {
 		clientSecret: '1624e159dc854fa88ad3357d5f6b9456',
 	},
 };
+
+console.log('how config sees env:: ', process.env.TEST_VAR);
