@@ -1,3 +1,4 @@
+require('dotenv').config();
 // Middleware
 const createError = require('http-errors');
 const express = require('express');
@@ -24,8 +25,6 @@ const studioFeedRouter = require('./routes/feedsRoutes/studioFeedRouter');
 
 const userPicUploadRouter = require('./routes/s3Storage/userPics');
 const { AWS_SECRET_ACCESS_KEY } = require('./config');
-
-require('dotenv').config();
 
 // Connecting Database
 const mongoose = require('mongoose');
