@@ -7,6 +7,7 @@ const AWS = require('aws-sdk');
 const FileType = require('file-type');
 const multiparty = require('multiparty');
 const fs = require('fs');
+const 
 const { AWS_KEY, AWS_SECRET } = require('../../config.js');
 
 AWS.config.update({
