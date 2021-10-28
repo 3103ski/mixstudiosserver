@@ -23,6 +23,7 @@ const activityRouter = require('./routes/feedsRoutes/activityFeedRouter');
 const studioFeedRouter = require('./routes/feedsRoutes/studioFeedRouter');
 
 const userPicUploadRouter = require('./routes/s3Storage/userPics');
+const { AWS_SECRET_ACCESS_KEY } = require('./config');
 
 require('dotenv').config();
 
@@ -46,7 +47,8 @@ connect.then(
 
 // Initializing express app
 const app = express();
-
+console.log('in app.js from config?', AWS_SECRET_ACCESS_KEY);
+console.log('in app.js from process num test', process.env.NUM_TEST);
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');

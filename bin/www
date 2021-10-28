@@ -45,8 +45,6 @@ const secureServer = https.createServer(httpsOptions, app);
 
 secureServer.listen(app.get('secPort'), () => {
 	console.log('HTTPS listening on port', app.get('secPort'));
-	console.log('in www from config?', AWS_SECRET_ACCESS_KEY);
-	console.log('in www from process num test', process.env.NUM_TEST);
 });
 secureServer.on('error', onError);
 secureServer.on('listening', onListening);
