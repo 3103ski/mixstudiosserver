@@ -8,7 +8,14 @@ const LocalStrategy = require('passport-local').Strategy;
 const JwtStrategy = require('passport-jwt').Strategy;
 const ExtractJwt = require('passport-jwt').ExtractJwt;
 
-const { AWS_KEY, AWS_SECRET } = require('./config.js');
+const {
+	AWS_KEY,
+	AWS_SECRET,
+	GOOGLE_CLIENT_ID,
+	GOOGLE_CLIENT_SECRET,
+	FACEBOOK_CLIENT_ID,
+	FACEBOOK_CLIENT_SECRET,
+} = require('./config.js').credentials;
 
 const FacebookTokenStrategy = require('passport-facebook-token');
 const GoogleTokenStrategy = require('passport-token-google2').Strategy;
@@ -74,8 +81,8 @@ exports.jwtPassport = passport.use(
 exports.googleStrategy = passport.use(
 	new GoogleTokenStrategy(
 		{
-			clientID: config.google.clientID,
-			clientSecret: config.google.clientSecret,
+			clientID: GOOGLE_CLIENT_ID,
+			clientSecret: GOOGLE_CLIENT_SECRET,
 		},
 		async function (accessToken, refreshToken, profile, done) {
 			User.findOne({ googleId: profile.id }, async (err, user) => {
@@ -136,8 +143,8 @@ exports.googleStrategy = passport.use(
 exports.facebookPassport = passport.use(
 	new FacebookTokenStrategy(
 		{
-			clientID: config.facebook.clientID,
-			clientSecret: config.facebook.clientSecret,
+			clientID: FACEBOOK_CLIENT_ID,
+			clientSecret: FACEBOOK_CLIENT_SECRET,
 			fbGraphVersion: 'v3.0',
 		},
 		function (accessToken, refreshToken, profile, done) {

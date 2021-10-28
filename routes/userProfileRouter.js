@@ -10,7 +10,7 @@ const FileType = require('file-type');
 
 // const SoundsLikeObject = require('../models/users/soundsLikeObject');
 const UserProfile = require('../models/users/userProfile');
-const { AWS_KEY, AWS_SECRET } = require('../config.js');
+const { AWS_KEY, AWS_SECRET } = require('../config.js').credentials;
 
 const userProfileRouter = express.Router();
 
