@@ -34,7 +34,7 @@ server.listen(port, () => {
 server.on('error', onError);
 server.on('listening', onListening);
 
-console.log('This work correctly?', process.env.AWS_SECRET_ACCESS_KEY)
+console.log('http env?', process.env);
 io = socketio(server);
 
 const httpsOptions = {
@@ -46,6 +46,7 @@ const secureServer = https.createServer(httpsOptions, app);
 
 secureServer.listen(app.get('secPort'), () => {
 	console.log('HTTPS listening on port', app.get('secPort'));
+	console.log('https env?', process.env)
 });
 secureServer.on('error', onError);
 secureServer.on('listening', onListening);
