@@ -18,4 +18,5 @@ module.exports = {
 	},
 };
 
-console.log('how config sees env:: ', process.env.TEST_VAR);
+console.log('fb cid:: ', process.env.FACEBOOK_CLIENT_ID);
+console.log('NUM TEST:: ', process.env.NUM_TEST);
