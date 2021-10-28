@@ -17,6 +17,3 @@ module.exports = {
 		clientSecret: '1624e159dc854fa88ad3357d5f6b9456',
 	},
 };
-
-console.log('fb cid:: ', process.env.FACEBOOK_CLIENT_ID);
-console.log('NUM TEST:: ', process.env.NUM_TEST);

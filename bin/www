@@ -12,13 +12,13 @@ const socketio = require('socket.io', { path: '/' });
 const threadSocketEvents = require('../webSockets/commentThreads/thread');
 const { messengerSocketEvents } = require('../webSockets/messenger/messenger');
 const { utilitySocketEvents } = require('../webSockets/utilitySockets/utilitySockets');
+const { AWS_SECRET_ACCESS_KEY } = require('../config');
 
 //•••••••••••••••••••••••••••
 //•••••••••••••••••••••••••••
 
 // Get port from environment and store in Express.
 var port = normalizePort(process.env.PORT || '8080');
-
 
 app.set('port', port);
 app.set('secPort', port + 443);
@@ -45,7 +45,8 @@ const secureServer = https.createServer(httpsOptions, app);
 
 secureServer.listen(app.get('secPort'), () => {
 	console.log('HTTPS listening on port', app.get('secPort'));
-	console.log('https env?', process.env.AWS_SECRET_ACCESS_KEY)
+	console.log('in www from config?', AWS_SECRET_ACCESS_KEY);
+	console.log('in www from process num test', process.env.NUM_TEST);
 });
 secureServer.on('error', onError);
 secureServer.on('listening', onListening);
