@@ -1,4 +1,3 @@
-require('dotenv').config();
 // Middleware
 const createError = require('http-errors');
 const express = require('express');
