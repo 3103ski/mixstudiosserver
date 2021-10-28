@@ -97,4 +97,5 @@ app.use(function (err, req, res, next) {
 });
 
 console.log('how app sees env:: ', process.env.TEST_VAR);
+console.log('how app sees bashrc:: ', process.env.TEST_BASHRC);
 module.exports = app;
