@@ -92,7 +92,9 @@ avatarUploadRouter
 					}
 				})
 				.catch((err) => {
+					console.log('upload saw an ERR');
 					if (err && err.statusCode === 404) {
+						console.log('upload saw a 404');
 						uploadAvatar(buffer, req.user._id.toString(), type)
 							.then((s3Res) => {
 								User.findById(req.user._id)
