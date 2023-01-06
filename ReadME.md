@@ -1,4 +1,5 @@
-ssh -i "mixstudiosaws.pem" ubuntu@ec2-3-141-97-2.us-east-2.compute.amazonaws.com
+NO LONGER OPERATIONAL -- REBUILDING
+
 
 # Mix Studios API
 
